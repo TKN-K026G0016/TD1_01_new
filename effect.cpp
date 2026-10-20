@@ -434,7 +434,7 @@ PlayerDamageEffect playerDamageEffect;
 #pragma region データ: EnemyDamageEffect
 
 struct EnemyDamageEffect {
-	int createTriangleLimit = 1;
+	int createTriangleLimit = 2;
 	float triangleSizeValue = 30.0f;
 	float triangleMoveSpeed = 30.0f;
 
