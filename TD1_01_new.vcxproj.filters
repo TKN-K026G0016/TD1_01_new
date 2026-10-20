@@ -23,6 +23,21 @@
     <Filter Include="audio\bgm">
       <UniqueIdentifier>{1e1694d4-a0b4-4453-8c9f-7fa97320e5c4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="boss_enemy">
+      <UniqueIdentifier>{3c071f8b-13a2-498e-888c-9db162fe17f9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="enemy">
+      <UniqueIdentifier>{276f058a-e057-4f5d-b453-31ace8f7c1e9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="enemy\enemy_bullet">
+      <UniqueIdentifier>{39fbc579-caec-4631-b0d6-09c3e5abacd5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="effect">
+      <UniqueIdentifier>{c6848193-ee73-40fb-b931-365a135e19c6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="gem">
+      <UniqueIdentifier>{4945e8bf-01a1-4280-9743-e655adc7e40f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
@@ -31,9 +46,6 @@
     </ClCompile>
     <ClCompile Include="bgm.cpp">
       <Filter>audio\bgm</Filter>
-    </ClCompile>
-    <ClCompile Include="boss_enemy.cpp">
-      <Filter>KamataEngine</Filter>
     </ClCompile>
     <ClCompile Include="clear.cpp">
       <Filter>KamataEngine</Filter>
@@ -44,22 +56,10 @@
     <ClCompile Include="credits.cpp">
       <Filter>KamataEngine</Filter>
     </ClCompile>
-    <ClCompile Include="effect.cpp">
-      <Filter>KamataEngine</Filter>
-    </ClCompile>
     <ClCompile Include="elec_bullet.cpp">
       <Filter>KamataEngine</Filter>
     </ClCompile>
-    <ClCompile Include="enemy.cpp">
-      <Filter>KamataEngine</Filter>
-    </ClCompile>
-    <ClCompile Include="enemy_bullet.cpp">
-      <Filter>KamataEngine</Filter>
-    </ClCompile>
     <ClCompile Include="gameover.cpp">
-      <Filter>KamataEngine</Filter>
-    </ClCompile>
-    <ClCompile Include="gem.cpp">
       <Filter>KamataEngine</Filter>
     </ClCompile>
     <ClCompile Include="guide.cpp">
@@ -115,6 +115,21 @@
     </ClCompile>
     <ClCompile Include="se.cpp">
       <Filter>audio\se</Filter>
+    </ClCompile>
+    <ClCompile Include="boss_enemy.cpp">
+      <Filter>boss_enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="enemy_bullet.cpp">
+      <Filter>enemy\enemy_bullet</Filter>
+    </ClCompile>
+    <ClCompile Include="enemy.cpp">
+      <Filter>enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="effect.cpp">
+      <Filter>effect</Filter>
+    </ClCompile>
+    <ClCompile Include="gem.cpp">
+      <Filter>gem</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -205,16 +220,11 @@
     <ClInclude Include="common.h" />
     <ClInclude Include="matrix.h" />
     <ClInclude Include="vector2.h" />
-    <ClInclude Include="boss_enemy.h" />
     <ClInclude Include="clear.h" />
     <ClInclude Include="collision_manager.h" />
     <ClInclude Include="credits.h" />
-    <ClInclude Include="effect.h" />
     <ClInclude Include="elec_bullet.h" />
-    <ClInclude Include="enemy.h" />
-    <ClInclude Include="enemy_bullet.h" />
     <ClInclude Include="gameover.h" />
-    <ClInclude Include="gem.h" />
     <ClInclude Include="guide.h" />
     <ClInclude Include="input.h" />
     <ClInclude Include="pause.h" />
@@ -234,6 +244,21 @@
     <ClInclude Include="tool.h" />
     <ClInclude Include="se.h">
       <Filter>audio\se</Filter>
+    </ClInclude>
+    <ClInclude Include="boss_enemy.h">
+      <Filter>boss_enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="enemy_bullet.h">
+      <Filter>enemy\enemy_bullet</Filter>
+    </ClInclude>
+    <ClInclude Include="enemy.h">
+      <Filter>enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="effect.h">
+      <Filter>effect</Filter>
+    </ClInclude>
+    <ClInclude Include="gem.h">
+      <Filter>gem</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
