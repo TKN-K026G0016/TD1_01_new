@@ -4,6 +4,7 @@
 #include "se.h"
 #include "score_data.h"
 #include "effect.h"
+#include "bgm.h"
 
 #include "common.h"
 #include "texture.h"
@@ -258,6 +259,7 @@ static void UpdateMenuBackground(void) {
 				menuBackground.easingT = 0.0f;
 
 				ChangeSceneImmediate(Scene::Title);
+				ResetBgmVolume();
 			}
 		}
 

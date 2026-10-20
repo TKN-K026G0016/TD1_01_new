@@ -32,8 +32,8 @@ void InitTexture(void) {
 		//Title
 		//===============
 		{ Novice::LoadTexture("./resources/texture/ui/title/title_logo.png"), { 640, 256 }, {0, 0}, 0, 0, WHITE },
-		{ Novice::LoadTexture("./resources/texture/ui/title/inst_shot.png"), { 640, 64 }, {0, 0}, 0, 0, WHITE },
-		{ Novice::LoadTexture("./resources/texture/ui/title/inst_start.png"), { 640, 64 }, {0, 0}, 0, 0, WHITE },
+		{ Novice::LoadTexture("./resources/texture/ui/title/inst_shot.png"), { 640, 128 }, {0, 0}, 0, 0, WHITE },
+		{ Novice::LoadTexture("./resources/texture/ui/title/inst_start.png"), { 640, 128 }, {0, 0}, 0, 0, WHITE },
 
 		{ Novice::LoadTexture("./resources/texture/ui/title/credits_button.png"), { 80, 80 }, {0, 0}, 0, 0, WHITE },
 		{ Novice::LoadTexture("./resources/texture/ui/title/reset_score_button.png"), { 80, 80 }, {0, 0}, 0, 0, WHITE },

@@ -260,8 +260,6 @@ static void InitScore(void) {
 }
 
 static void MoveScoreIcon(void) {
-
-
 	//アイコンの移動処理
 	scoreIcon.pos.x = UpdateValueByEasing(scoreIcon.standbyPosX, scoreIcon.showPosX, clearIcon.easingT, clearIcon.easingMode);
 	maxComboIcon.pos.x = UpdateValueByEasing(maxComboIcon.standbyPosX, maxComboIcon.showPosX, clearIcon.easingT, clearIcon.easingMode);
@@ -362,6 +360,10 @@ static void CheckBreakScore(void) {
 
 		//演出実装
 		CreateFlashPanel();
+
+		if (CheckIsPlayingSe(SeType::StageClearJingle)) {
+			StopPlayingSe(SeType::StageClearJingle);
+		}
 
 		PlaySe(SeType::BreakScoreJingle);
 
@@ -616,11 +618,13 @@ void UpdateClear(void) {
 void DrawClear(void) {
 	DrawTitleBackground();
 
+	DrawEffect();
+
 	DrawMenuBackground();
 
 	DrawIcon();
 	DrawScore();
 	DrawButton();
 
-	DrawEffect();
+
 }

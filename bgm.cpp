@@ -3,7 +3,7 @@
 #include "tool.h"
 
 #include <Novice.h>
-
+#include <algorithm>
 
 struct BGM {
 	int aHandle = -1;
@@ -29,7 +29,7 @@ struct BGMFader {
 	ModeBgmFade nowMode = ModeBgmFade::Standby;
 
 	float fadeSpeed = 0.01f;
-	float fadeOutSpeed = 0.005f;
+	float fadeOutSpeed = 0.01f;
 
 	Timer waitPlayTimer = { 120, 0 };
 };
@@ -78,9 +78,9 @@ void InitBgm(void) {
 		{Novice::LoadAudio("./NoviceResources/mokugyo.wav"), 1.0f},
 
 		//Title
-		{Novice::LoadAudio("./NoviceResources/mokugyo.wav"), 1.0f},
+		{Novice::LoadAudio("./resources/sound/bgm/title.wav"), 0.6f},
 		//Stage
-		{Novice::LoadAudio("./NoviceResources/mokugyo.wav"), 1.0f},
+		{Novice::LoadAudio("./resources/sound/bgm/stage.wav"), 1.0f},
 		//Boss
 		{Novice::LoadAudio("./NoviceResources/mokugyo.wav"), 1.0f},
 
@@ -129,4 +129,17 @@ void ChangeModeBgmFade(ModeBgmFade mode) {
 
 void ChangeNextBgmType(BgmType type) {
 	nextType = type;
+}
+
+void ChangeBgmVolume(float volume) {
+	volume = std::clamp(volume, 0.0f, 1.0f);
+
+	bgmVolume = volume;
+
+	Novice::SetAudioVolume(playHandle, bgmVolume * bgms[ToInt(currentType)].volume);
+}
+
+void ResetBgmVolume(void) {
+	bgmVolume = 1.0f;
+	Novice::SetAudioVolume(playHandle, bgmVolume * bgms[ToInt(currentType)].volume);
 }

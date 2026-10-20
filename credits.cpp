@@ -2,6 +2,7 @@
 #include "scene_manager.h"
 #include "input.h"
 #include "se.h"
+#include "bgm.h"
 
 #include "common.h"
 #include "texture.h"
@@ -102,6 +103,7 @@ static CreditsContent credits;
 
 #pragma endregion
 
+
 #pragma region 関数: カバーパネル
 
 static void InitCoverPanel(void) {
@@ -146,6 +148,7 @@ static void UpdateMenuBackground(void) {
 				menuBackground.easingT = 0.0f;
 
 				ChangeSceneImmediate(Scene::Title);
+				ResetBgmVolume();
 			}
 		}
 
