@@ -18,6 +18,8 @@ enum class SeType {
 	Cancel,
 	MoveCursor,
 	Pause,
+
+	Flash,
 	
 	ResetHighScore,
 

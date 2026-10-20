@@ -149,7 +149,7 @@ constexpr float kShootDisLength = 15.0f;
 
 //チャージタイマー
 Timer chargeElecBulletTimer = { 40, 0 };
-float consumptionShootNormal = 0.5f;
+float consumptionShootNormal = 0.1f;
 float consumptionShootCharge = 10.0f;
 static bool isCharge = false;
 

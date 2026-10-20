@@ -619,6 +619,10 @@ static void UpdateFlashPanel(void) {
 		blackPanel.isShow = false;
 	}
 
+	if (flashPanel.easingT == flashPanel.startFadeOutEasingT) {
+		PlaySe(SeType::Flash);
+	}
+
 }
 
 static void DrawFlashPanel(void) {
