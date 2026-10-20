@@ -120,8 +120,3 @@ void TriggerDodgeClose(Vector2 eBulletPos);
 /// </summary>
 /// <returns>player.nowState</returns>
 PlayerState GetPlayerNowState(void);
-
-/// <summary>
-/// 体力ゲージ制のスイッチ確認
-/// </summary>
-bool GetLifeGaugeSwitch(void);
