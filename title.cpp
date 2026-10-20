@@ -108,6 +108,7 @@ TitleInst instStart;
 
 struct Button {
 	Vector2 pos = { };
+	Vector2 showPos = {};
 	Vector2 size = { 80, 80 };
 
 	float hitRadius = 64.0f;
@@ -404,11 +405,11 @@ static void DrawInst(void) {
 static void InitButton(void) {
 	creditsButton = {};
 	creditsButton.pos = creditsPos;
-	creditsButton.texture = GetTexture(TextureType::White1x1);
+	creditsButton.texture = GetTexture(TextureType::CreditsIcon);
 
 	resetButton = {};
 	resetButton.pos = resetPos;
-	resetButton.texture = GetTexture(TextureType::White1x1);
+	resetButton.texture = GetTexture(TextureType::ResetScoreIcon);
 }
 
 static void ChangeModeByCredits(void) {
@@ -508,28 +509,45 @@ static void UpdateButton(void) {
 		resetButton.hitTimer.count--;
 	}
 
-}
+#pragma region 振動処理
 
-static void DrawButton(void) {
-	Vector2 showPos;
-	Texture texture;
-
-#pragma region CreditsButton
-
-	showPos = creditsButton.pos;
+	creditsButton.showPos = creditsButton.pos;
 
 	if (creditsButton.hitTimer.count > 0) {
-		showPos.x += GetRand(-creditsButton.shakeDurationHit, creditsButton.shakeDurationHit);
-		showPos.y += GetRand(-creditsButton.shakeDurationHit, creditsButton.shakeDurationHit);
+		creditsButton.showPos.x += GetRand(-creditsButton.shakeDurationHit, creditsButton.shakeDurationHit);
+		creditsButton.showPos.y += GetRand(-creditsButton.shakeDurationHit, creditsButton.shakeDurationHit);
 	} else if (nowMode != ModeTitle::MovePlayer) {
 		creditsButton.shakeTimer.count++;
 		if (creditsButton.shakeTimer.count >= creditsButton.shakeTimer.time) {
 			creditsButton.shakeTimer.count = 0;
 
-			showPos.x += GetRand(-creditsButton.shakeDuration, creditsButton.shakeDuration);
-			showPos.y += GetRand(-creditsButton.shakeDuration, creditsButton.shakeDuration);
+			creditsButton.showPos.x += GetRand(-creditsButton.shakeDuration, creditsButton.shakeDuration);
+			creditsButton.showPos.y += GetRand(-creditsButton.shakeDuration, creditsButton.shakeDuration);
 		}
 	}
+
+	resetButton.showPos = resetButton.pos;
+
+	if (resetButton.hitTimer.count > 0) {
+		resetButton.showPos.x += GetRand(-resetButton.shakeDurationHit, resetButton.shakeDurationHit);
+		resetButton.showPos.y += GetRand(-resetButton.shakeDurationHit, resetButton.shakeDurationHit);
+	} else if (nowMode != ModeTitle::MovePlayer) {
+		resetButton.shakeTimer.count++;
+		if (resetButton.shakeTimer.count >= resetButton.shakeTimer.time) {
+			resetButton.shakeTimer.count = 0;
+
+			resetButton.showPos.x += GetRand(-resetButton.shakeDuration, resetButton.shakeDuration);
+			resetButton.showPos.y += GetRand(-resetButton.shakeDuration, resetButton.shakeDuration);
+		}
+	}
+
+#pragma endregion
+}
+
+static void DrawButton(void) {
+	Texture texture;
+
+#pragma region CreditsButton
 
 	//colorの変更
 	texture = creditsButton.texture;
@@ -537,26 +555,11 @@ static void DrawButton(void) {
 		texture.color = creditsButton.lightOutColor;
 	}
 
-	DrawTextureUI(texture, showPos, creditsButton.size);
+	DrawTextureUI(texture, creditsButton.showPos, creditsButton.size);
 
 #pragma endregion
 
 #pragma region resetButton
-
-	showPos = resetButton.pos;
-
-	if (resetButton.hitTimer.count > 0) {
-		showPos.x += GetRand(-resetButton.shakeDurationHit, resetButton.shakeDurationHit);
-		showPos.y += GetRand(-resetButton.shakeDurationHit, resetButton.shakeDurationHit);
-	} else if (nowMode != ModeTitle::MovePlayer) {
-		resetButton.shakeTimer.count++;
-		if (resetButton.shakeTimer.count >= resetButton.shakeTimer.time) {
-			resetButton.shakeTimer.count = 0;
-
-			showPos.x += GetRand(-resetButton.shakeDuration, resetButton.shakeDuration);
-			showPos.y += GetRand(-resetButton.shakeDuration, resetButton.shakeDuration);
-		}
-	}
 
 	//colorの変更
 	texture = resetButton.texture;
@@ -564,7 +567,7 @@ static void DrawButton(void) {
 		texture.color = resetButton.lightOutColor;
 	}
 
-	DrawTextureUI(texture, showPos, resetButton.size);
+	DrawTextureUI(texture, resetButton.showPos, resetButton.size);
 
 #pragma endregion
 

@@ -33,7 +33,13 @@ void InitTexture(void) {
 		//===============
 		{ Novice::LoadTexture("./resources/texture/ui/title/title_logo.png"), { 640, 256 }, {0, 0}, 0, 0, WHITE },
 		{ Novice::LoadTexture("./resources/texture/ui/title/inst_shot.png"), { 640, 64 }, {0, 0}, 0, 0, WHITE },
-			{ Novice::LoadTexture("./resources/texture/ui/title/inst_start.png"), { 640, 64 }, {0, 0}, 0, 0, WHITE },
+		{ Novice::LoadTexture("./resources/texture/ui/title/inst_start.png"), { 640, 64 }, {0, 0}, 0, 0, WHITE },
+
+		{ Novice::LoadTexture("./resources/texture/ui/title/credits_icon.png"), { 80, 80 }, {0, 0}, 0, 0, WHITE },
+		{ Novice::LoadTexture("./resources/texture/ui/title/reset_score_icon.png"), { 80, 80 }, {0, 0}, 0, 0, WHITE },
+
+		{ Novice::LoadTexture("./resources/texture/ui/title/credits_exit_button.png"), { 256, 64 }, {0, 0}, 0, 0, WHITE },
+		{ Novice::LoadTexture("./resources/texture/ui/title/reset_button.png"), { 256, 64 }, {0, 0}, 0, 0, WHITE },
 
 		{ Novice::LoadTexture("./resources/texture/ui/title/title_line.png"), { 1280, 2 }, {0, 0}, 0, 0, WHITE },
 		{ Novice::LoadTexture("./resources/texture/ui/title/title_effect.png"), { 1280, 720 }, {0, 0}, 0, 0, WHITE },
