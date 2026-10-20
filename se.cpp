@@ -40,7 +40,7 @@ void InitSe(void) {
 		//player
 		{Novice::LoadAudio("./resources/sound/se/player/shoot_bullet.wav"), 1.0f},
 		{Novice::LoadAudio("./resources/sound/se/player/shoot_charge_bullet.wav"), 1.0f},
-		{Novice::LoadAudio("./resources/sound/se/player/elec_shock.wav"), 0.5f},
+		{Novice::LoadAudio("./resources/sound/se/player/elec_shock.wav"), 0.4f},
 		{Novice::LoadAudio("./resources/sound/se/player/elec_shock_charge.wav"), 0.5f},
 		{Novice::LoadAudio("./resources/sound/se/player/charge.wav"), 0.5f},
 

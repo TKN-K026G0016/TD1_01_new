@@ -618,13 +618,11 @@ void UpdateClear(void) {
 void DrawClear(void) {
 	DrawTitleBackground();
 
-	DrawEffect();
-
 	DrawMenuBackground();
 
 	DrawIcon();
 	DrawScore();
 	DrawButton();
 
-
+	DrawEffect();
 }

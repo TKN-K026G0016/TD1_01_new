@@ -328,14 +328,14 @@ void SpawnElecShock(Vector2 pos, ElecBulletType type, ElecShockOriginType origin
 		if (type == ElecBulletType::Normal) {
 			CreateElecShockEffect(pos);
 			//Se
-			if (CheckIsPlayingSe(SeType::SpawnElecShock)) {
+			if (!CheckIsPlayingSe(SeType::SpawnElecShock)) {
 				PlaySe(SeType::SpawnElecShock);
 			}
 
 		} else if(type == ElecBulletType::Charge){
 			CreateElecShockChargedEffect(pos);
 			//Se
-			if (CheckIsPlayingSe(SeType::SpawnElecShockCharge)) {
+			if (!CheckIsPlayingSe(SeType::SpawnElecShockCharge)) {
 				PlaySe(SeType::SpawnElecShockCharge);
 			}
 		}
