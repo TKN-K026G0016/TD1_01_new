@@ -90,7 +90,7 @@ struct TitleInst {
 	EasingMode easingMode = EasingMode::EaseInOut;
 	float isFadeIn = true;
 
-	Timer waitEasingTimer = { 120, 0 };
+	Timer waitEasingTimer = { 100, 0 };
 
 	//透明度
 	int alpha = 0;
