@@ -38,6 +38,9 @@
     <Filter Include="gem">
       <UniqueIdentifier>{4945e8bf-01a1-4280-9743-e655adc7e40f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="collision_manager">
+      <UniqueIdentifier>{41a2d594-ef8c-4e5b-ab4a-882882c5580b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
@@ -48,9 +51,6 @@
       <Filter>audio\bgm</Filter>
     </ClCompile>
     <ClCompile Include="clear.cpp">
-      <Filter>KamataEngine</Filter>
-    </ClCompile>
-    <ClCompile Include="collision_manager.cpp">
       <Filter>KamataEngine</Filter>
     </ClCompile>
     <ClCompile Include="credits.cpp">
@@ -130,6 +130,9 @@
     </ClCompile>
     <ClCompile Include="gem.cpp">
       <Filter>gem</Filter>
+    </ClCompile>
+    <ClCompile Include="collision_manager.cpp">
+      <Filter>collision_manager</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -221,7 +224,6 @@
     <ClInclude Include="matrix.h" />
     <ClInclude Include="vector2.h" />
     <ClInclude Include="clear.h" />
-    <ClInclude Include="collision_manager.h" />
     <ClInclude Include="credits.h" />
     <ClInclude Include="elec_bullet.h" />
     <ClInclude Include="gameover.h" />
@@ -259,6 +261,9 @@
     </ClInclude>
     <ClInclude Include="gem.h">
       <Filter>gem</Filter>
+    </ClInclude>
+    <ClInclude Include="collision_manager.h">
+      <Filter>collision_manager</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
