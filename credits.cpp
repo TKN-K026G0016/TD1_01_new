@@ -18,7 +18,7 @@ struct CreditsCoverPanel {
 	Vector2 pos = kWindowCenter;
 	Vector2 size = { 1280, 720 };
 
-	unsigned int color = 0x000000AA;
+	unsigned int color = 0x000000DD;
 
 	Texture texture = {};
 };

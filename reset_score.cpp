@@ -3,6 +3,7 @@
 #include "input.h"
 #include "se.h"
 #include "score_data.h"
+#include "effect.h"
 
 #include "common.h"
 #include "texture.h"
@@ -127,7 +128,8 @@ struct ScoreManager {
 
 	int showScore = 0;
 
-	
+	int exploseLimit = 8;
+	Vector2 exploseRange = { 400, 30 };
 
 };
 static ScoreManager scoreManager;
@@ -187,6 +189,15 @@ static void Confirm(void) {
 
 			//初期化処理
 			ResetHighScore();
+
+			//爆発演出
+			for (int i = 0; i < scoreManager.exploseLimit; i++) {
+				Vector2 createPos;
+				createPos.x = scoreManager.pos.x + ToFloat(GetRand(0, ToInt(scoreManager.exploseRange.x)));
+				createPos.y = scoreManager.pos.y + ToFloat(GetRand(-ToInt(scoreManager.exploseRange.y), ToInt(scoreManager.exploseRange.y)));
+
+				CreateExplodeEffect(createPos, WHITE);
+			}
 
 
 		} else {
@@ -417,6 +428,7 @@ void InitResetScore(void) {
 
 	InitIcon();
 	InitScoreCount();
+	InitEffect();
 }
 
 void UpdateResetScore(void) {
@@ -427,6 +439,7 @@ void UpdateResetScore(void) {
 	UpdateIcon();
 	UpdateCursor();
 	UpdateScoreCount();
+	UpdateEffect();
 }
 
 void DrawResetScore(void) {
@@ -436,4 +449,5 @@ void DrawResetScore(void) {
 	DrawIcon();
 	DrawCursor();
 	DrawScoreCount();
+	DrawEffect();
 }
