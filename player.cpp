@@ -79,8 +79,8 @@ struct Player {
 	float lockOnRotateSpeed = 0.2f;
 
 
-	//<プレイヤー状態>
-	PlayerState nowState = PlayerState::Normal;
+	////<プレイヤー状態>
+	//PlayerState nowState = PlayerState::Normal;
 
 	//<射撃関係>
 	//射撃スパン
@@ -147,19 +147,13 @@ static Vector2 shootPos = {};
 //プレイヤーの中心からの発射位置の距離
 constexpr float kShootDisLength = 15.0f;
 
-//Lv2レーザーの持続時間
-int sustainLv2Count = 0;
-//Lv2レーザーの攻撃力倍率
-float laserPowRate = 1.0f;
-constexpr float kLaserPowRateMin = 1.0f;
-constexpr float kLaserPowRateMax = 3.0f;
-//火力の上昇速度
-constexpr float kLaserPowRateIncreaseSpeed = 0.01f;
-
 //チャージタイマー
 Timer chargeElecBulletTimer = { 40, 0 };
 float consumptionShootNormal = 0.5f;
 float consumptionShootCharge = 10.0f;
+static bool isCharge = false;
+
+float laserPowRate;
 
 #pragma endregion
 
@@ -332,8 +326,8 @@ static void MovePlayer(void) {
 		moveVec.y /= moveVecLength;
 	}
 
-	//異常発生時は移動速度を変更
-	float moveSpeed = (player.nowState == PlayerState::Normal) ? player.moveSpeed[0] : player.moveSpeed[1];
+	//energy量で移動速度を変更
+	float moveSpeed = (player.remainEnergy > 0.0f) ? player.moveSpeed[0] : player.moveSpeed[1];
 
 	player.pos.x += moveSpeed * moveVec.x;
 	player.pos.y += moveSpeed * moveVec.y;
@@ -671,8 +665,8 @@ static void UpdateShootPos(void) {
 static void ShootElecBullet(void) {
 	if (!player.isAlive) return;
 
-	//異常発生時は発射しない
-	if (player.nowState != PlayerState::Normal) return;
+	////異常発生時は発射しない
+	//if (player.nowState != PlayerState::Normal) return;
 
 	//押し
 	if (CheckInputAction(InputAction::Charge)) {
@@ -684,7 +678,13 @@ static void ShootElecBullet(void) {
 
 		//チャージ完了したら、エネルギー消費
 		if (chargeElecBulletTimer.count >= chargeElecBulletTimer.time) {
+
+			//一定量たまっていないと打てない
+			if (player.remainEnergy < consumptionShootCharge) return;
+
 			player.remainEnergy -= consumptionShootCharge;
+			isCharge = true;
+
 			if (player.remainEnergy < 0.0f) {
 				player.remainEnergy = 0.0f;
 			}
@@ -695,7 +695,7 @@ static void ShootElecBullet(void) {
 		if (chargeElecBulletTimer.count <= 0) return;
 
 		//通常弾
-		if (chargeElecBulletTimer.count < chargeElecBulletTimer.time) {
+		if (!isCharge) {
 			ShootElecBullet(shootPos, player.rotateTheta, ElecBulletType::Normal);
 			player.remainEnergy -= consumptionShootNormal;
 
@@ -708,6 +708,8 @@ static void ShootElecBullet(void) {
 
 			//SEの再生
 			PlaySe(SeType::ShootElecBulletCharge);
+
+			isCharge = false;
 		}
 
 		chargeElecBulletTimer.count = 0;
@@ -723,8 +725,6 @@ static void ConsumptionEnergy(void) {
 	if (!player.isAlive) return;
 	if (startEffectManager.nowMode != ModeStartEffect::Standby) return;
 
-	if (player.nowState != PlayerState::Normal) return;
-
 	player.remainEnergy -= kConsumptionEnergy;
 
 	if (player.remainEnergy <= 0.0f) {
@@ -738,17 +738,17 @@ static void ConsumptionEnergy(void) {
 /// </summary>
 /// <param name=""></param>
 static void CheckFailedMaintenance(void) {
-	if (!player.isAlive) return;
-	if (GetBossEnemyIsDead()) return;
+	//if (!player.isAlive) return;
+	//if (GetBossEnemyIsDead()) return;
 
-	if (player.nowState != PlayerState::Normal) return;
+	///*if (player.nowState != PlayerState::Normal) return;*/
 
-	//デンリョク不足
-	if (player.remainEnergy <= kEnergyMin) {
-		player.nowState = PlayerState::DeadEnergy;
-		player.remainEnergy = 0.0f;
-		chargeElecBulletTimer.count = 0;
-	}
+	////デンリョク不足
+	//if (player.remainEnergy <= kEnergyMin) {
+	//	player.nowState = PlayerState::DeadEnergy;
+	//	player.remainEnergy = 0.0f;
+	//	chargeElecBulletTimer.count = 0;
+	//}
 
 }
 
@@ -779,44 +779,44 @@ static void CheckFailedMaintenance(void) {
 /// <param name=""></param>
 static void UpdatePlayerEffect(void) {
 	//モードごとによる演出
-	switch (player.nowState) {
-	case PlayerState::DeadEnergy: {
-		//プレイヤーを青・黒に点灯させる処理
-
-#pragma region イージングでの点滅
-		if (colorManager.isGoToBlack) {
-			colorManager.easingT += colorManager.changeSpeed;
-			if (colorManager.easingT > 1.0f) {
-				colorManager.easingT = 1.0f;
-				//反転
-				colorManager.isGoToBlack = false;
-			}
-		} else {
-			colorManager.easingT -= colorManager.changeSpeed;
-			if (colorManager.easingT < 0.0f) {
-				colorManager.easingT = 0.0f;
-				//反転
-				colorManager.isGoToBlack = true;
-			}
-		}
-
-		colorManager.colorValue = UpdateValueByEasing(colorManager.colorValueMax, colorManager.colorValueMin, colorManager.easingT, EasingMode::EaseInOut);
-
-#pragma endregion
-
-		unsigned int newColor = (colorManager.colorValue << 24) | (colorManager.colorValue << 16) | (colorManager.colorValue << 8) | (0xFF);
-		player.texture.color = newColor;
-
-		break;
-	}
-	case PlayerState::Normal: {
-		player.texture.color = WHITE;
-		colorManager.isGoToBlack = true;
-		colorManager.easingT = 0.0f;
-
-		break;
-	}
-	}
+//	switch (player.nowState) {
+//	case PlayerState::DeadEnergy: {
+//		//プレイヤーを青・黒に点灯させる処理
+//
+//#pragma region イージングでの点滅
+//		if (colorManager.isGoToBlack) {
+//			colorManager.easingT += colorManager.changeSpeed;
+//			if (colorManager.easingT > 1.0f) {
+//				colorManager.easingT = 1.0f;
+//				//反転
+//				colorManager.isGoToBlack = false;
+//			}
+//		} else {
+//			colorManager.easingT -= colorManager.changeSpeed;
+//			if (colorManager.easingT < 0.0f) {
+//				colorManager.easingT = 0.0f;
+//				//反転
+//				colorManager.isGoToBlack = true;
+//			}
+//		}
+//
+//		colorManager.colorValue = UpdateValueByEasing(colorManager.colorValueMax, colorManager.colorValueMin, colorManager.easingT, EasingMode::EaseInOut);
+//
+//#pragma endregion
+//
+//		unsigned int newColor = (colorManager.colorValue << 24) | (colorManager.colorValue << 16) | (colorManager.colorValue << 8) | (0xFF);
+//		player.texture.color = newColor;
+//
+//		break;
+//	}
+//	case PlayerState::Normal: {
+//		player.texture.color = WHITE;
+//		colorManager.isGoToBlack = true;
+//		colorManager.easingT = 0.0f;
+//
+//		break;
+//	}
+//	}
 }
 
 /// <summary>
@@ -1201,8 +1201,8 @@ void TriggerDodgeClose(Vector2 eBulletPos) {
 	}
 }
 
-PlayerState GetPlayerNowState(void) {
-	return player.nowState;
-}
+//PlayerState GetPlayerNowState(void) {
+//	return player.nowState;
+//}
 
 #pragma endregion

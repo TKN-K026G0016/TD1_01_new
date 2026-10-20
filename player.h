@@ -115,8 +115,8 @@ float GetPlayerDodgeCloseRadius(void);
 /// <param name="eBulletPos">敵弾の座標</param>
 void TriggerDodgeClose(Vector2 eBulletPos);
 
-/// <summary>
-/// playerの現在状態を取得
-/// </summary>
-/// <returns>player.nowState</returns>
-PlayerState GetPlayerNowState(void);
+///// <summary>
+///// playerの現在状態を取得
+///// </summary>
+///// <returns>player.nowState</returns>
+//PlayerState GetPlayerNowState(void);

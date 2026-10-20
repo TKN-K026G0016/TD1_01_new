@@ -7,6 +7,7 @@
 #include "effect.h"
 #include "play_ui.h"
 #include "se.h"
+#include "bgm.h"
 
 #include "texture.h"
 #include "vector2.h"
@@ -423,6 +424,9 @@ static void UpdateStartEffect(void) {
 		if (goTelopTimer.count >= goTelopTimer.time) {
 			goTelopTimer.count = 0;
 			nowModeStart = ModeStartEffect::Standby;
+
+			//BGM再生
+			//PlayBgm(BgmType::Stage);
 		}
 
 		break;

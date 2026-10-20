@@ -76,6 +76,11 @@ void InitBgm(void) {
 
 		//sample
 		{Novice::LoadAudio("./NoviceResources/mokugyo.wav"), 1.0f},
+
+		{Novice::LoadAudio("./resources/sound/bgm/stage.wav"), 1.0f},
+		{Novice::LoadAudio("./resources/sound/bgm/stage.wav"), 0.5f},
+		{Novice::LoadAudio("./resources/sound/bgm/stage.wav"), 1.0f},
+
 	};
 
 	memcpy(bgms, temp, sizeof(bgms));
