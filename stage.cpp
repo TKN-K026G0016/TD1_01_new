@@ -7,6 +7,7 @@
 #include "effect.h"
 #include "play_ui.h"
 #include "se.h"
+#include "bgm.h"
 
 #include "texture.h"
 #include "vector2.h"
@@ -302,6 +303,9 @@ static void ChangeRound(void) {
 			//ボスの警告演出
 			isWarningBoss = true;
 			TriggerDangerDisplayEffect();
+
+			//Bgmの変更
+			ChangeModeBgmFade(ModeBgmFade::FadeOut);
 		}
 	}
 
@@ -423,6 +427,9 @@ static void UpdateStartEffect(void) {
 		if (goTelopTimer.count >= goTelopTimer.time) {
 			goTelopTimer.count = 0;
 			nowModeStart = ModeStartEffect::Standby;
+
+			//Bgm再生
+			PlayBgm(BgmType::Stage);
 		}
 
 		break;
@@ -466,6 +473,8 @@ static void UpdateWarningBoss(void) {
 		SpawnBoss({ 1200, 720 });
 		CancelDangerDisplayEffect();
 		CreateFlashPanel();
+
+		PlayBgm(BgmType::Boss);
 	}
 
 }
@@ -478,6 +487,8 @@ static void GoClearScene(void) {
 
 	//フェードアウトし始めたらスキップ
 	if (GetNowModeFade() != ModeFade::Standby) return;
+
+	ChangeModeBgmFade(ModeBgmFade::FadeOut);
 
 	goToClearTimer.count++;
 	if (goToClearTimer.count >= goToClearTimer.time) {

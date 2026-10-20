@@ -822,12 +822,16 @@ static void UpdateScore(void) {
 
 		scoreIcon.easingT += scoreIcon.easingSpeed;
 		if (scoreIcon.easingT > 1.0f) {
- 			scoreIcon.easingT = 1.0f;
-
-
+			scoreIcon.easingT = 1.0f;
 		}
 
- 		scoreIcon.showScore = UpdateValueByEasing(scoreIcon.startScore, scoreIcon.endScore, scoreIcon.easingT, EasingMode::Linear);
+		scoreIcon.showScore = UpdateValueByEasing(scoreIcon.startScore, scoreIcon.endScore, scoreIcon.easingT, EasingMode::Linear);
+
+		if (scoreIcon.easingT >= 1.0f) { 
+			scoreIcon.easingT = 0.0f; 
+			scoreIcon.showScore = scoreIcon.endScore;
+		}
+
 
 		PlaySe(SeType::CountUpScore);
 
@@ -1012,9 +1016,6 @@ static void UpdateBossTelop(void) {
 		if (bossTelop.easingT >= 1.0f) {
 			bossTelop.easingT = 1.0f;
 			bossTelop.isFadeIn = false;
-
-			/*PlaySe(SeType::WarningBossAlarm);*/
-
 		}
 
 	} else {

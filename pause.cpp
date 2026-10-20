@@ -2,6 +2,7 @@
 #include "input.h"
 #include "scene_manager.h"
 #include "se.h"
+#include "bgm.h"
 
 #include "texture.h"
 #include "tool.h"
@@ -240,6 +241,7 @@ static void ChangeScene(void) {
 		switch (nowSelect) {
 		case ModePauseSelect::Resume: {
 			ChangeSceneImmediate(Scene::Play);
+			ResumeBgm();
 
 			break;
 		}
@@ -368,6 +370,7 @@ static void DrawCursor(void) {
 
 void InitPause(void) {
 	PlaySe(SeType::Pause);
+	PauseBgm();
 
 	InitSelect();
 	InitIcon();

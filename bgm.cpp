@@ -80,9 +80,9 @@ void InitBgm(void) {
 		//Title
 		{Novice::LoadAudio("./resources/sound/bgm/title.wav"), 0.6f},
 		//Stage
-		{Novice::LoadAudio("./resources/sound/bgm/stage.wav"), 1.0f},
+		{Novice::LoadAudio("./resources/sound/bgm/stage.wav"), 0.6f},
 		//Boss
-		{Novice::LoadAudio("./NoviceResources/mokugyo.wav"), 1.0f},
+		{Novice::LoadAudio("./resources/sound/bgm/boss.wav"), 0.6f},
 
 
 	};

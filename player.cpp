@@ -8,6 +8,7 @@
 #include "boss_enemy.h"
 #include "play_ui.h"
 #include "se.h"
+#include "bgm.h"
 
 #include "vector2.h"
 #include "tool.h"
@@ -1003,6 +1004,8 @@ static void CheckDeadPlayer(void) {
 
 		//SE
 		PlaySe(SeType::DeadPlayer);
+
+		ChangeModeBgmFade(ModeBgmFade::FadeOut);
 
 	}
 }

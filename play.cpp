@@ -17,7 +17,7 @@
 #include <Novice.h>
 
 static void Pause(void) {
-	if (CheckInputAction(InputAction::Pause)) {
+	if (CheckInputAction(InputAction::Pause) && GetPlayerIsAlive()) {
 		ChangeScene(Scene::Pause);
 	}
 }
