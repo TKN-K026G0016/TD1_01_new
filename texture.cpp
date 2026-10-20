@@ -96,7 +96,7 @@ void InitTexture(void) {
 		//MapChip
 
 		//background
-		{ Novice::LoadTexture("./resources/texture/stage/background.png"), { 2560, 1440 }, {0, 0}, 0, 0, WHITE },
+		{ Novice::LoadTexture("./resources/texture/stage/background.png"), { 2960, 1840 }, {0, 0}, 0, 0, WHITE },
 
 		//UI
 		{ Novice::LoadTexture("./resources/texture/ui/play/life_icon.png"), { 64, 64 }, {0, 0}, 0, 0, WHITE },

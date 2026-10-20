@@ -148,7 +148,7 @@ float spawnPosOffset = 100;
 #pragma region データ: 背景
 struct BackGround {
 	Vector2 pos = { 1280, 720 };
-	Vector2 size = { 2560, 1440 };
+	Vector2 size = { 2960, 1840 };
 
 	float scrollRate = 1.0f;
 
