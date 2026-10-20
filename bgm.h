@@ -17,6 +17,10 @@ enum class BgmType {
 
 	Sample,
 
+	Title,
+	Stage,
+	Boss,
+
 	Count
 };
 
