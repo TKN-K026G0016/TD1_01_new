@@ -74,7 +74,7 @@ static constexpr int kScoreNumberLimit = 9;
 struct ScoreNumber {
 	Vector2 size = { 32, 64 };
 
-	Vector2 startPos = { 220, 300 };
+	Vector2 startPosOffset = { 220, 300 };
 	Vector2 interval = { 32, 0 };
 
 	int animNum = 0;
@@ -295,7 +295,7 @@ static void DrawScoreCount(void) {
 	if (ToInt(nowMode) < ToInt(ModeGameover::CountUpScore)) return;
 
 	for (int i = 0; i < kScoreNumberLimit; i++) {
-		Vector2 pos = { scoreNumbers[i].startPos.x + scoreNumbers[i].interval.x * (kScoreNumberLimit - i - 1), scoreNumbers[i].startPos.y };
+		Vector2 pos = { scoreNumbers[i].startPosOffset.x + scoreNumbers[i].interval.x * (kScoreNumberLimit - i - 1), scoreNumbers[i].startPosOffset.y };
 
 		Texture texture = scoreNumberTexture;
 		texture.animNum = scoreNumbers[i].animNum;

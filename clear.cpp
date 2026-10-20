@@ -50,7 +50,7 @@ static constexpr int kComboNumberLimit = 4;
 struct ScoreNumber {
 	Vector2 size = { 32, 64 };
 
-	Vector2 startPos = {};
+	Vector2 startPosOffset = {};
 	Vector2 interval = { 32, 0 };
 
 	float offsetY = -5;
@@ -269,11 +269,11 @@ static void MoveScoreIcon(void) {
 
 	//numberのstartPos変更
 	for (int i = 0; i < kScoreNumberLimit; i++) {
-		nowScoreNumbers[i].startPos = { scoreIcon.pos.x + nowScoreStartPosOffset,  scoreIcon.pos.y + nowScoreNumbers[i].offsetY };
-		bestScoreNumbers[i].startPos = { bestScoreIcon.pos.x + bestScoreStartPosOffset,  bestScoreIcon.pos.y + bestScoreNumbers[i].offsetY };
+		nowScoreNumbers[i].startPosOffset = { scoreIcon.pos.x + nowScoreStartPosOffset,  scoreIcon.pos.y + nowScoreNumbers[i].offsetY };
+		bestScoreNumbers[i].startPosOffset = { bestScoreIcon.pos.x + bestScoreStartPosOffset,  bestScoreIcon.pos.y + bestScoreNumbers[i].offsetY };
 	}
 	for (int i = 0; i < kComboNumberLimit; i++) {
-		maxComboNumbers[i].startPos = { maxComboIcon.pos.x + maxComboStartPosOffset,  maxComboIcon.pos.y + maxComboNumbers[i].offsetY };
+		maxComboNumbers[i].startPosOffset = { maxComboIcon.pos.x + maxComboStartPosOffset,  maxComboIcon.pos.y + maxComboNumbers[i].offsetY };
 	}
 }
 
@@ -319,7 +319,7 @@ static void DrawScore(void) {
 	for (int i = 0; i < kScoreNumberLimit; i++) {
 		nowScoreNumbers[i].animNum = GetValueAtDigit(scoreManager.showScore, i);
 
-		Vector2 pos = { nowScoreNumbers[i].startPos.x + nowScoreNumbers[i].interval.x * (kScoreNumberLimit - i - 1), nowScoreNumbers[i].startPos.y };
+		Vector2 pos = { nowScoreNumbers[i].startPosOffset.x + nowScoreNumbers[i].interval.x * (kScoreNumberLimit - i - 1), nowScoreNumbers[i].startPosOffset.y };
 
 		Texture texture = clearScoreNumbersTexture;
 		texture.animNum = nowScoreNumbers[i].animNum;
@@ -331,7 +331,7 @@ static void DrawScore(void) {
 	for (int i = 0; i < kComboNumberLimit; i++) {
 		maxComboNumbers[i].animNum = GetValueAtDigit(scoreManager.showMaxCombo, i);
 
-		Vector2 pos = { maxComboNumbers[i].startPos.x + maxComboNumbers[i].interval.x * (kScoreNumberLimit - i - 1), maxComboNumbers[i].startPos.y };
+		Vector2 pos = { maxComboNumbers[i].startPosOffset.x + maxComboNumbers[i].interval.x * (kScoreNumberLimit - i - 1), maxComboNumbers[i].startPosOffset.y };
 
 		Texture texture = clearScoreNumbersTexture;
 		texture.animNum = maxComboNumbers[i].animNum;
@@ -343,7 +343,7 @@ static void DrawScore(void) {
 	for (int i = 0; i < kScoreNumberLimit; i++) {
 		bestScoreNumbers[i].animNum = GetValueAtDigit(scoreManager.bestScore, i);
 
-		Vector2 pos = { bestScoreNumbers[i].startPos.x + bestScoreNumbers[i].interval.x * (kScoreNumberLimit - i - 1), bestScoreNumbers[i].startPos.y };
+		Vector2 pos = { bestScoreNumbers[i].startPosOffset.x + bestScoreNumbers[i].interval.x * (kScoreNumberLimit - i - 1), bestScoreNumbers[i].startPosOffset.y };
 
 		Texture texture = clearScoreNumbersTexture;
 		texture.animNum = bestScoreNumbers[i].animNum;
