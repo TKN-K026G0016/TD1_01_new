@@ -405,11 +405,11 @@ static void DrawInst(void) {
 static void InitButton(void) {
 	creditsButton = {};
 	creditsButton.pos = creditsPos;
-	creditsButton.texture = GetTexture(TextureType::CreditsIcon);
+	creditsButton.texture = GetTexture(TextureType::CreditsButton);
 
 	resetButton = {};
 	resetButton.pos = resetPos;
-	resetButton.texture = GetTexture(TextureType::ResetScoreIcon);
+	resetButton.texture = GetTexture(TextureType::ResetScoreButton);
 }
 
 static void ChangeModeByCredits(void) {
