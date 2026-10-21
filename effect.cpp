@@ -537,6 +537,16 @@ static RecoveryEnergyEffect recoveryEffect[kRecoveryEnergyEffectLimit];
 
 #pragma endregion
 
+#pragma region データ: BreakGemEffect
+
+struct BreakGemEffect {
+	float endSizeValue = 64;
+	unsigned int color = WHITE;
+};
+BreakGemEffect breakGemEffect;
+
+#pragma endregion
+
 #pragma region データ: BombExplosionEffect
 //爆発本体
 const int kBombExplosionEffectNumber = 4;
@@ -1887,6 +1897,14 @@ static void DrawRecoveryEffect(void) {
 	}
 }
 
+
+#pragma endregion
+
+#pragma region 関数: BreakGemEffect
+
+void CreateBreakGemEffect(Vector2 pos) {
+	CreateCircleEffect(pos, breakGemEffect.endSizeValue, breakGemEffect.color);
+}
 
 #pragma endregion
 

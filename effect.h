@@ -108,6 +108,12 @@ void CreatePlayerMoveEffect(Vector2 pos, Vector2 moveVec);
 /// </summary>
 void TriggerCreateRecoveryEffect(void);
 
+/// <summary>
+/// ジェムの破壊エフェクト生成処理
+/// </summary>
+/// <param name="pos">生成座標</param>
+void CreateBreakGemEffect(Vector2 pos);
+
 void CreateBombExplosionEffect(Vector2 pos, float endSizeValue, unsigned int color);
 
 void CreateFlashPanel(void);

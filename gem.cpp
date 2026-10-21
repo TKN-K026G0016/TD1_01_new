@@ -189,6 +189,8 @@ void SpawnGem(Vector2 pos, GemType type) {
 void BreakGem(int index) {
 	gem[index].isAlive = false;
 	gem[index].breakTimer.count = 0;
+
+	CreateBreakGemEffect(gem[index].pos);
 }
 
 Gem* GetGemArray(void) {
