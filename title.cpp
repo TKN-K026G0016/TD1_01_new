@@ -110,7 +110,7 @@ TitleInst instStart;
 struct Button {
 	Vector2 pos = { };
 	Vector2 showPos = {};
-	Vector2 size = { 80, 80 };
+	Vector2 size = { 256, 128 };
 
 	float hitRadius = 64.0f;
 
@@ -141,9 +141,9 @@ struct Button {
 	int alphaMax = 170;
 };
 Button creditsButton;
-Vector2 creditsPos = { 80, 640 };
+Vector2 creditsPos = { 90, 630 };
 Button resetButton;
-Vector2 resetPos = { 1200, 640 };
+Vector2 resetPos = { 1190, 630 };
 
 
 #pragma endregion
@@ -434,11 +434,11 @@ static void DrawInst(void) {
 static void InitButton(void) {
 	creditsButton = {};
 	creditsButton.pos = creditsPos;
-	creditsButton.texture = GetTexture(TextureType::CreditsButton);
+	creditsButton.texture = GetTexture(TextureType::CreditsButtonNew);
 
 	resetButton = {};
 	resetButton.pos = resetPos;
-	resetButton.texture = GetTexture(TextureType::ResetScoreButton);
+	resetButton.texture = GetTexture(TextureType::ResetScoreButtonNew);
 }
 
 static void ChangeModeByCredits(void) {

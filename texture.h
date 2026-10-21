@@ -44,11 +44,14 @@ enum class TextureType {
 	TitleInstStart,
 
 	CreditsButton,
+	CreditsButtonNew,
 	ResetScoreButton,
+	ResetScoreButtonNew,
 
 	CreditsIcon,
 	CreditsExitIcon,
 	CreditsContent,
+
 	ResetIcon,
 	ResetConfirmIcon,
 
