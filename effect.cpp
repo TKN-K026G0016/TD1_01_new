@@ -447,6 +447,8 @@ EnemyDamageEffect enemyDamageEffect;
 
 static constexpr int kPlayerMoveEffectLimit = 7;
 static Timer createPlayerMoveEffectTimer = { 7, 0 };
+//ブレる量
+int playerMoveEffectShakeAmp = 10;
 
 struct PlayerMoveEffect {
 	Vector2 pos = {};
@@ -462,26 +464,29 @@ struct PlayerMoveEffect {
 
 	//<イージング関係>
 	float easingT = 0;
-	float easingSpeed = 0.01f;
+	float easingSpeed = 0.03f;
 	EasingMode easingMode = EasingMode::EaseOut;
 
 	//サイズ関係
 	Vector2 size = {};
-	Vector2 sizeMax = { 30, 30 };
-	Vector2 sizeMin = { 5,5 };
+	Vector2 sizeMax = { 15, 15 };
+	Vector2 sizeMin = { 2,2 };
 
 	//移動速度関係
 	float moveSpeed = 0;
-	float moveSpeedMax = 20.0f;
+	float moveSpeedMax = 8.0f;
 	float moveSpeedMin = 0.1f;
 
 	//透明度関係
 	int alpha = 0;
+	int alphaMax = 80;
 };
 static PlayerMoveEffect playerMoveEffect[kPlayerMoveEffectLimit];
 
 
 #pragma endregion
+
+#pragma region 
 
 #pragma region データ: BombExplosionEffect
 //爆発本体
@@ -558,6 +563,8 @@ struct FlashPanel {
 static FlashPanel flashPanel;
 
 #pragma endregion
+
+
 
 #pragma region 関数: ジェム取得effect
 
@@ -1653,6 +1660,10 @@ void CreatePlayerMoveEffect(Vector2 pos, Vector2 moveVec) {
 		Vector2 effectMoveVec = { -moveVec.x, -moveVec.y };
 		playerMoveEffect[i].moveTheta = atan2f(effectMoveVec.y, effectMoveVec.x);
 
+		//ブレさせる処理
+		float shakeValue = ToFloat(GetRand(-playerMoveEffectShakeAmp, playerMoveEffectShakeAmp)) * (ToFloat(M_PI) / 180.0f);
+		playerMoveEffect[i].moveTheta += shakeValue;
+
 		//初期化処理
 		playerMoveEffect[i].easingT = 0.0f;
 		playerMoveEffect[i].moveSpeed = playerMoveEffect[i].moveSpeedMax;
@@ -1694,7 +1705,7 @@ void UpdatePlayerMoveEffect() {
 		playerMoveEffect[i].moveSpeed = UpdateValueByEasing(playerMoveEffect[i].moveSpeedMax, playerMoveEffect[i].moveSpeedMin, playerMoveEffect[i].easingT, playerMoveEffect[i].easingMode);
 
 		//透明度
-		playerMoveEffect[i].alpha = UpdateValueByEasing(kAlphaMax, kAlphaMin, playerMoveEffect[i].easingT, playerMoveEffect[i].easingMode);
+		playerMoveEffect[i].alpha = UpdateValueByEasing(playerMoveEffect[i].alphaMax, kAlphaMin, playerMoveEffect[i].easingT, playerMoveEffect[i].easingMode);
 
 #pragma endregion
 
