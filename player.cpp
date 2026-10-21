@@ -172,7 +172,7 @@ constexpr float kFirstEnergy = kEnergyMax;
 static constexpr float kConsumptionEnergy = 0.05f;
 
 //シールドが消えるエネルギー量のライン
-static constexpr float kBreakShieldLine = 10.0f;
+static constexpr float kBreakShieldLine = 5.0f;
 
 ////故障時のenergy回復量
 //constexpr float kRecoveryEnergyDuringEmpty = 0.15f;
@@ -885,7 +885,7 @@ static void InitElecShield(void) {
 
 static void UpdateElecShield(void) {
 	//シールドが十分な量存在したら
-	if (player.remainEnergy >= kBreakShieldLine) {
+	if (player.remainEnergy > kBreakShieldLine) {
 
 		//イージング処理
 		float easingSpeed = (player.remainEnergy >= kWarnEnergyLine) ? elecShield.easingSpeedNormal : elecShield.easingSpeedDanger;
@@ -904,7 +904,7 @@ static void UpdateElecShield(void) {
 		}
 	} else {
 
-		elecShield.easingT -= elecShield.easingSpeedNormal;
+		elecShield.easingT -= elecShield.easingSpeedDanger;
 		elecShield.isScaleUp = true;
 	}
 

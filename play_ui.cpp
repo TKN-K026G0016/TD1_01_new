@@ -43,9 +43,6 @@ struct EnergyGaugeFrame {
 	float warnDeadEnergy = 30.0f;
 	float dangerEnergy = 15.0f;
 
-	////過ジュウデン警告表示のタイミング
-	//float warnOverHeat = 75.0f;
-
 	//ケムリの生成範囲(frameのposを中心に)
 	Vector2i spawnSmokeRange = { 250, 60 };
 	//警告中の煙エフェクト生成スパン
@@ -55,9 +52,9 @@ struct EnergyGaugeFrame {
 
 	//ゲージエフェクトの生成スパン
 	Timer createGaugeEffectTimer = { 3, 0 };
-
-	////警告音SEのスパン
-	//Timer alarmSeTimer = { 60, 0 };
+	//振動の強さ
+	int shakeAmpNormal = 3;
+	int shakeAmpDamage = 5;
 
 	Texture texture = {};
 };
@@ -466,8 +463,8 @@ static void UpdateEnergyGauge(void) {
 
 		//振動処理
 		if (kGaugeShakeSwitch) {
-			energyGaugeFrame.viewPos.x = energyGaugeFrame.pos.x + GetRand(-2, 2);
-			energyGaugeFrame.viewPos.y = energyGaugeFrame.pos.y + GetRand(-2, 2);
+			energyGaugeFrame.viewPos.x = energyGaugeFrame.pos.x + GetRand(-energyGaugeFrame.shakeAmpNormal, energyGaugeFrame.shakeAmpNormal);
+			energyGaugeFrame.viewPos.y = energyGaugeFrame.pos.y + GetRand(-energyGaugeFrame.shakeAmpNormal, energyGaugeFrame.shakeAmpNormal);
 		}
 
 		//displayEFfect
@@ -492,8 +489,8 @@ static void UpdateEnergyGauge(void) {
 		gaugeShakeDamageTimer.count++;
 
 		if (kGaugeShakeSwitch) {
-			energyGaugeFrame.viewPos.x = energyGaugeFrame.pos.x + GetRand(-4, 4);
-			energyGaugeFrame.viewPos.y = energyGaugeFrame.pos.y + GetRand(-4, 4);
+			energyGaugeFrame.viewPos.x = energyGaugeFrame.pos.x + GetRand(-energyGaugeFrame.shakeAmpDamage, energyGaugeFrame.shakeAmpDamage);
+			energyGaugeFrame.viewPos.y = energyGaugeFrame.pos.y + GetRand(-energyGaugeFrame.shakeAmpDamage, energyGaugeFrame.shakeAmpDamage);
 		}
 
 	}
