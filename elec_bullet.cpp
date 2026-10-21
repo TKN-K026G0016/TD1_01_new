@@ -7,6 +7,7 @@
 #include "score_data.h"
 #include "scene_manager.h"
 #include "se.h"
+#include "stage.h"
 
 #include "vector2.h"
 #include "timer.h"
@@ -233,12 +234,16 @@ static void UpdateShockCombo(void) {
 			//コンボ終了ジングル
 			if (nowCombo > jingle3Combo) {
 				PlaySe(SeType::ComboJingle1000);
+
+				//フラッシュ演出
+				TriggerBackgroundFlash();
 			}
 			else if (nowCombo > jingle2Combo) {
 				PlaySe(SeType::ComboJingle100);
 			}
 			else if (nowCombo > jingle1Combo) {
 				PlaySe(SeType::ComboJingle10);
+	/*			TriggerBackgroundFlash();*/
 			}
 			
 			totalComboInCombo = 0;

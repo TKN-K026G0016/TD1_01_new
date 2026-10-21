@@ -50,3 +50,5 @@ TimeData GetBossRoundTimeData(void);
 ModeStartEffect GetNowModeStart(void);
 
 bool GetIsWarningBoss(void);
+
+void TriggerBackgroundFlash(void);

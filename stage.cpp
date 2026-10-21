@@ -155,7 +155,16 @@ struct BackGround {
 
 	float scrollRate = 1.0f;
 
+	bool isFlash = true;
+
+	float easingT = 0.0f;
+	float easingSpeed = 0.03f;
+	EasingMode easingMode = EasingMode::EaseInOut;
+	bool isFadeIn = true;
+
+	unsigned int nowColor = 0x240912FF;
 	unsigned int normalColor = 0x240912FF;
+	unsigned int combo1000Color = 0x91D2E8FF;
 
 	Texture texture = {};
 };
@@ -295,6 +304,51 @@ static void InitBackGround(void) {
 	scanLineTexture = GetTexture(TextureType::TitleLine);
 }
 
+static unsigned int LerpColor(
+	unsigned int startColor,
+	unsigned int endColor,
+	float t) {
+	int sr = (startColor >> 24) & 0xFF;
+	int sg = (startColor >> 16) & 0xFF;
+	int sb = (startColor >> 8) & 0xFF;
+	int sa = (startColor) & 0xFF;
+
+	int er = (endColor >> 24) & 0xFF;
+	int eg = (endColor >> 16) & 0xFF;
+	int eb = (endColor >> 8) & 0xFF;
+	int ea = (endColor) & 0xFF;
+
+	int r = static_cast<int>(sr + (er - sr) * t);
+	int g = static_cast<int>(sg + (eg - sg) * t);
+	int b = static_cast<int>(sb + (eb - sb) * t);
+	int a = static_cast<int>(sa + (ea - sa) * t);
+
+	return (r << 24) | (g << 16) | (b << 8) | a;
+}
+
+static void UpdateBackGround(void) {
+	if (!backGround.isFlash) return;
+
+	if (backGround.isFadeIn) {
+		backGround.easingT += backGround.easingSpeed;
+		if (backGround.easingT >= 1.0f) {
+			backGround.easingT = 1.0f;
+			backGround.isFadeIn = false;
+		}
+	} else {
+		backGround.easingT -= backGround.easingSpeed;
+		if (backGround.easingT <= 0.0f) {
+			backGround.easingT = 0.0f;
+			backGround.isFadeIn = true;
+			backGround.isFlash = false;
+		}
+	}
+
+	//色の変更
+
+	backGround.nowColor = LerpColor(backGround.normalColor, backGround.combo1000Color, backGround.easingT);
+}
+
 static void UpdateScanLine(void) {
 	for (int i = 0; i < kScanLineLimit; i++) {
 		scanLine[i].pos.y += scanLine[i].moveSpeed;
@@ -319,11 +373,17 @@ static void DrawScanLine(void) {
 
 static void DrawBackGround(void) {
 	Texture texture = backGround.texture;
-	texture.color = backGround.normalColor;
+	texture.color = backGround.nowColor;
 
 	DrawTextureBG(texture, backGround.pos, backGround.size, backGround.scrollRate);
 
 	DrawScanLine();
+}
+
+void TriggerBackgroundFlash(void) {
+	backGround.isFlash = true;
+	backGround.isFadeIn = true;
+	backGround.easingT = 0.0f;
 }
 
 #pragma endregion
@@ -579,6 +639,9 @@ void UpdateStage(void) {
 	//カメラ関係
 	MoveCameraPos();
 	ClampCameraPos();
+
+	//背景関係
+	UpdateBackGround();
 
 	//ラウンド関係
 	ChangeRound();

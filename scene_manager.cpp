@@ -51,7 +51,7 @@ static constexpr void (*DrawFuncs[ToInt(Scene::Count)])(void) = {
 };
 
 //現在のシーン
-static Scene nowScene = Scene::Clear;
+static Scene nowScene = Scene::Title;
 
 #pragma endregion
 

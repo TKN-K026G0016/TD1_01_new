@@ -691,7 +691,7 @@ static void DrawButton(void) {
 void InitClear(void) {
 #ifdef _DEBUG
 
-	AddScore(1000005);
+	//AddScore(1000005);
 
 #endif
 
