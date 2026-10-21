@@ -154,6 +154,9 @@ struct BackGround {
 	Vector2 size = { 2960, 1840 };
 
 	float scrollRate = 1.0f;
+
+	unsigned int normalColor = 0x240912FF;
+
 	Texture texture = {};
 };
 BackGround backGround;
@@ -315,7 +318,10 @@ static void DrawScanLine(void) {
 }
 
 static void DrawBackGround(void) {
-	DrawTextureBG(backGround.texture, backGround.pos, backGround.size, backGround.scrollRate);
+	Texture texture = backGround.texture;
+	texture.color = backGround.normalColor;
+
+	DrawTextureBG(texture, backGround.pos, backGround.size, backGround.scrollRate);
 
 	DrawScanLine();
 }
