@@ -494,8 +494,13 @@ static constexpr int kRecoveryEffectAfterimageLimit = 2;
 
 //何個生成するか
 static constexpr int kCreateRecoveryEffectLimit = 3;
+static int createRecoveryEffectCount = 0;
+//生成中フラグ
+static bool isCreateRecoveryEffect = false;
+static Timer createRecoveryEffectTimer = { 5, 0 };
+
 //recoveryEffectを生成する範囲
-static constexpr Vector2i kCreateRecoveryEffectPosRange = { 30, 10 };
+static constexpr Vector2i kCreateRecoveryEffectPosRange = { 30, 20 };
 
 
 struct RecoveryEnergyEffect {
@@ -505,7 +510,7 @@ struct RecoveryEnergyEffect {
 	bool isShoot = false;
 
 	//移動速度
-	float moveSpeed = 7.0f;
+	float moveSpeed = 8.0f;
 
 	//<回転関係>
 	float rotateTheta = 0.0f;
@@ -513,7 +518,7 @@ struct RecoveryEnergyEffect {
 
 	//<イージング関係>
 	float easingT = 0.0f;
-	float easingSpeed = 0.05f;
+	float easingSpeed = 0.04f;
 	EasingMode easingMode = EasingMode::EaseOut;
 
 	//透明度関係
@@ -1773,21 +1778,38 @@ void DrawPlayerMoveEffect() {
 
 #pragma region 関数: RecoveryEffect
 
-void CreateRecoveryEffect(Vector2 pos) {
+void TriggerCreateRecoveryEffect(void) {
+	isCreateRecoveryEffect = true;
+	createRecoveryEffectCount = 0;
+	createRecoveryEffectTimer.count = createRecoveryEffectTimer.time;
+}
 
-	for (int i = 0; i < kCreateRecoveryEffectLimit; i++) {
+static void CreateRecoveryEffect(void) {
+	if (!isCreateRecoveryEffect) return;
+
+	createRecoveryEffectTimer.count++;
+	if (createRecoveryEffectTimer.count >= createRecoveryEffectTimer.time) {
+		createRecoveryEffectTimer.count = 0;
+
+		//生成処理
 		for (int j = 0; j < kRecoveryEnergyEffectLimit; j++) {
 			if (recoveryEffect[j].isShoot) continue;
 
-			Vector2 createPos;
-			createPos.x = pos.x + ToFloat(GetRand(-kCreateRecoveryEffectPosRange.x, kCreateRecoveryEffectPosRange.x));
-			createPos.y = pos.y - ToFloat(GetRand(0, kCreateRecoveryEffectPosRange.y));
+			Vector2 createPos = GetPlayerPos();
+			createPos.x += ToFloat(GetRand(-kCreateRecoveryEffectPosRange.x, kCreateRecoveryEffectPosRange.x));
+			createPos.y += ToFloat(GetRand(0, kCreateRecoveryEffectPosRange.y));
 
 			recoveryEffect[j].isShoot = true;
 			recoveryEffect[j].pos = createPos;
 
 			//初期化処理
 			recoveryEffect[j].easingT = 0.0f;
+
+			//一定数生成したら
+			createRecoveryEffectCount++;
+			if (createRecoveryEffectCount >= kCreateRecoveryEffectLimit) {
+				isCreateRecoveryEffect = false;
+			}
 
 			break;
 		}
@@ -1890,8 +1912,7 @@ void CreateBombExplosionEffect(Vector2 pos, float endSizeValue, unsigned int col
 
 		bombBlastEffect[i][3].pos.x = pos.x + static_cast<float>((rand() % 374) - 374);
 		bombBlastEffect[i][3].pos.y = pos.y + static_cast<float>((rand() % 374));
-		for (int j = 0; j < kBombBlastEffectNumber; j++)
-		{
+		for (int j = 0; j < kBombBlastEffectNumber; j++) {
 			bombBlastEffect[i][j].endSizeValue = endSizeValue;
 			bombBlastEffect[i][j].color = color;
 			bombBlastEffect[i][j].easingT = 0.0f;
@@ -1903,8 +1924,7 @@ static void InitBombExplosionEffect(void) {
 	for (int i = 0; i < kBombExplosionEffectNumber; i++) {
 		bombExplosionEffect[i] = {};
 		bombExplosionEffect[i].texture = GetTexture(TextureType::EffectExplosion);
-		for (int j = 0; j < kBombBlastEffectNumber; j++)
-		{
+		for (int j = 0; j < kBombBlastEffectNumber; j++) {
 			bombBlastEffect[i][j] = {};
 			bombBlastEffect[i][j].texture = GetTexture(TextureType::EffectCircle);
 		}
@@ -1967,10 +1987,9 @@ void DrawBombExplosionEffect() {
 		texture.color = (bombExplosionEffect[i].color & 0xFFFFFF00) | bombExplosionEffect[i].alpha;
 
 		DrawTextureObj(texture, bombExplosionEffect[i].pos, size);
-		
-		for (int j = 0; j < kBombBlastEffectNumber; j++)
-		{
-			Vector2 Blostsize = { bombBlastEffect[i][j].sizeValue,bombBlastEffect[i][j].sizeValue};
+
+		for (int j = 0; j < kBombBlastEffectNumber; j++) {
+			Vector2 Blostsize = { bombBlastEffect[i][j].sizeValue,bombBlastEffect[i][j].sizeValue };
 
 			Texture Blosttexture = bombBlastEffect[i][j].texture;
 			Blosttexture.color = (bombBlastEffect[i][j].color & 0xFFFFFF00) | bombBlastEffect[i][j].alpha;
@@ -2055,7 +2074,7 @@ void InitEffect() {
 	InitElecLineEffect();
 	InitBombExplosionEffect();
 	InitFlashPanel();
-	
+
 	/*CreateBombExplosionEffect({100,100}, 768,WHITE);*/
 
 #ifdef _DEBUG
@@ -2084,6 +2103,7 @@ void UpdateEffect() {
 	UpdateCircleEffect();
 	UpdatePlayerMoveEffect();
 	UpdateRecoveryEffect();
+	CreateRecoveryEffect();
 	UpdateElecLineEffect();
 	UpdateBombExplosionEffect();
 	UpdateFlashPanel();

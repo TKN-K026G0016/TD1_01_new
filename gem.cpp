@@ -84,7 +84,7 @@ static void CheckHitVSPlayer(void) {
 
 			//SEの再生
 			PlaySe(SeType::GetGem);
-			CreateRecoveryEffect(playerPos);
+			TriggerCreateRecoveryEffect();
 		}
 	}
 

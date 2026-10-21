@@ -104,10 +104,9 @@ void CreateEnemyDamageEffect(Vector2 pos);
 void CreatePlayerMoveEffect(Vector2 pos, Vector2 moveVec);
 
 /// <summary>
-/// エネルギー回復エフェクトの生成処理
+/// 回復エフェクト生成開始処理
 /// </summary>
-/// <param name="pos">生成座標</param>
-void CreateRecoveryEffect(Vector2 pos);
+void TriggerCreateRecoveryEffect(void);
 
 void CreateBombExplosionEffect(Vector2 pos, float endSizeValue, unsigned int color);
 

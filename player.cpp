@@ -31,7 +31,7 @@ constexpr bool kElecShieldSwitch = true;
 
 #pragma region データ: player本体
 struct Player {
-	Vector2 pos = { 600, 600 };
+	Vector2 pos = { 1280, 720 };
 	Vector2 size = { 32, 32 };
 
 	//<生存関係>
