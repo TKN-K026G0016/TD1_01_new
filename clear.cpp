@@ -192,6 +192,47 @@ ClearMenuCursor clearMenuCursor;
 
 #pragma endregion
 
+#pragma region データ: NewRecordアイコン
+
+struct NewRecordIcon {
+	Vector2 pos = {};
+	Vector2 size = { 512,64 };
+
+	bool isBreakScore = false;
+
+	//<イージング関係>
+	float easingTMove = 0.0f;
+	float easingSpeedMove = 0.03f;
+	EasingMode easingMode = EasingMode::EaseOut;
+
+	Vector2 standbyPos = { -300, 400 };
+	Vector2 showPos = { 350, 400 };
+
+	//<イージング関係(点滅処理)>
+	float easingTAlpha = 0.0f;
+	float easingSpeedAlpha = 0.03f;
+	bool isFadeIn = true;
+
+	int alpha = 0;
+	int alphaMin = 0;
+	int alphaMax = 255;
+
+	Texture texture = {};
+};
+NewRecordIcon newRecordIcon;
+
+struct ShockSpawner {
+	Vector2i createPosRange[2] = { {200, 100}, {1080, 620} };
+
+	Timer createTimer = { 24, 0 };
+
+	int createLimit = 8;
+	int createCount = 0;
+
+};
+static ShockSpawner shockSpawner;
+
+#pragma endregion
 
 #pragma region 関数: アイコン落下
 
@@ -251,6 +292,8 @@ static void InitScore(void) {
 	maxComboIcon.showPosX = maxComboIconShowPosX;
 	bestScoreIcon.pos.y = bestScoreIconPosY;
 	bestScoreIcon.showPosX = bestScoreIconShowPosX;
+
+	scoreManager = {};
 
 	//必要なデータ取得
 	scoreManager.nowScore = GetNowScore();
@@ -368,6 +411,7 @@ static void CheckBreakScore(void) {
 		PlaySe(SeType::BreakScoreJingle);
 
 		scoreManager.breakScore = true;
+		newRecordIcon.isBreakScore = true;
 	}
 
 	//スコア更新時
@@ -387,6 +431,80 @@ static void CheckBreakScore(void) {
 		nowMode = ModeClear::Select;
 	}
 	
+}
+
+#pragma endregion
+
+#pragma region 関数: ハイスコア更新演出
+
+static void InitNewRecordIcon(void) {
+	newRecordIcon = {};
+	newRecordIcon.texture = GetTexture(TextureType::NewRecordIcon);
+}
+
+static void UpdateNewRecordIcon(void) {
+	if (!newRecordIcon.isBreakScore) return;
+
+	//移動処理
+	if (!onceSelect) {
+		newRecordIcon.easingTMove += newRecordIcon.easingSpeedMove;
+		if (newRecordIcon.easingTMove >= 1.0f) {
+			newRecordIcon.easingTMove = 1.0f;
+		}
+
+		newRecordIcon.pos = MoveByEasing(newRecordIcon.standbyPos, newRecordIcon.showPos, newRecordIcon.easingTMove, newRecordIcon.easingMode);
+	} else {
+		newRecordIcon.pos = MoveByEasing(newRecordIcon.standbyPos, newRecordIcon.showPos, menuBackground.easingT, newRecordIcon.easingMode);
+	}
+
+	//点滅処理
+	if (newRecordIcon.isFadeIn) {
+		newRecordIcon.easingTAlpha += newRecordIcon.easingSpeedAlpha;
+		if (newRecordIcon.easingTAlpha >= 1.0f) {
+			newRecordIcon.easingTAlpha = 1.0f;
+			newRecordIcon.isFadeIn = false;
+		}
+	} else {
+		newRecordIcon.easingTAlpha -= newRecordIcon.easingSpeedAlpha;
+		if (newRecordIcon.easingTAlpha <= 0.0f) {
+			newRecordIcon.easingTAlpha = 0.0f;
+			newRecordIcon.isFadeIn = true;
+		}
+	}
+	newRecordIcon.alpha = UpdateValueByEasing(newRecordIcon.alphaMin, newRecordIcon.alphaMax, newRecordIcon.easingTAlpha, newRecordIcon.easingMode);
+
+}
+
+static void DrawNewRecordIcon(void) {
+	if (!newRecordIcon.isBreakScore) return;
+
+	Texture texture = newRecordIcon.texture;
+	texture.color = (texture.color & 0xFFFFFF00) | newRecordIcon.alpha;
+	DrawTextureUI(texture, newRecordIcon.pos, newRecordIcon.size);
+}
+
+static void InitShockSpawner(void) {
+	shockSpawner = {};
+}
+
+static void UpdateShockSpawner(void) {
+	if (!newRecordIcon.isBreakScore) return;
+
+	if (shockSpawner.createCount >= shockSpawner.createLimit) return;
+
+	shockSpawner.createTimer.count++;
+	if (shockSpawner.createTimer.count >= shockSpawner.createTimer.time) {
+		shockSpawner.createTimer.count = 0;
+
+		Vector2 createPos;
+		createPos.x = ToFloat(GetRand(shockSpawner.createPosRange[0].x, shockSpawner.createPosRange[1].x));
+		createPos.y = ToFloat(GetRand(shockSpawner.createPosRange[0].y, shockSpawner.createPosRange[1].y));
+
+		CreateElecShockChargedEffect(createPos);
+
+		shockSpawner.createCount++;
+	}
+
 }
 
 #pragma endregion
@@ -496,6 +614,7 @@ static void Confirm(void) {
 		}
 
 		PlaySe(SeType::Confirm);
+		onceSelect = true;
 	}
 }
 
@@ -568,7 +687,14 @@ static void DrawButton(void) {
 
 #pragma endregion
 
+
 void InitClear(void) {
+#ifdef _DEBUG
+
+	AddScore(1000005);
+
+#endif
+
 	nowMode = ModeClear::IconFrameIn;
 
 	PlaySe(SeType::StageClearJingle);
@@ -578,6 +704,9 @@ void InitClear(void) {
 	InitMenuBackground();
 	InitButton();
 	InitSelect();
+	InitNewRecordIcon();
+	InitShockSpawner();
+	InitEffect();
 
 	InitTitleBackground();
 }
@@ -611,6 +740,9 @@ void UpdateClear(void) {
 	MoveScoreIcon();
 	UpdateButton();
 	UpdateCursor();
+	UpdateNewRecordIcon();
+	UpdateShockSpawner();
+	UpdateEffect();
 
 	UpdateTitleBackground();
 }
@@ -618,11 +750,14 @@ void UpdateClear(void) {
 void DrawClear(void) {
 	DrawTitleBackground();
 
+	DrawEffectAsUI();
+
 	DrawMenuBackground();
 
 	DrawIcon();
 	DrawScore();
 	DrawButton();
+	DrawNewRecordIcon();
 
 	DrawEffect();
 }

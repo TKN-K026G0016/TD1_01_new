@@ -164,6 +164,7 @@ enum class TextureType {
 	ClearScoreIcon,
 	ClearMaxComboIcon,
 	ClearBestScoreIcon,
+	NewRecordIcon,
 
 	//===============
 	//Gameover

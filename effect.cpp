@@ -505,7 +505,7 @@ static constexpr Vector2i kCreateRecoveryEffectPosRange = { 30, 20 };
 
 struct RecoveryEnergyEffect {
 	Vector2 pos = {};
-	Vector2 size = { 16, 16 };
+	
 
 	bool isShoot = false;
 
@@ -520,6 +520,11 @@ struct RecoveryEnergyEffect {
 	float easingT = 0.0f;
 	float easingSpeed = 0.04f;
 	EasingMode easingMode = EasingMode::EaseOut;
+
+	//サイズ関係
+	Vector2 size = { 16, 16 };
+	Vector2 sizeMax = { 40, 40 };
+	Vector2 sizeMin = { 16,16 };
 
 	//透明度関係
 	int alpha = 0;
@@ -1859,6 +1864,9 @@ static void UpdateRecoveryEffect(void) {
 			recoveryEffect[i].easingT = 1.0f;
 			recoveryEffect[i].isShoot = false;
 		}
+
+		//サイズ変更
+		recoveryEffect[i].size = MoveByEasing(recoveryEffect[i].sizeMax, recoveryEffect[i].sizeMin, recoveryEffect[i].easingT, recoveryEffect[i].easingMode);
 
 		//透明度変更
 		recoveryEffect[i].alpha = UpdateValueByEasing(recoveryEffect[i].alphaMax, recoveryEffect[i].alphaMin, recoveryEffect[i].easingT, recoveryEffect[i].easingMode);

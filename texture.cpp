@@ -156,6 +156,8 @@ void InitTexture(void) {
 		{ Novice::LoadTexture("./resources/texture/ui/clear/max_combo_icon.png"), { 512, 64 }, {0, 0}, 0, 0, WHITE },
 		{ Novice::LoadTexture("./resources/texture/ui/clear/best_score_icon.png"), { 512, 64 }, {0, 0}, 0, 0, WHITE },
 
+		{ Novice::LoadTexture("./resources/texture/ui/clear/break_score_telop.png"), { 512, 64 }, {0, 0}, 0, 0, WHITE },
+
 		//===============
 		//Gameover
 		//===============
