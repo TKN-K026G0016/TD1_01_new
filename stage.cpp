@@ -147,15 +147,38 @@ float spawnPosOffset = 100;
 #pragma endregion
 
 #pragma region データ: 背景
+
+//背景本体
 struct BackGround {
 	Vector2 pos = { 1280, 720 };
 	Vector2 size = { 2960, 1840 };
 
 	float scrollRate = 1.0f;
-
 	Texture texture = {};
 };
 BackGround backGround;
+
+
+//走査線
+static constexpr int kScanLineLimit = 21;
+
+struct ScanLine {
+	Vector2 pos = {};
+	Vector2 size = { 1280, 2 };
+
+	float moveSpeed = 0.5f;
+	float posYMin = -0.2f;
+	float posYMax = 722;
+
+	float intervalY = 36.0f;
+
+	int shakeDuration = 1;
+
+	unsigned int color = 0x340314AA;
+
+};
+static ScanLine scanLine[kScanLineLimit];
+static Texture scanLineTexture = {};
 
 #pragma endregion
 
@@ -260,10 +283,41 @@ static void ClampCameraPos(void) {
 static void InitBackGround(void) {
 	backGround = {};
 	backGround.texture = GetTexture(TextureType::BackGround);
+
+	//走査線
+	for (int i = 0; i < kScanLineLimit; i++) {
+		scanLine[i] = {};
+		scanLine[i].pos = { 640, scanLine[i].intervalY * i };
+	}
+	scanLineTexture = GetTexture(TextureType::TitleLine);
+}
+
+static void UpdateScanLine(void) {
+	for (int i = 0; i < kScanLineLimit; i++) {
+		scanLine[i].pos.y += scanLine[i].moveSpeed;
+
+		if (scanLine[i].pos.y >= scanLine[i].posYMax) {
+			scanLine[i].pos.y = scanLine[i].posYMin;
+		}
+	}
+}
+
+static void DrawScanLine(void) {
+	for (int i = 0; i < kScanLineLimit; i++) {
+		Vector2 pos;
+		pos.y = scanLine[i].pos.y + ToFloat(GetRand(-scanLine[i].shakeDuration, scanLine[i].shakeDuration));
+
+		Texture texture = scanLineTexture;
+		texture.color = scanLine[i].color;
+
+		DrawTextureUI(texture, scanLine[i].pos, scanLine[i].size);
+	}
 }
 
 static void DrawBackGround(void) {
 	DrawTextureBG(backGround.texture, backGround.pos, backGround.size, backGround.scrollRate);
+
+	DrawScanLine();
 }
 
 #pragma endregion
@@ -402,11 +456,13 @@ static void UpdateStartEffect(void) {
 	switch (nowModeStart) {
 	case ModeStartEffect::WaitPlayerSpawn: {
 		waitPlayerTimer.count++;
+
 		if (waitPlayerTimer.count >= waitPlayerTimer.time) {
 			waitPlayerTimer.count = 0;
 			nowModeStart = ModeStartEffect::Ready;
 
 			PlaySe(SeType::Ready);
+			TriggerStartIconFrameIn();
 		}
 
 		break;
@@ -430,6 +486,7 @@ static void UpdateStartEffect(void) {
 
 			//Bgm再生
 			PlayBgm(BgmType::Stage);
+			TriggerStartIconFrameOut();
 		}
 
 		break;
@@ -526,6 +583,8 @@ void UpdateStage(void) {
 	GoGameoverScene();
 	GoClearScene();
 	UpdateWarningBoss();
+
+	UpdateScanLine();
 }
 
 void DrawStage(void) {

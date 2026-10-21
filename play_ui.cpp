@@ -321,9 +321,28 @@ Texture displayEffectTexture = {};
 
 #pragma region データ: 開始演出
 
+enum class ModeStartTelop {
+	Standby,
+	FrameIn,
+	FrameOut,
+};
+
 struct StartTelop {
 	Vector2 pos = { 640, 550 };
 	Vector2 size = { 512, 128 };
+
+	ModeStartTelop nowMode = ModeStartTelop::Standby;
+
+	//<イージング関係>
+	float easingT = 0.0f;
+	float easingSpeedFrameIn = 0.02f;
+	float easingSpeedFrameOut = 0.05f;
+	EasingMode easingMode = EasingMode::EaseOut;
+
+	//座標
+	Vector2 standbyPos = { 640, 800 };
+	Vector2 showPos = { 640, 550 };
+
 };
 StartTelop startTelop;
 Texture readyTexture = {};
@@ -971,19 +990,50 @@ static void InitStartTelop(void) {
 }
 
 static void UpdateStartTelop(void) {
+	//イージング処理
+	switch (startTelop.nowMode) {
+	case ModeStartTelop::FrameIn:
+		startTelop.easingT += startTelop.easingSpeedFrameIn;
+		if (startTelop.easingT >= 1.0f) {
+			startTelop.easingT = 1.0f;
+		}
 
+		break;
+	case ModeStartTelop::FrameOut:
+		startTelop.easingT -= startTelop.easingSpeedFrameOut;
+		if (startTelop.easingT <= 0.0f) {
+			startTelop.easingT = 0.0f;
+			startTelop.nowMode = ModeStartTelop::Standby;
+		}
+
+		break;
+	}
+
+	//座標の移動
+	startTelop.pos = MoveByEasing(startTelop.standbyPos, startTelop.showPos, startTelop.easingT, startTelop.easingMode);
 }
 
 static void DrawStartTelop(void) {
-	ModeStartEffect nowMode = GetNowModeStart();
+	if (startTelop.nowMode == ModeStartTelop::Standby) return;
 
-	if (nowMode == ModeStartEffect::WaitPlayerSpawn || nowMode == ModeStartEffect::Standby) return;
+	ModeStartEffect nowMode = GetNowModeStart();
 
 	Texture texture;
 	texture = (nowMode == ModeStartEffect::Ready) ? readyTexture : goTexture;
 
 	DrawTextureUI(texture, startTelop.pos, startTelop.size);
 }
+
+void TriggerStartIconFrameIn(void) {
+	startTelop.nowMode = ModeStartTelop::FrameIn;
+	startTelop.easingT = 0.0f;
+}
+
+void TriggerStartIconFrameOut(void) {
+	startTelop.nowMode = ModeStartTelop::FrameOut;
+	startTelop.easingT = 1.0f;
+}
+
 
 #pragma endregion
 
@@ -1099,7 +1149,7 @@ void TriggerEndCombo(void) {
 	comboIcon.showPreComboTimer.count = 0;
 }
 
-void TriggerGaugeShackByDamage(void) {
+void TriggerGaugeShakeByDamage(void) {
 	gaugeShakeDamageTimer.count = 0;
 }
 

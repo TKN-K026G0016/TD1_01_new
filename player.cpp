@@ -1152,7 +1152,7 @@ void PlayerDamage(Vector2 hitPos, float damage) {
 	//ダメージエフェクトを生成
 	CreatePlayerDamageEffect(player.pos);
 
-	TriggerGaugeShackByDamage();
+	TriggerGaugeShakeByDamage();
 
 #pragma region ノックバック方向設定
 

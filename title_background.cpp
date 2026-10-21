@@ -67,8 +67,8 @@ struct ScanLine {
 	unsigned int color = 0x340314FF;
 
 };
-ScanLine scanLine[kScanLineLimit];
-Texture scanLineTexture = {};
+static ScanLine scanLine[kScanLineLimit];
+static Texture scanLineTexture = {};
 
 #pragma endregion
 
@@ -143,6 +143,8 @@ static void DrawBackground(void) {
 #pragma endregion
 
 #pragma region 関数: 走査線
+
+
 static void UpdateScanLine(void) {
 	for (int i = 0; i < kScanLineLimit; i++) {
 		scanLine[i].pos.y += scanLine[i].moveSpeed;

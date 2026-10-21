@@ -28,4 +28,15 @@ void TriggerDangerDisplayEffect(void);
 /// </summary>
 void CancelDangerDisplayEffect(void);
 
-void TriggerGaugeShackByDamage(void);
+void TriggerGaugeShakeByDamage(void);
+
+/// <summary>
+/// 開始アイコンのフレームイン開始
+/// </summary>
+/// <param name=""></param>
+void TriggerStartIconFrameIn(void);
+
+/// <summary>
+/// 開始アイコンのフレームイン終了
+/// </summary>
+void TriggerStartIconFrameOut(void);
