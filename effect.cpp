@@ -446,6 +446,8 @@ EnemyDamageEffect enemyDamageEffect;
 #pragma region データ: PlayerMoveEffect
 
 static constexpr int kPlayerMoveEffectLimit = 7;
+static Timer createPlayerMoveEffectTimer = { 7, 0 };
+
 struct PlayerMoveEffect {
 	Vector2 pos = {};
 
@@ -477,6 +479,7 @@ struct PlayerMoveEffect {
 	int alpha = 0;
 };
 static PlayerMoveEffect playerMoveEffect[kPlayerMoveEffectLimit];
+
 
 #pragma endregion
 
@@ -1632,31 +1635,83 @@ void CreateEnemyDamageEffect(Vector2 pos) {
 
 #pragma endregion
 
-#pragma region 関数: PlayerFootprintEffect
+#pragma region 関数: PlayerMoveEffectEffect
 
-void CreatePlayerFootprintsEffect(Vector2 pos, Vector2 inputVec) {
+void CreatePlayerMoveEffect(Vector2 pos, Vector2 moveVec) {
+	if (moveVec.x == 0.0f && moveVec.y == 0.0f) return;
+
+	createPlayerMoveEffectTimer.count++;
+	if (createPlayerMoveEffectTimer.count < createPlayerMoveEffectTimer.time) return;
+
 	for (int i = 0; i < kPlayerMoveEffectLimit; i++) {
 		if (playerMoveEffect[i].isShoot) continue;
 
+		playerMoveEffect[i].isShoot = true;
+		playerMoveEffect[i].pos = pos;
 
+		//移動方向設定
+		Vector2 effectMoveVec = { -moveVec.x, -moveVec.y };
+		playerMoveEffect[i].moveTheta = atan2f(effectMoveVec.y, effectMoveVec.x);
+
+		//初期化処理
+		playerMoveEffect[i].easingT = 0.0f;
+		playerMoveEffect[i].moveSpeed = playerMoveEffect[i].moveSpeedMax;
+
+		createPlayerMoveEffectTimer.count = 0;
 
 		break;
 	}
 }
 static void InitPlayerMoveEffect(void) {
 	for (int i = 0; i < kPlayerMoveEffectLimit; i++) {
-		
+		playerMoveEffect[i] = {};
 	}
 }
 
 void UpdatePlayerMoveEffect() {
 	for (int i = 0; i < kPlayerMoveEffectLimit; i++) {
 		if (!playerMoveEffect[i].isShoot) continue;
+
+		//移動処理
+		playerMoveEffect[i].pos.x += cosf(playerMoveEffect[i].moveTheta) * playerMoveEffect[i].moveSpeed;
+		playerMoveEffect[i].pos.y += sinf(playerMoveEffect[i].moveTheta) * playerMoveEffect[i].moveSpeed;
+
+		//回転処理
+		playerMoveEffect[i].rotateTheta += playerMoveEffect[i].rotateSpeed;
+
+#pragma region イージング関係
+
+		playerMoveEffect[i].easingT += playerMoveEffect[i].easingSpeed;
+		if (playerMoveEffect[i].easingT >= 1.0f) {
+			playerMoveEffect[i].easingT = 1.0f;
+			playerMoveEffect[i].isShoot = false;
+		}
+
+		//サイズ
+		playerMoveEffect[i].size = MoveByEasing(playerMoveEffect[i].sizeMax, playerMoveEffect[i].sizeMin, playerMoveEffect[i].easingT, playerMoveEffect[i].easingMode);
+
+		//移動速度
+		playerMoveEffect[i].moveSpeed = UpdateValueByEasing(playerMoveEffect[i].moveSpeedMax, playerMoveEffect[i].moveSpeedMin, playerMoveEffect[i].easingT, playerMoveEffect[i].easingMode);
+
+		//透明度
+		playerMoveEffect[i].alpha = UpdateValueByEasing(kAlphaMax, kAlphaMin, playerMoveEffect[i].easingT, playerMoveEffect[i].easingMode);
+
+#pragma endregion
+
 	}
 }
 void DrawPlayerMoveEffect() {
 	for (int i = 0; i < kPlayerMoveEffectLimit; i++) {
 		if (!playerMoveEffect[i].isShoot) continue;
+
+		Texture texture = triangleTexture;
+		texture.color = (kPlayerColor & 0xFFFFFF00) | playerMoveEffect[i].alpha;
+
+		if (nowScene == Scene::Play) {
+			DrawTextureRotateObj(texture, playerMoveEffect[i].pos, playerMoveEffect[i].size, playerMoveEffect[i].rotateTheta);
+		} else {
+			DrawTextureRotateUI(texture, playerMoveEffect[i].pos, playerMoveEffect[i].size, playerMoveEffect[i].rotateTheta);
+		}
 	}
 }
 #pragma endregion

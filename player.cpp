@@ -333,6 +333,8 @@ static void MovePlayer(void) {
 	player.pos.x += moveSpeed * moveVec.x;
 	player.pos.y += moveSpeed * moveVec.y;
 
+	//playerの移動エフェクト
+	CreatePlayerMoveEffect(player.pos, moveVec);
 }
 
 static void ClampPlayerPos(void) {

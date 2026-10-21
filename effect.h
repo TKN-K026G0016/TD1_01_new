@@ -83,12 +83,26 @@ void CreateTriangleEffect2(Vector2 pos, float sizeValue, float moveSpeed, unsign
 /// <param name="color">色</param>
 void CreateCircleEffect(Vector2 pos, float endSizeValue, unsigned int color);
 
+/// <summary>
+/// playerのダメージエフェクト生成処理
+/// </summary>
+/// <param name="pos">生成座標</param>
 void CreatePlayerDamageEffect(Vector2 pos);
 
+/// <summary>
+/// enemyのダメージエフェクト生成処理
+/// </summary>
+/// <param name="pos"></param>
 void CreateEnemyDamageEffect(Vector2 pos);
-void CreateEnemyDamageEffect(Vector2 pos);
+//void CreateEnemyDamageEffect(Vector2 pos);
 
-void CreatePlayerFootprintsEffect(Vector2 pos);
+/// <summary>
+/// playerの移動エフェクト生成処理
+/// </summary>
+/// <param name="pos">生成座標</param>
+/// <param name="moveVec">対象の移動方向</param>
+void CreatePlayerMoveEffect(Vector2 pos, Vector2 moveVec);
+
 void CreateBombExplosionEffect(Vector2 pos, float endSizeValue, unsigned int color);
 
 void CreateFlashPanel(void);
