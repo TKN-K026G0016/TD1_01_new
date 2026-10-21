@@ -270,12 +270,14 @@ struct ElecShield {
 	EasingMode easingMode = EasingMode::EaseInOut;
 
 	//サイズ関係
-	Vector2 sizeValueMin = { 10.0f, 10.0f };
+	Vector2 sizeValueMin = { 35.0f, 35.0f };
+	Vector2 sizeValueMinDanger = { 10.0f, 10.0f };
 	Vector2 sizeValueMax = { 60.0f, 60.0f };
 
 	//透明度関係
 	int alpha = 0;
-	int alphaMin = 0;
+	int alphaMin = 50;
+	int alphaMinDanger = 0;
 	int alphaMax = 170;
 
 	unsigned int color = 0x04C1E8FF;
@@ -781,45 +783,7 @@ static void CheckFailedMaintenance(void) {
 /// </summary>
 /// <param name=""></param>
 static void UpdatePlayerEffect(void) {
-	//モードごとによる演出
-//	switch (player.nowState) {
-//	case PlayerState::DeadEnergy: {
-//		//プレイヤーを青・黒に点灯させる処理
-//
-//#pragma region イージングでの点滅
-//		if (colorManager.isGoToBlack) {
-//			colorManager.easingT += colorManager.changeSpeed;
-//			if (colorManager.easingT > 1.0f) {
-//				colorManager.easingT = 1.0f;
-//				//反転
-//				colorManager.isGoToBlack = false;
-//			}
-//		} else {
-//			colorManager.easingT -= colorManager.changeSpeed;
-//			if (colorManager.easingT < 0.0f) {
-//				colorManager.easingT = 0.0f;
-//				//反転
-//				colorManager.isGoToBlack = true;
-//			}
-//		}
-//
-//		colorManager.colorValue = UpdateValueByEasing(colorManager.colorValueMax, colorManager.colorValueMin, colorManager.easingT, EasingMode::EaseInOut);
-//
-//#pragma endregion
-//
-//		unsigned int newColor = (colorManager.colorValue << 24) | (colorManager.colorValue << 16) | (colorManager.colorValue << 8) | (0xFF);
-//		player.texture.color = newColor;
-//
-//		break;
-//	}
-//	case PlayerState::Normal: {
-//		player.texture.color = WHITE;
-//		colorManager.isGoToBlack = true;
-//		colorManager.easingT = 0.0f;
-//
-//		break;
-//	}
-//	}
+
 }
 
 /// <summary>
@@ -905,13 +869,28 @@ static void UpdateElecShield(void) {
 	} else {
 
 		elecShield.easingT -= elecShield.easingSpeedDanger;
+		if (elecShield.easingT < 0.0f) {
+			elecShield.easingT = 0.0f;
+		}
+
 		elecShield.isScaleUp = true;
 	}
 
 	//サイズの変更
-	elecShield.size = MoveByEasing(elecShield.sizeValueMin, elecShield.sizeValueMax, elecShield.easingT, elecShield.easingMode);
-	//透明度の変更
-	elecShield.alpha = UpdateValueByEasing(elecShield.alphaMin, elecShield.alphaMax, elecShield.easingT, elecShield.easingMode);
+	if (player.remainEnergy > kWarnEnergyLine) {
+		elecShield.size = MoveByEasing(elecShield.sizeValueMin, elecShield.sizeValueMax, elecShield.easingT, elecShield.easingMode);
+
+		//透明度の変更
+		elecShield.alpha = UpdateValueByEasing(elecShield.alphaMin, elecShield.alphaMax, elecShield.easingT, elecShield.easingMode);
+	} 
+	else {
+		elecShield.size = MoveByEasing(elecShield.sizeValueMinDanger, elecShield.sizeValueMax, elecShield.easingT, elecShield.easingMode);
+
+		//透明度の変更
+		elecShield.alpha = UpdateValueByEasing(elecShield.alphaMinDanger, elecShield.alphaMax, elecShield.easingT, elecShield.easingMode);
+	}
+
+	
 }
 
 static void DrawElecShield(void) {
