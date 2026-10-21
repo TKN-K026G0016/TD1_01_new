@@ -434,7 +434,7 @@ PlayerDamageEffect playerDamageEffect;
 #pragma region データ: EnemyDamageEffect
 
 struct EnemyDamageEffect {
-	int createTriangleLimit = 2;
+	int createTriangleLimit = 1;
 	float triangleSizeValue = 30.0f;
 	float triangleMoveSpeed = 30.0f;
 
@@ -443,20 +443,41 @@ EnemyDamageEffect enemyDamageEffect;
 
 #pragma endregion
 
-#pragma region データ: PlayerFootprintsEffect
-const int kFootprintsEffectNumber = 20;
-struct FootprintsEffect {
-	Vector2 pos;
-	Vector2 move;
-	Vector2 size;
-	float speed;
-	float width;
-	bool isAppear;
-	unsigned int color;
-	Texture texture = {};
+#pragma region データ: PlayerMoveEffect
+
+static constexpr int kPlayerMoveEffectLimit = 7;
+struct PlayerMoveEffect {
+	Vector2 pos = {};
+
+	bool isShoot = false;
+
+	//移動関係
+	float moveTheta = 0.0f;
+
+	//回転関係
+	float rotateTheta = 0.0f;
+	float rotateSpeed = ToFloat(M_PI) / 20.0f;
+
+	//<イージング関係>
+	float easingT = 0;
+	float easingSpeed = 0.01f;
+	EasingMode easingMode = EasingMode::EaseOut;
+
+	//サイズ関係
+	Vector2 size = {};
+	Vector2 sizeMax = { 30, 30 };
+	Vector2 sizeMin = { 5,5 };
+
+	//移動速度関係
+	float moveSpeed = 0;
+	float moveSpeedMax = 20.0f;
+	float moveSpeedMin = 0.1f;
+
+	//透明度関係
+	int alpha = 0;
 };
-FootprintsEffect footprintsEffect[kFootprintsEffectNumber] = {};
-int footprintsEffectTimer = 0;
+static PlayerMoveEffect playerMoveEffect[kPlayerMoveEffectLimit];
+
 #pragma endregion
 
 #pragma region データ: BombExplosionEffect
@@ -1614,57 +1635,28 @@ void CreateEnemyDamageEffect(Vector2 pos) {
 #pragma region 関数: PlayerFootprintEffect
 
 void CreatePlayerFootprintsEffect(Vector2 pos, Vector2 inputVec) {
+	for (int i = 0; i < kPlayerMoveEffectLimit; i++) {
+		if (playerMoveEffect[i].isShoot) continue;
 
-	if (footprintsEffectTimer > 0) {
-		footprintsEffectTimer--;
+
+
+		break;
 	}
-
-	if (footprintsEffectTimer <= 0) {
-		for (int i = 0; i < kFootprintsEffectNumber; i++) {
-			if (footprintsEffect[i].isAppear == false) continue;
-			footprintsEffect[i].isAppear = true;
-			footprintsEffectTimer = 5;
-			footprintsEffect[i].pos.x = pos.x + static_cast<float>((rand() % 30) - 15);
-			footprintsEffect[i].pos.y = pos.y;
-			footprintsEffect[i].color = 0xffffffff;
-			footprintsEffect[i].move.x = -inputVec.x;
-			footprintsEffect[i].move.y = -inputVec.y;
-			footprintsEffect[i].speed = 5;
-			footprintsEffect[i].size.x = 32;
-			footprintsEffect[i].size.y = 32;
-
-			break;
-
-		}
-	}
-
 }
-static void InitPlayerFootprintsEffect(void) {
-	for (int i = 0; i < kFootprintsEffectNumber; i++) {
-		footprintsEffect[i] = {};
-		footprintsEffect[i].texture = GetTexture(TextureType::EffectSquareMini);
+static void InitPlayerMoveEffect(void) {
+	for (int i = 0; i < kPlayerMoveEffectLimit; i++) {
+		
 	}
 }
 
-void UpdatePlayerFootprintsEffect() {
-	for (int i = 0; i < kFootprintsEffectNumber; i++) {
-		if (!footprintsEffect[i].isAppear) continue;
-		footprintsEffect[i].pos.x += footprintsEffect[i].move.x * footprintsEffect[i].speed;
-		footprintsEffect[i].pos.y += footprintsEffect[i].move.y * footprintsEffect[i].speed;
-		if (footprintsEffect[i].color >= 0xffffff10) {
-			footprintsEffect[i].color -= 0x00000010;
-		} else {
-			footprintsEffect[i].color = 0xffffffff;
-			footprintsEffect[i].isAppear = false;
-		}
+void UpdatePlayerMoveEffect() {
+	for (int i = 0; i < kPlayerMoveEffectLimit; i++) {
+		if (!playerMoveEffect[i].isShoot) continue;
 	}
 }
-void DrawPlayerFootprints() {
-	for (int i = 0; i < kFootprintsEffectNumber; i++) {
-		if (!footprintsEffect[i].isAppear) continue;
-
-		Texture texture = footprintsEffect[i].texture;
-		DrawTextureObj(texture, footprintsEffect[i].pos, footprintsEffect[i].size);
+void DrawPlayerMoveEffect() {
+	for (int i = 0; i < kPlayerMoveEffectLimit; i++) {
+		if (!playerMoveEffect[i].isShoot) continue;
 	}
 }
 #pragma endregion
@@ -1851,7 +1843,7 @@ void InitEffect() {
 	InitTriangleEffect();
 	InitTriangleEffect2();
 	InitCircleEffect();
-	InitPlayerFootprintsEffect();
+	InitPlayerMoveEffect();
 	InitElecLineEffect();
 	InitBombExplosionEffect();
 	InitFlashPanel();
@@ -1882,7 +1874,7 @@ void UpdateEffect() {
 	UpdateTriangleEffect();
 	UpdateTriangleEffect2();
 	UpdateCircleEffect();
-	UpdatePlayerFootprintsEffect();
+	UpdatePlayerMoveEffect();
 	UpdateElecLineEffect();
 	UpdateBombExplosionEffect();
 	UpdateFlashPanel();
@@ -1900,7 +1892,7 @@ void DrawEffect() {
 	DrawTriangleEffect2();
 	DrawCircleEffect();
 	DrawElecLineEffect();
-	DrawPlayerFootprints();
+	DrawPlayerMoveEffect();
 	DrawBombExplosionEffect();
 }
 
