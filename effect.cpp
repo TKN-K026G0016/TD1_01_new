@@ -486,7 +486,51 @@ static PlayerMoveEffect playerMoveEffect[kPlayerMoveEffectLimit];
 
 #pragma endregion
 
-#pragma region 
+#pragma region データ: RecoveryEnergyEffect
+
+static constexpr int kRecoveryEnergyEffectLimit = 20;
+//残像の数
+static constexpr int kRecoveryEffectAfterimageLimit = 2;
+
+//何個生成するか
+static constexpr int kCreateRecoveryEffectLimit = 3;
+//recoveryEffectを生成する範囲
+static constexpr Vector2i kCreateRecoveryEffectPosRange = { 30, 10 };
+
+
+struct RecoveryEnergyEffect {
+	Vector2 pos = {};
+	Vector2 size = { 16, 16 };
+
+	bool isShoot = false;
+
+	//移動速度
+	float moveSpeed = 7.0f;
+
+	//<回転関係>
+	float rotateTheta = 0.0f;
+	float rotateSpeed = ToFloat(M_PI) / 20.0f;
+
+	//<イージング関係>
+	float easingT = 0.0f;
+	float easingSpeed = 0.05f;
+	EasingMode easingMode = EasingMode::EaseOut;
+
+	//透明度関係
+	int alpha = 0;
+	int alphaMax = 180;
+	int alphaMin = 0;
+
+	//<残像関係>
+	float preRotateTheta[kRecoveryEffectAfterimageLimit] = {};
+	//本体との座標のずれ
+	float posOffset = 10;
+	//本体との透明度のズレ
+	int diffAlpha = 30;
+};
+static RecoveryEnergyEffect recoveryEffect[kRecoveryEnergyEffectLimit];
+
+#pragma endregion
 
 #pragma region データ: BombExplosionEffect
 //爆発本体
@@ -1727,6 +1771,103 @@ void DrawPlayerMoveEffect() {
 }
 #pragma endregion
 
+#pragma region 関数: RecoveryEffect
+
+void CreateRecoveryEffect(Vector2 pos) {
+
+	for (int i = 0; i < kCreateRecoveryEffectLimit; i++) {
+		for (int j = 0; j < kRecoveryEnergyEffectLimit; j++) {
+			if (recoveryEffect[j].isShoot) continue;
+
+			Vector2 createPos;
+			createPos.x = pos.x + ToFloat(GetRand(-kCreateRecoveryEffectPosRange.x, kCreateRecoveryEffectPosRange.x));
+			createPos.y = pos.y - ToFloat(GetRand(0, kCreateRecoveryEffectPosRange.y));
+
+			recoveryEffect[j].isShoot = true;
+			recoveryEffect[j].pos = createPos;
+
+			//初期化処理
+			recoveryEffect[j].easingT = 0.0f;
+
+			break;
+		}
+	}
+}
+
+static void InitRecoveryEffect(void) {
+	for (int i = 0; i < kRecoveryEnergyEffectLimit; i++) {
+		recoveryEffect[i] = {};
+	}
+}
+
+static void UpdateRecoveryEffect(void) {
+	for (int i = 0; i < kRecoveryEnergyEffectLimit; i++) {
+		if (!recoveryEffect[i].isShoot) continue;
+
+#pragma region 残像の更新処理
+		//prePos(残像位置の更新)
+		for (int j = 0; j < kRecoveryEffectAfterimageLimit; j++) {
+			if (j == 0) {
+				recoveryEffect[i].preRotateTheta[j] = recoveryEffect[i].rotateTheta;
+			} else {
+				recoveryEffect[i].preRotateTheta[j] = recoveryEffect[i].preRotateTheta[j - 1];
+			}
+		}
+
+#pragma endregion
+
+		recoveryEffect[i].pos.y += recoveryEffect[i].moveSpeed;
+
+		recoveryEffect[i].rotateTheta += recoveryEffect[i].rotateSpeed;
+
+#pragma region イージング処理
+
+		recoveryEffect[i].easingT += recoveryEffect[i].easingSpeed;
+		if (recoveryEffect[i].easingT >= 1.0f) {
+			recoveryEffect[i].easingT = 1.0f;
+			recoveryEffect[i].isShoot = false;
+		}
+
+		//透明度変更
+		recoveryEffect[i].alpha = UpdateValueByEasing(recoveryEffect[i].alphaMax, recoveryEffect[i].alphaMin, recoveryEffect[i].easingT, recoveryEffect[i].easingMode);
+
+#pragma endregion
+
+	}
+}
+
+static void DrawRecoveryEffect(void) {
+	for (int i = 0; i < kRecoveryEnergyEffectLimit; i++) {
+		if (!recoveryEffect[i].isShoot) continue;
+
+		//残像の描写
+		for (int j = 0; j < kRecoveryEffectAfterimageLimit; j++) {
+			Vector2 pos = { recoveryEffect[i].pos.x, recoveryEffect[i].pos.y - recoveryEffect[i].posOffset * (j + 1) };
+
+			Texture afterFadeTexture = whiteBoxTexture;
+
+			//透明度の変更
+			int alpha = recoveryEffect[i].alpha - recoveryEffect[i].diffAlpha * (j + 1);
+			if (alpha < 0) {
+				alpha = 0;
+			}
+			unsigned int color = (kPlayerColor & 0xFFFFFF00) | alpha;
+			afterFadeTexture.color = color;
+
+
+			DrawTextureRotateObj(afterFadeTexture, pos, recoveryEffect[i].size, recoveryEffect[i].preRotateTheta[j]);
+		}
+
+		//本体の描写
+		Texture texture = whiteBoxTexture;
+		texture.color = (kPlayerColor & 0xFFFFFF00) | recoveryEffect[i].alpha;
+		DrawTextureRotateObj(texture, recoveryEffect[i].pos, recoveryEffect[i].size, recoveryEffect[i].rotateTheta);
+	}
+}
+
+
+#pragma endregion
+
 #pragma region 関数: BombExplosionEffect
 void CreateBombExplosionEffect(Vector2 pos, float endSizeValue, unsigned int color) {
 	for (int i = 0; i < kBombExplosionEffectNumber; i++) {
@@ -1910,6 +2051,7 @@ void InitEffect() {
 	InitTriangleEffect2();
 	InitCircleEffect();
 	InitPlayerMoveEffect();
+	InitRecoveryEffect();
 	InitElecLineEffect();
 	InitBombExplosionEffect();
 	InitFlashPanel();
@@ -1941,6 +2083,7 @@ void UpdateEffect() {
 	UpdateTriangleEffect2();
 	UpdateCircleEffect();
 	UpdatePlayerMoveEffect();
+	UpdateRecoveryEffect();
 	UpdateElecLineEffect();
 	UpdateBombExplosionEffect();
 	UpdateFlashPanel();
@@ -1959,6 +2102,7 @@ void DrawEffect() {
 	DrawCircleEffect();
 	DrawElecLineEffect();
 	DrawPlayerMoveEffect();
+	DrawRecoveryEffect();
 	DrawBombExplosionEffect();
 }
 

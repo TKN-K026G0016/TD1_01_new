@@ -2,6 +2,7 @@
 #include "player.h"
 #include "score_data.h"
 #include "se.h"
+#include "effect.h"
 
 #include "vector2.h"
 #include "timer.h"
@@ -83,6 +84,7 @@ static void CheckHitVSPlayer(void) {
 
 			//SEの再生
 			PlaySe(SeType::GetGem);
+			CreateRecoveryEffect(playerPos);
 		}
 	}
 

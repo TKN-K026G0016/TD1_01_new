@@ -103,6 +103,12 @@ void CreateEnemyDamageEffect(Vector2 pos);
 /// <param name="moveVec">対象の移動方向</param>
 void CreatePlayerMoveEffect(Vector2 pos, Vector2 moveVec);
 
+/// <summary>
+/// エネルギー回復エフェクトの生成処理
+/// </summary>
+/// <param name="pos">生成座標</param>
+void CreateRecoveryEffect(Vector2 pos);
+
 void CreateBombExplosionEffect(Vector2 pos, float endSizeValue, unsigned int color);
 
 void CreateFlashPanel(void);
