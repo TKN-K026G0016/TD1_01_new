@@ -446,7 +446,7 @@ static void UpdateEnergyGauge(void) {
 
 #pragma region GaugeEffectの生成
 
-	if (remainEnergy <= energyGaugeFrame.warnDeadEnergy) {
+	if (remainEnergy <= energyGaugeFrame.warnDeadEnergy && remainEnergy > 0) {
 		energyGaugeFrame.createGaugeEffectTimer.count++;
 		if (energyGaugeFrame.createGaugeEffectTimer.count >= energyGaugeFrame.createGaugeEffectTimer.time) {
 			energyGaugeFrame.createGaugeEffectTimer.count = 0;
@@ -470,13 +470,6 @@ static void UpdateEnergyGauge(void) {
 			energyGaugeFrame.viewPos.y = energyGaugeFrame.pos.y + GetRand(-2, 2);
 		}
 
-		////alramSE
-		//energyGaugeFrame.alarmSeTimer.count++;
-		//if (energyGaugeFrame.alarmSeTimer.count >= energyGaugeFrame.alarmSeTimer.time) {
-		//	energyGaugeFrame.alarmSeTimer.count = 0;
-		//	PlaySe(SeType::GaugeAlarm);
-		//}
-
 		//displayEFfect
 		TriggerDangerDisplayEffect();
 
@@ -488,8 +481,6 @@ static void UpdateEnergyGauge(void) {
 		miniEnergyGauge.frameTexture.animChangeTimer.count = 0;
 
 		energyGaugeFrame.viewPos = energyGaugeFrame.pos;
-
-		//energyGaugeFrame.alarmSeTimer.count = 0;
 
 		if (!GetIsWarningBoss()) {
 			CancelDangerDisplayEffect();
