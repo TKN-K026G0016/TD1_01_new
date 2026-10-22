@@ -169,9 +169,9 @@ struct BackGround {
 	unsigned int nowColor = 0x240912FF;
 	unsigned int normalColor = 0x240912FF;
 
-	unsigned int combo100Color = 0x91D2E8FF;
-	unsigned int combo500Color = 0x91D2E8FF;
-	unsigned int combo1000Color = 0x91D2E8FF;
+	unsigned int combo100Color = 0x5F255FFF;
+	unsigned int combo500Color = 0x485793FF;
+	unsigned int combo1000Color = 0x70AFCBFF;
 
 	Texture texture = {};
 };
