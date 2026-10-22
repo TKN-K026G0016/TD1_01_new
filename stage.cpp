@@ -304,28 +304,6 @@ static void InitBackGround(void) {
 	scanLineTexture = GetTexture(TextureType::TitleLine);
 }
 
-static unsigned int LerpColor(
-	unsigned int startColor,
-	unsigned int endColor,
-	float t) {
-	int sr = (startColor >> 24) & 0xFF;
-	int sg = (startColor >> 16) & 0xFF;
-	int sb = (startColor >> 8) & 0xFF;
-	int sa = (startColor) & 0xFF;
-
-	int er = (endColor >> 24) & 0xFF;
-	int eg = (endColor >> 16) & 0xFF;
-	int eb = (endColor >> 8) & 0xFF;
-	int ea = (endColor) & 0xFF;
-
-	int r = static_cast<int>(sr + (er - sr) * t);
-	int g = static_cast<int>(sg + (eg - sg) * t);
-	int b = static_cast<int>(sb + (eb - sb) * t);
-	int a = static_cast<int>(sa + (ea - sa) * t);
-
-	return (r << 24) | (g << 16) | (b << 8) | a;
-}
-
 static void UpdateBackGround(void) {
 	if (!backGround.isFlash) return;
 
@@ -346,8 +324,9 @@ static void UpdateBackGround(void) {
 	}
 
 	//色の変更
+	float easedT = CreateEasedT(backGround.easingT, backGround.easingMode);
 
-	backGround.nowColor = LerpColor(backGround.normalColor, backGround.combo1000Color, backGround.easingT);
+	backGround.nowColor = UpdateColorByEasing(backGround.normalColor, backGround.combo1000Color, easedT);
 }
 
 static void UpdateScanLine(void) {

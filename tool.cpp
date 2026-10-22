@@ -329,6 +329,58 @@ float UpdateValueByEasing(float startNum, float endNum, float t, EasingMode mode
 	return (1.0f - easedT) * startNum + easedT * endNum;
 }
 
+float CreateEasedT(float t, EasingMode mode) {
+	float easedT = 0.0f;
+
+	switch (mode) {
+	case  EasingMode::Linear:
+	{
+		easedT = t;
+
+		break;
+	}
+	case  EasingMode::EaseIn:
+	{
+		easedT = t * t;
+
+		break;
+	}
+	case  EasingMode::EaseOut:
+	{
+		easedT = 1.0f - powf(1.0f - t, 3.0f);
+
+		break;
+	}
+	case  EasingMode::EaseInOut:
+	{
+		easedT = -(cosf(static_cast<float>(M_PI) * t) - 1.0f) / 2.0f;
+
+		break;
+	}
+	}
+
+	return easedT;
+}
+
+unsigned int UpdateColorByEasing(unsigned int startColor, unsigned int endColor, float t) {
+	int sr = (startColor >> 24) & 0xFF;
+	int sg = (startColor >> 16) & 0xFF;
+	int sb = (startColor >> 8) & 0xFF;
+	int sa = (startColor) & 0xFF;
+
+	int er = (endColor >> 24) & 0xFF;
+	int eg = (endColor >> 16) & 0xFF;
+	int eb = (endColor >> 8) & 0xFF;
+	int ea = (endColor) & 0xFF;
+
+	int r = static_cast<int>(sr + (er - sr) * t);
+	int g = static_cast<int>(sg + (eg - sg) * t);
+	int b = static_cast<int>(sb + (eb - sb) * t);
+	int a = static_cast<int>(sa + (ea - sa) * t);
+
+	return (r << 24) | (g << 16) | (b << 8) | a;
+}
+
 /// <summary>
 /// 矩形の当たり判定描画
 /// </summary>
