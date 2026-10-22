@@ -243,7 +243,6 @@ static void UpdateShockCombo(void) {
 			}
 			else if (nowCombo > jingle1Combo) {
 				PlaySe(SeType::ComboJingle10);
-	/*			TriggerBackgroundFlash();*/
 			}
 			
 			totalComboInCombo = 0;
