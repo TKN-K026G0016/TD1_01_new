@@ -179,7 +179,7 @@ static constexpr float kBreakShieldLine = 5.0f;
 #pragma region データ: ElecShield
 
 //シールドがなくなってから再展開するまでの時間
-Timer recoveryShieldTimer = { 60, 0 };
+Timer recoveryShieldTimer = { 180, 0 };
 
 struct ElecShield {
 	Vector2 size = {};
@@ -334,7 +334,7 @@ static void MovePlayer(void) {
 	}
 
 	//energy量で移動速度を変更
-	float moveSpeed = (player.remainEnergy > 0.0f) ? player.moveSpeed[0] : player.moveSpeed[1];
+	float moveSpeed = (player.isEquipShield) ? player.moveSpeed[0] : player.moveSpeed[1];
 
 	player.pos.x += moveSpeed * moveVec.x;
 	player.pos.y += moveSpeed * moveVec.y;
@@ -785,7 +785,6 @@ static void InitElecShield(void) {
 	elecShield.texture = GetTexture(TextureType::ElecShield);
 }
 
-
 /// <summary>
 /// ElecShieldの更新処理
 /// </summary>
@@ -814,7 +813,7 @@ static void UpdateElecShield(void) {
 
 static void UpdateElecShieldEffect(void) {
 	//シールドが十分な量存在したら
-	if (player.remainEnergy > kBreakShieldLine) {
+	if (player.remainEnergy > kBreakShieldLine && player.isEquipShield) {
 
 		//イージング処理
 		float energyRate = std::clamp(player.remainEnergy / kEnergyMax, 0.0f, 1.0f);
@@ -848,8 +847,8 @@ static void UpdateElecShieldEffect(void) {
 				}
 			}
 		}
-	}
-	else if (!player.isEquipShield) {
+	} 
+	else {
 		elecShield.easingT -= elecShield.easingSpeedMax;
 		if (elecShield.easingT < 0.0f) {
 			elecShield.easingT = 0.0f;
