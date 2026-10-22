@@ -876,7 +876,7 @@ static void UpdateStartEffect(void) {
 
 static void InitElecShield(void) {
 	elecShield = {};
-	elecShield.texture = GetTexture(TextureType::EffectCircle);
+	elecShield.texture = GetTexture(TextureType::ElecShield);
 }
 
 static void UpdateElecShield(void) {

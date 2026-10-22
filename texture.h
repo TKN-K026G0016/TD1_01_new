@@ -80,6 +80,8 @@ enum class TextureType {
 	Elec,
 	ElecLine,
 
+	ElecShield,
+
 	LockOnSign,
 
 	//Item
