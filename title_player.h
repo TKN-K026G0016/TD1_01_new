@@ -8,3 +8,5 @@ void DrawTitlePlayer(void);
 Vector2 GetTitlePlayerPos();
 
 Vector2 GetTitlePlayerShootPos();
+
+void NoticeTitlePlayerGameStart(void);

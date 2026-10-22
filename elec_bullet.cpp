@@ -305,6 +305,17 @@ void BreakElecBullet(int index) {
 	elecBullet[index].breakTimer.count = 0;
 }
 
+void BreakAllElecBullet(void) {
+	for (int i = 0; i < kElecBulletLimit; i++) {
+		BreakElecBullet(i);
+		if (elecBullet[i].type == ElecBulletType::Normal) {
+			CreateElecShockEffect(elecBullet[i].pos);
+		} else {
+			CreateElecShockChargedEffect(elecBullet[i].pos);
+		}
+	}
+}
+
 ElecBullet* GetElecBulletArray(void) {
 	return elecBullet;
 }

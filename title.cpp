@@ -211,6 +211,8 @@ static void ChangeMode(void) {
 		PlaySe(SeType::DeadEnemy);
 		PlaySe(SeType::Confirm);
 
+		NoticeTitlePlayerGameStart();
+
 		//Bgmをフェード
 		ChangeModeBgmFade(ModeBgmFade::FadeOut);
 	}
@@ -460,6 +462,7 @@ static void ChangeModeByCredits(void) {
 		PlaySe(SeType::DeadEnemy);
 
 		ChangeBgmVolume(lightOutVolume);
+		BreakAllElecBullet();
 	}
 }
 
@@ -481,6 +484,8 @@ static void ChangeModeByReset(void) {
 		PlaySe(SeType::Confirm);
 
 		ChangeBgmVolume(lightOutVolume);
+
+		BreakAllElecBullet();
 	}
 }
 

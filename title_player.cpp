@@ -16,8 +16,6 @@ struct TitlePlayer {
 	Vector2 pos = { 640, -200 };
 	Vector2 size = { 32, 32 };
 
-
-
 	//<移動関係>
 	Vector2 velocity = { 0.0f, 0.0f };
 	//移動速度(等速)
@@ -219,4 +217,9 @@ Vector2 GetTitlePlayerPos() {
 
 Vector2 GetTitlePlayerShootPos() {
 	return shootPos;
+}
+
+void NoticeTitlePlayerGameStart(void) {
+	chargeElecBulletTimer.count = 0;
+	StopPlayingSe(SeType::Charge);
 }
