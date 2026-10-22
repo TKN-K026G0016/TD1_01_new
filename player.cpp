@@ -65,7 +65,7 @@ struct Player {
 	float decelerationSpeed = 0.15f;
 
 	//移動速度(等速)
-	float moveSpeed[2] = { 6.0f, 3.0f };
+	float moveSpeed[2] = { 6.0f, 6.0f };
 	Vector2 inputVec = { 0, 0 };
 
 
