@@ -179,30 +179,63 @@ static constexpr float kBreakShieldLine = 5.0f;
 #pragma region データ: ElecShield
 
 //シールドがなくなってから再展開するまでの時間
-Timer recoveryShieldTimer = { 180, 0 };
+Timer reEquipShieldTimer = { 180, 0 };
+
+enum class ModeElecShield {
+	//通常時
+	Standby,
+
+	//回復状態時
+	Recovery,
+	//破壊状態時
+	Break,
+	//復活処理時
+	ReEquip,
+};
 
 struct ElecShield {
 	Vector2 size = {};
 
-	//イージング関係
+	ModeElecShield nowMode = ModeElecShield::Standby;
+
+	//<イージング関係>
 	float easingT = 0.0f;
-	float easingSpeedMin = 0.01f;
-	float easingSpeedMax = 0.05f;
-	bool isScaleUp = true;
-	EasingMode easingMode = EasingMode::EaseInOut;
-
-	//サイズ関係
-	Vector2 sizeValueMin = { 40.0f, 40.0f };
-	Vector2 sizeValueMinDanger = { 10.0f, 10.0f };
-	Vector2 sizeValueMax = { 60.0f, 60.0f };
-
-	//透明度関係
 	int alpha = 0;
-	int alphaMin = 100;
-	int alphaMinDanger = 0;
-	int alphaMax = 150;
 
-	unsigned int color = 0x04C1E8FF;
+	//通常時のイージング速度
+	float easingSpeedNormal = 0.01f;
+	EasingMode easingModeNormal = EasingMode::EaseInOut;
+	//拡大中フラグ
+	bool isScaleUp = true;
+	//回復状態時のイージング速度
+	float easingSpeedRecovery = 0.08f;
+	EasingMode easingModeRecovery = EasingMode::EaseOut;
+	//復活処理時のイージング速度
+	float easingSpeedReEquip = 0.06f;
+	EasingMode easingModeReEquip = EasingMode::EaseOutBack;
+
+	
+	//<サイズ関係>
+	//通常時のサイズ最小値
+	Vector2 sizeValueMin = { 50.0f, 50.0f };
+	//通常時のサイズ最大値
+	Vector2 sizeValueMax = { 60.0f, 60.0f };
+	//回復状態時のサイズ最大値
+	Vector2 sizeValueMaxRecovery = { 100.0f, 100.0f };
+	//復活処理時のサイズ最小値
+	Vector2 sizeValueMinReEquip = { 0.0f, 0.0f };
+
+	//<不透明度関係>
+	//通常時の透明度最低値
+	int alphaMin = 100;
+	int alphaMax = 150;
+	int alphaMinRecovery = 0;
+	int alphaMinReEquip = 0;
+
+	//色の最小値
+	unsigned int colorMin = 0x04C1E8FF;
+	//色の最大値
+	unsigned int colorMax = 0x5004E8FF;
 
 	Texture texture = {};
 };
@@ -796,16 +829,16 @@ static void UpdateElecShield(void) {
 	//シールドの破壊処理
 	if (player.remainEnergy < kBreakShieldLine) {
 		if (player.isEquipShield) {
-			recoveryShieldTimer.count = 0;
+			reEquipShieldTimer.count = 0;
 		}
 
 		player.isEquipShield = false;
 	}
 	//シールドの回復処理
 	else if (!player.isEquipShield) {
-		recoveryShieldTimer.count++;
-		if (recoveryShieldTimer.count >= recoveryShieldTimer.time) {
-			recoveryShieldTimer.count = 0;
+		reEquipShieldTimer.count++;
+		if (reEquipShieldTimer.count >= reEquipShieldTimer.time) {
+			reEquipShieldTimer.count = 0;
 			player.isEquipShield = true;
 		}
 	}
@@ -873,7 +906,7 @@ static void UpdateElecShieldEffect(void) {
 
 static void DrawElecShield(void) {
 	Texture texture = elecShield.texture;
-	texture.color = (elecShield.color & 0xFFFFFF00) | elecShield.alpha;
+	texture.color = (elecShield.colorMin & 0xFFFFFF00) | elecShield.alpha;
 
 	DrawTextureObj(texture, player.pos, elecShield.size);
 }

@@ -27,7 +27,7 @@ constexpr int kAlphaMax = 255;
 constexpr int kAlphaMin = 0;
 
 unsigned int kPlayerColor = 0x04C1E8FF;
-unsigned int kPlayerChargedColor = 0x5004e8FF;
+unsigned int kPlayerChargedColor = 0x5004E8FF;
 unsigned int kEnemyColor = 0xE01068FF;
 
 #pragma endregion
