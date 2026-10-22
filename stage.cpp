@@ -335,7 +335,8 @@ static void UpdateBackGround(void) {
 			backGround.easingT = 1.0f;
 			backGround.isFadeIn = false;
 		}
-	} else {
+	}
+	else {
 		backGround.easingT -= backGround.easingSpeed;
 		if (backGround.easingT <= 0.0f) {
 			backGround.easingT = 0.0f;
@@ -502,9 +503,33 @@ static void SpawnEnemyByRound(void) {
 			data.timer.count = 0;
 
 			Vector2 spawnPos;
-			
-			spawnPos = CreatePosOutCameraZone();
-			SpawnEnemy(spawnPos, data.type);
+			if (data.type == EnemyType::EnemyM) {
+				int getrand = GetRand(0, 3);;
+				//左上
+				if (getrand == 0) {
+					spawnPos = { ToFloat(GetRand(50,150)),ToFloat(GetRand(50,150)) };
+					SpawnEnemy(spawnPos, data.type);
+				}
+				//左下
+				else if (getrand == 1) {
+					spawnPos = { ToFloat(GetRand(50,150)),ToFloat(GetRand(1290,1390)) };
+					SpawnEnemy(spawnPos, data.type);
+				}
+				//右上 
+				else if (getrand == 2) {
+					spawnPos = { ToFloat(GetRand(2410,2510)),ToFloat(GetRand(50,150)) };
+					SpawnEnemy(spawnPos, data.type);
+				}
+				//右下
+				else if (getrand == 3) {
+					spawnPos = { ToFloat(GetRand(2410,2510)),ToFloat(GetRand(1290,1390)) };
+				SpawnEnemy(spawnPos, data.type);
+				}
+			}
+			else {
+				spawnPos = CreatePosOutCameraZone();
+				SpawnEnemy(spawnPos, data.type);
+			}
 		}
 	}
 }
