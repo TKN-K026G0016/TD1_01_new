@@ -13,6 +13,13 @@ enum class ModeStartEffect {
 	Standby
 };
 
+enum class ModeBackground {
+	Standby,
+	Combo100,
+	Combo500,
+	Combo1000,
+};
+
 void InitStage(void);
 void UpdateStage(void);
 void DrawStage(void);
@@ -51,4 +58,8 @@ ModeStartEffect GetNowModeStart(void);
 
 bool GetIsWarningBoss(void);
 
-void TriggerBackgroundFlash(void);
+/// <summary>
+/// 背景のフラッシュ処理
+/// </summary>
+/// <param name="mode">次の状態</param>
+void TriggerBackgroundFlash(ModeBackground mode);

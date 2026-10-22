@@ -240,13 +240,15 @@ static void UpdateShockCombo(void) {
 				PlaySe(SeType::ComboJingle1000);
 
 				//フラッシュ演出
-				TriggerBackgroundFlash();
+				TriggerBackgroundFlash(ModeBackground::Combo1000);
 			}
 			else if (nowCombo > jingle2Combo) {
 				PlaySe(SeType::ComboJingle500);
+				TriggerBackgroundFlash(ModeBackground::Combo500);
 			}
 			else if (nowCombo > jingle1Combo) {
 				PlaySe(SeType::ComboJingle100);
+				TriggerBackgroundFlash(ModeBackground::Combo100);
 			}
 			
 			totalComboInCombo = 0;
