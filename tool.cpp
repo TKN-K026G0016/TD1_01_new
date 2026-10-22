@@ -77,12 +77,12 @@ Vector2i ConvertPosWToS(Vector2 posW) {
 	Vector2 posS = { 0, 0 };
 	Vector2 cameraPos = GetCameraPos();
 	// まず通常のスクリーン座標へ変換
-	posS.x = (posW.x - cameraPos.x)+ kWindowCenter.x;
+	posS.x = (posW.x - cameraPos.x) + kWindowCenter.x;
 	posS.y = -(posW.y - cameraPos.y) + kWindowCenter.y;
 
 	// ウィンドウ中心
 	float centerX = kWindowCenter.x;
-	float centerY =  kWindowCenter.y;
+	float centerY = kWindowCenter.y;
 
 	// 中心基準で拡縮
 	posS.x = (posS.x - centerX) * GetCameraZoom() + centerX;
@@ -210,11 +210,19 @@ Vector2 MoveByEasing(Vector2 startPos, Vector2 endPos, float t, EasingMode mode)
 	{
 		easedT = t;
 
+		if (easedT > 1.0f) {
+			easedT = 1.0f;
+		}
+
 		break;
 	}
 	case  EasingMode::EaseIn:
 	{
 		easedT = t * t;
+
+		if (easedT > 1.0f) {
+			easedT = 1.0f;
+		}
 
 		break;
 	}
@@ -222,19 +230,47 @@ Vector2 MoveByEasing(Vector2 startPos, Vector2 endPos, float t, EasingMode mode)
 	{
 		easedT = 1.0f - powf(1.0f - t, 3.0f);
 
+		if (easedT > 1.0f) {
+			easedT = 1.0f;
+		}
+
 		break;
 	}
 	case  EasingMode::EaseInOut:
 	{
 		easedT = -(cosf(static_cast<float>(M_PI) * t) - 1.0f) / 2.0f;
 
+		if (easedT > 1.0f) {
+			easedT = 1.0f;
+		}
+
+		break;
+	}
+	case  EasingMode::EaseInBack:
+	{
+		float c1 = kOvershootAmount;
+		float c3 = c1 + 1;
+
+		easedT = c3 * t * t * t - c1 * t * t;
+
+		if (easedT > 1.0f) {
+			easedT = 1.0f;
+		}
+
+		break;
+	}
+	case  EasingMode::EaseOutBack:
+	{
+		float c1 = kOvershootAmount;
+		float c3 = c1 + 1;
+
+		easedT = 1 + c3 * static_cast<float>(pow(t - 1, 3)) + c1 * static_cast<float>(pow(t - 1, 2));
+
 		break;
 	}
 	}
 
-	if (easedT > 1.0f) {
-		easedT = 1.0f;
-	}
+
 
 	return { (1.0f - easedT) * startPos.x + easedT * endPos.x,(1.0f - easedT) * startPos.y + easedT * endPos.y };
 }
@@ -251,9 +287,13 @@ int UpdateValueByEasing(int startNum, int endNum, float t, EasingMode mode) {
 	float easedT = 0.0f;
 
 	switch (mode) {
-	case  EasingMode::Linear:
+	case EasingMode::Linear:
 	{
 		easedT = t;
+
+		if (easedT > 1.0f) {
+			easedT = 1.0f;
+		}
 
 		break;
 	}
@@ -261,11 +301,19 @@ int UpdateValueByEasing(int startNum, int endNum, float t, EasingMode mode) {
 	{
 		easedT = t * t;
 
+		if (easedT > 1.0f) {
+			easedT = 1.0f;
+		}
+
 		break;
 	}
 	case  EasingMode::EaseOut:
 	{
 		easedT = 1.0f - powf(1.0f - t, 3.0f);
+
+		if (easedT > 1.0f) {
+			easedT = 1.0f;
+		}
 
 		break;
 	}
@@ -273,13 +321,36 @@ int UpdateValueByEasing(int startNum, int endNum, float t, EasingMode mode) {
 	{
 		easedT = -(cosf(static_cast<float>(M_PI) * t) - 1.0f) / 2.0f;
 
+		if (easedT > 1.0f) {
+			easedT = 1.0f;
+		}
+
+		break;
+	}
+	case  EasingMode::EaseInBack:
+	{
+		float c1 = kOvershootAmount;
+		float c3 = c1 + 1;
+
+		easedT = c3 * t * t * t - c1 * t * t;
+
+		if (easedT > 1.0f) {
+			easedT = 1.0f;
+		}
+
+		break;
+	}
+	case  EasingMode::EaseOutBack:
+	{
+		float c1 = kOvershootAmount;
+		float c3 = c1 + 1;
+
+		easedT = 1 + c3 * static_cast<float>(pow(t - 1, 3)) + c1 * static_cast<float>(pow(t - 1, 2));
+
 		break;
 	}
 	}
 
-	if (easedT > 1.0f) {
-		easedT = 1.0f;
-	}
 
 	return static_cast<int>((1.0f - easedT) * startNum + easedT * endNum);
 }
@@ -296,9 +367,13 @@ float UpdateValueByEasing(float startNum, float endNum, float t, EasingMode mode
 	float easedT = 0.0f;
 
 	switch (mode) {
-	case  EasingMode::Linear:
+	case EasingMode::Linear:
 	{
 		easedT = t;
+
+		if (easedT > 1.0f) {
+			easedT = 1.0f;
+		}
 
 		break;
 	}
@@ -306,11 +381,19 @@ float UpdateValueByEasing(float startNum, float endNum, float t, EasingMode mode
 	{
 		easedT = t * t;
 
+		if (easedT > 1.0f) {
+			easedT = 1.0f;
+		}
+
 		break;
 	}
 	case  EasingMode::EaseOut:
 	{
 		easedT = 1.0f - powf(1.0f - t, 3.0f);
+
+		if (easedT > 1.0f) {
+			easedT = 1.0f;
+		}
 
 		break;
 	}
@@ -318,12 +401,34 @@ float UpdateValueByEasing(float startNum, float endNum, float t, EasingMode mode
 	{
 		easedT = -(cosf(static_cast<float>(M_PI) * t) - 1.0f) / 2.0f;
 
+		if (easedT > 1.0f) {
+			easedT = 1.0f;
+		}
+
 		break;
 	}
-	}
+	case  EasingMode::EaseInBack:
+	{
+		float c1 = kOvershootAmount;
+		float c3 = c1 + 1;
 
-	if (easedT > 1.0f) {
-		easedT = 1.0f;
+		easedT = c3 * t * t * t - c1 * t * t;
+
+		if (easedT > 1.0f) {
+			easedT = 1.0f;
+		}
+
+		break;
+	}
+	case  EasingMode::EaseOutBack:
+	{
+		float c1 = kOvershootAmount;
+		float c3 = c1 + 1;
+
+		easedT = 1 + c3 * static_cast<float>(pow(t - 1, 3)) + c1 * static_cast<float>(pow(t - 1, 2));
+
+		break;
+	}
 	}
 
 	return (1.0f - easedT) * startNum + easedT * endNum;
@@ -333,9 +438,13 @@ float CreateEasedT(float t, EasingMode mode) {
 	float easedT = 0.0f;
 
 	switch (mode) {
-	case  EasingMode::Linear:
+	case EasingMode::Linear:
 	{
 		easedT = t;
+
+		if (easedT > 1.0f) {
+			easedT = 1.0f;
+		}
 
 		break;
 	}
@@ -343,17 +452,51 @@ float CreateEasedT(float t, EasingMode mode) {
 	{
 		easedT = t * t;
 
+		if (easedT > 1.0f) {
+			easedT = 1.0f;
+		}
+
 		break;
 	}
 	case  EasingMode::EaseOut:
 	{
 		easedT = 1.0f - powf(1.0f - t, 3.0f);
 
+		if (easedT > 1.0f) {
+			easedT = 1.0f;
+		}
+
 		break;
 	}
 	case  EasingMode::EaseInOut:
 	{
 		easedT = -(cosf(static_cast<float>(M_PI) * t) - 1.0f) / 2.0f;
+
+		if (easedT > 1.0f) {
+			easedT = 1.0f;
+		}
+
+		break;
+	}
+	case  EasingMode::EaseInBack:
+	{
+		float c1 = kOvershootAmount;
+		float c3 = c1 + 1;
+
+		easedT = c3 * t * t * t - c1 * t * t;
+
+		if (easedT > 1.0f) {
+			easedT = 1.0f;
+		}
+
+		break;
+	}
+	case  EasingMode::EaseOutBack:
+	{
+		float c1 = kOvershootAmount;
+		float c3 = c1 + 1;
+
+		easedT = 1 + c3 * static_cast<float>(pow(t - 1, 3)) + c1 * static_cast<float>(pow(t - 1, 2));
 
 		break;
 	}

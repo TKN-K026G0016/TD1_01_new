@@ -7,6 +7,22 @@ constexpr int kVertexNum = 4;
 //当たり判定の透明度
 constexpr unsigned int kDebugHitColor = 0x55;
 
+enum class EasingMode {
+	//一定の速度
+	Linear,
+	//前半ゆっくり
+	EaseIn,
+	//後半ゆっくり
+	EaseOut,
+	//前後半ゆっくり
+	EaseInOut,
+	//前半に後退する
+	EaseInBack,
+	//後半に後退する
+	EaseOutBack,
+};
+constexpr float kOvershootAmount = 1.70158f;
+
 template <typename T>
 //static_cast<int>()の代わり
 constexpr int ToInt(T value) {
@@ -18,6 +34,7 @@ template <typename T>
 constexpr float ToFloat(T value) {
 	return static_cast<float>(value);
 }
+
 
 void InitTool(void);
 
@@ -103,16 +120,6 @@ bool CheckCollisionBoxVSCircle(Vector2 circlePos, float circleRadius, Vector2 bo
 /// <param name="vertex">矩形の頂点座標</param>
 /// <returns>接触しているか</returns>
 bool CheckCollisionOBBvsCircle(Vector2 circlePos, float circleRadius, Vector2 vertex[4]);
-
-enum class EasingMode {
-	//一定の速度
-	Linear,
-	//前半に加速
-	EaseIn,
-	//後半に減速
-	EaseOut,
-	EaseInOut,
-};
 
 Vector2 MoveByEasing(Vector2 startPos, Vector2 endPos, float t, EasingMode mode);
 
