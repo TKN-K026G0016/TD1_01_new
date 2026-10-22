@@ -21,6 +21,7 @@ static constexpr unsigned int kNormalColor = 0xE01068FF;
 static constexpr unsigned int kFlashColor = WHITE;
 
 #pragma region データ: EnemyShooter
+
 constexpr int kEnemyShooterLimit = 10;
 static EnemyShooter enemyShooter[kEnemyShooterLimit];
 int nowEnemyShooterIsAliveCount = 0;
@@ -1097,11 +1098,9 @@ static void DrawEnemySniper(void) {
 
 
 void DeadAllEnemy(void) {
-	//ボスが死亡したら
-	if(!GetBossEnemyIsDead()) return;
 	// Shooter
 	for (int i = 0; i < kEnemyShooterLimit; i++) {
-		if (enemySniper[i].isAlive) {
+		if (enemyShooter[i].isAlive) {
 			DeadEnemyShooter(i);
 		}
 	}
@@ -1148,7 +1147,7 @@ void DeadAllEnemy(void) {
 		}
 	}
 
-	return; // ★ 全滅後は敵処理をスキップ
+	return;
 
 }
 
@@ -1174,7 +1173,6 @@ void UpdateEnemy(void) {
 	UpdateHitStopTimerEnemyShooter();
 	CountIgnoreShockEnemyShooter();
 	ShootEnemyBulletShooter();
-	DeadAllEnemy();
 
 	//enemyGuardian
 	CheckDeadEnemyGuardian();

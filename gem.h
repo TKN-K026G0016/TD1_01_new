@@ -15,6 +15,9 @@ struct Gem {
 	Vector2 pos = { 0, 0 };
 	Vector2 size = { 32, 32 };
 
+	Vector2 moveVec = {0, 0};
+	bool isVacume = true;
+
 	bool isAlive = false;
 	Timer breakTimer = { 3000, 0 };
 

@@ -120,6 +120,10 @@ int UpdateValueByEasing(int startNum, int endNum, float t, EasingMode mode);
 
 float UpdateValueByEasing(float startNum, float endNum, float t, EasingMode mode);
 
+float CreateEasedT(float t, EasingMode mode);
+
+unsigned int UpdateColorByEasing(unsigned int startColor, unsigned int endColor, float t);
+
 void DrawHitBox(Vector2 hitVertex0, Vector2 hitVertex1);
 
 /// <summary>

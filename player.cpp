@@ -123,6 +123,7 @@ enum class LockTargetType {
 	EnemySmall = 3,
 	EnemyM = 4,
 	EnemyBomb = 5,
+	EnemySniper = 6,
 
 	Gem,
 };
@@ -371,11 +372,11 @@ static void RotatePlayer(void) {
 	nowTargetType = LockTargetType::None;
 	targetIndex = -1;
 
-	EnemyShooter* enemy1 = GetEnemyShooterArray();
-	int enemy1Limit = GetEnemyShooterLimit();
+	EnemyShooter* enemyShooter = GetEnemyShooterArray();
+	int enemyShooterLimit = GetEnemyShooterLimit();
 
-	EnemyGuardian* enemy2 = GetEnemyGuardianArray();
-	int enemy2Limit = GetEnemyGuardianLimit();
+	EnemyGuardian* enemyGuardian = GetEnemyGuardianArray();
+	int enemyGuardianLimit = GetEnemyGuardianLimit();
 
 	EnemyBasic* enemyBasic = GetEnemyBasicArray();
 	int enemyBasicLimit = GetEnemyBasicLimit();
@@ -389,15 +390,18 @@ static void RotatePlayer(void) {
 	EnemyBomb* enemyBomb = GetEnemyBombArray();
 	int enemyBombLimit = GetEnemyBombLimit();
 
+	EnemySniper* enemySniper = GetEnemySniperArray();
+	int enemySniperLimit = GetEnemySniperLimit();
+
 	Gem* gem = GetGemArray();
 	int gemLimit = GetGemLimit();
 
 	// enemy1探索
-	for (int i = 0; i < enemy1Limit; i++) {
-		if (!enemy1[i].isAlive) continue;
+	for (int i = 0; i < enemyShooterLimit; i++) {
+		if (!enemyShooter[i].isAlive) continue;
 
-		float dx = enemy1[i].pos.x - player.pos.x;
-		float dy = enemy1[i].pos.y - player.pos.y;
+		float dx = enemyShooter[i].pos.x - player.pos.x;
+		float dy = enemyShooter[i].pos.y - player.pos.y;
 		float dis = sqrtf(dx * dx + dy * dy);
 
 		if (dis < closestDis) {
@@ -407,11 +411,11 @@ static void RotatePlayer(void) {
 		}
 	}
 
-	for (int i = 0; i < enemy2Limit; i++) {
-		if (!enemy2[i].isAlive) continue;
+	for (int i = 0; i < enemyGuardianLimit; i++) {
+		if (!enemyGuardian[i].isAlive) continue;
 
-		float dx = enemy2[i].pos.x - player.pos.x;
-		float dy = enemy2[i].pos.y - player.pos.y;
+		float dx = enemyGuardian[i].pos.x - player.pos.x;
+		float dy = enemyGuardian[i].pos.y - player.pos.y;
 		float dis = sqrtf(dx * dx + dy * dy);
 
 		if (dis < closestDis) {
@@ -477,6 +481,20 @@ static void RotatePlayer(void) {
 		}
 	}
 
+	for (int i = 0; i < enemySniperLimit; i++) {
+		if (!enemySniper[i].isAlive) continue;
+
+		float dx = enemySniper[i].pos.x - player.pos.x;
+		float dy = enemySniper[i].pos.y - player.pos.y;
+		float dis = sqrtf(dx * dx + dy * dy);
+
+		if (dis < closestDis) {
+			closestDis = dis;
+			targetIndex = i;
+			nowTargetType = LockTargetType::EnemySniper;
+		}
+	}
+
 	// boss探索
 	BossEnemy* boss = GetBossEnemy();
 	if (boss->isAlive) {
@@ -521,17 +539,17 @@ static void RotatePlayer(void) {
 		}
 		targetPos = boss->pos;
 	} else if (nowTargetType == LockTargetType::Enemy1) {
-		if (!enemy1[targetIndex].isAlive) {
+		if (!enemyShooter[targetIndex].isAlive) {
 			nowTargetType = LockTargetType::None;
 			return;
 		}
-		targetPos = enemy1[targetIndex].pos;
+		targetPos = enemyShooter[targetIndex].pos;
 	} else if (nowTargetType == LockTargetType::Enemy2) {
-		if (!enemy2[targetIndex].isAlive) {
+		if (!enemyGuardian[targetIndex].isAlive) {
 			nowTargetType = LockTargetType::None;
 			return;
 		}
-		targetPos = enemy2[targetIndex].pos;
+		targetPos = enemyGuardian[targetIndex].pos;
 	} else if (nowTargetType == LockTargetType::EnemyBasic) {
 		if (!enemyBasic[targetIndex].isAlive) {
 			nowTargetType = LockTargetType::None;
@@ -556,6 +574,12 @@ static void RotatePlayer(void) {
 			return;
 		}
 		targetPos = enemyBomb[targetIndex].pos;
+	} else if (nowTargetType == LockTargetType::EnemySniper) {
+		if (!enemySniper[targetIndex].isAlive) {
+			nowTargetType = LockTargetType::None;
+			return;
+		}
+		targetPos = enemySniper[targetIndex].pos;
 	} else if (nowTargetType == LockTargetType::Gem) {
 		if (!gem[targetIndex].isAlive) {
 			nowTargetType = LockTargetType::None;
@@ -635,7 +659,17 @@ static void UpdateLockOnSign(void) {
 		EnemyM* enemyM = GetEnemyMArray();
 		lockOnSign.pos = enemyM[targetIndex].pos;
 	}
-	//enemyM
+	//enemyBomb
+	else if (nowTargetType == LockTargetType::EnemyBomb) {
+		EnemyBomb* enemyBomb = GetEnemyBombArray();
+		lockOnSign.pos = enemyBomb[targetIndex].pos;
+	}
+	//enemySniper
+	else if (nowTargetType == LockTargetType::EnemySniper) {
+		EnemySniper* enemySniper = GetEnemySniperArray();
+		lockOnSign.pos = enemySniper[targetIndex].pos;
+	}
+	//gem
 	else if (nowTargetType == LockTargetType::Gem) {
 		Gem* gem = GetGemArray();
 		lockOnSign.pos = gem[targetIndex].pos;
@@ -1201,6 +1235,10 @@ void TriggerDodgeClose(Vector2 eBulletPos) {
 
 		SpawnGem(eBulletPos, GemType::S);
 	}
+}
+
+bool GetPlayerIsInvincible(void) {
+	return player.isInvincible;
 }
 
 //PlayerState GetPlayerNowState(void) {

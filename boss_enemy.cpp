@@ -11,6 +11,7 @@
 #include "tool.h"
 #include "input.h"
 #include "texture.h"
+#include "effect.h"
 
 #include <Novice.h>
 #define _USE_MATH_DEFINES
@@ -409,6 +410,8 @@ void DeathBossEnemy(void) {
 
 	if (bossEnemy.remainLife <= 0) {
 		bossEnemy.isDead = true;
+		CreateFlashPanel();
+		DeadAllEnemy();
 	}
 
 }

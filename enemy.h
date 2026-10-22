@@ -408,3 +408,5 @@ int GetEnemySniperLimit(void);
 /// <param name="enemy"></param>
 /// <param name="pow"></param>
 void DamageEnemySniper(EnemySniper& enemy, int pow, bool hitStopSwitch);
+
+void DeadAllEnemy(void);

@@ -120,3 +120,5 @@ void TriggerDodgeClose(Vector2 eBulletPos);
 /// </summary>
 /// <returns>player.nowState</returns>
 PlayerState GetPlayerNowState(void);
+
+bool GetPlayerIsInvincible(void);

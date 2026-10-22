@@ -155,16 +155,23 @@ struct BackGround {
 
 	float scrollRate = 1.0f;
 
-	bool isFlash = false;
+	//現在の状態
+	ModeBackground nowMode = ModeBackground::Standby;
 
 	float easingT = 0.0f;
-	float easingSpeed = 0.03f;
 	EasingMode easingMode = EasingMode::EaseInOut;
 	bool isFadeIn = true;
 
+	float easingSpeed100 = 0.06f;
+	float easingSpeed500 = 0.04f;
+	float easingSpeed1000 = 0.02f;
+
 	unsigned int nowColor = 0x240912FF;
 	unsigned int normalColor = 0x240912FF;
-	unsigned int combo1000Color = 0x91D2E8FF;
+
+	unsigned int combo100Color = 0x451545FF;
+	unsigned int combo500Color = 0x485793FF;
+	unsigned int combo1000Color = 0x70AFCBFF;
 
 	Texture texture = {};
 };
@@ -304,50 +311,64 @@ static void InitBackGround(void) {
 	scanLineTexture = GetTexture(TextureType::TitleLine);
 }
 
-static unsigned int LerpColor(
-	unsigned int startColor,
-	unsigned int endColor,
-	float t) {
-	int sr = (startColor >> 24) & 0xFF;
-	int sg = (startColor >> 16) & 0xFF;
-	int sb = (startColor >> 8) & 0xFF;
-	int sa = (startColor) & 0xFF;
-
-	int er = (endColor >> 24) & 0xFF;
-	int eg = (endColor >> 16) & 0xFF;
-	int eb = (endColor >> 8) & 0xFF;
-	int ea = (endColor) & 0xFF;
-
-	int r = static_cast<int>(sr + (er - sr) * t);
-	int g = static_cast<int>(sg + (eg - sg) * t);
-	int b = static_cast<int>(sb + (eb - sb) * t);
-	int a = static_cast<int>(sa + (ea - sa) * t);
-
-	return (r << 24) | (g << 16) | (b << 8) | a;
-}
-
 static void UpdateBackGround(void) {
-	if (!backGround.isFlash) return;
+	if (backGround.nowMode == ModeBackground::Standby) return;
 
+	float easingSpeed;
+	if (backGround.nowMode == ModeBackground::Combo100) {
+		easingSpeed = backGround.easingSpeed100;
+	} else if (backGround.nowMode == ModeBackground::Combo500) {
+		easingSpeed = backGround.easingSpeed500;
+	} else {
+		easingSpeed = backGround.easingSpeed1000;
+	}
+
+	//イージング処理
 	if (backGround.isFadeIn) {
-		backGround.easingT += backGround.easingSpeed;
+		backGround.easingT += easingSpeed;
 		if (backGround.easingT >= 1.0f) {
 			backGround.easingT = 1.0f;
 			backGround.isFadeIn = false;
 		}
-	}
-	else {
-		backGround.easingT -= backGround.easingSpeed;
+	} else {
+		backGround.easingT -= easingSpeed;
 		if (backGround.easingT <= 0.0f) {
 			backGround.easingT = 0.0f;
 			backGround.isFadeIn = true;
-			backGround.isFlash = false;
+
+			backGround.nowMode = ModeBackground::Standby;
 		}
 	}
 
-	//色の変更
+	switch (backGround.nowMode) {
+	case ModeBackground::Combo100: {
 
-	backGround.nowColor = LerpColor(backGround.normalColor, backGround.combo1000Color, backGround.easingT);
+		//色の変更
+		float easedT = CreateEasedT(backGround.easingT, backGround.easingMode);
+
+		backGround.nowColor = UpdateColorByEasing(backGround.normalColor, backGround.combo100Color, easedT);
+
+		break;
+	}
+	case ModeBackground::Combo500: {
+
+		//色の変更
+		float easedT = CreateEasedT(backGround.easingT, backGround.easingMode);
+
+		backGround.nowColor = UpdateColorByEasing(backGround.normalColor, backGround.combo500Color, easedT);
+
+		break;
+	}
+	case ModeBackground::Combo1000: {
+
+		//色の変更
+		float easedT = CreateEasedT(backGround.easingT, backGround.easingMode);
+
+		backGround.nowColor = UpdateColorByEasing(backGround.normalColor, backGround.combo1000Color, easedT);
+
+		break;
+	}
+	}
 }
 
 static void UpdateScanLine(void) {
@@ -381,8 +402,8 @@ static void DrawBackGround(void) {
 	DrawScanLine();
 }
 
-void TriggerBackgroundFlash(void) {
-	backGround.isFlash = true;
+void TriggerBackgroundFlash(ModeBackground mode) {
+	backGround.nowMode = mode;
 	backGround.isFadeIn = true;
 	backGround.easingT = 0.0f;
 }

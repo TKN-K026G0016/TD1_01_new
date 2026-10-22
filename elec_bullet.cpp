@@ -8,6 +8,7 @@
 #include "scene_manager.h"
 #include "se.h"
 #include "stage.h"
+#include "bgm.h"
 
 #include "vector2.h"
 #include "timer.h"
@@ -89,12 +90,15 @@ int scoreInCombo = 0;
 //スコア数による獲得スコアの倍率
 constexpr float kScoreMugByCombo = 0.01f;
 
-//
+//コンボサウンドの間隔
 int comboSoundSpan = 100;
 
 int jingle1Combo = 100;
 int jingle2Combo = 500;
 int jingle3Combo = 1000;
+
+//スコアジングル再生中のbgmVolume
+static constexpr  float bgmVolumePlayingJingle = 0.5f;
 
 #pragma endregion
 
@@ -236,20 +240,30 @@ static void UpdateShockCombo(void) {
 				PlaySe(SeType::ComboJingle1000);
 
 				//フラッシュ演出
-				TriggerBackgroundFlash();
+				TriggerBackgroundFlash(ModeBackground::Combo1000);
 			}
 			else if (nowCombo > jingle2Combo) {
-				PlaySe(SeType::ComboJingle100);
+				PlaySe(SeType::ComboJingle500);
+				TriggerBackgroundFlash(ModeBackground::Combo500);
 			}
 			else if (nowCombo > jingle1Combo) {
-				PlaySe(SeType::ComboJingle10);
+				PlaySe(SeType::ComboJingle100);
+				TriggerBackgroundFlash(ModeBackground::Combo100);
 			}
 			
 			totalComboInCombo = 0;
 			nowCombo = 0;
 		}
 	}
+
+	if (CheckIsPlayingSe(SeType::ComboJingle1000) || CheckIsPlayingSe(SeType::ComboJingle500) || CheckIsPlayingSe(SeType::ComboJingle100)) {
+		ChangeBgmVolume(bgmVolumePlayingJingle);
+	} else {
+		ResetBgmVolume();
+	}
+
 }
+
 
 #pragma endregion
 
