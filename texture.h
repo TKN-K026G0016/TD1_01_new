@@ -151,6 +151,7 @@ enum class TextureType {
 	EffectExplosion,
 
 	ExplodeEffect,
+	barrierEffect,
 
 	//===============
 	//Pause
