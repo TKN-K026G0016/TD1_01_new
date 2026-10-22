@@ -546,9 +546,9 @@ static RecoveryEnergyEffect recoveryEffect[kRecoveryEnergyEffectLimit];
 #pragma region データ: BreakGemEffect
 
 struct BreakGemEffect {
-	float endSizeValue = 80;
+	float endSizeValue = 100;
 
-	float easingSpeed = 0.06f;
+	float easingSpeed = 0.05f;
 
 	unsigned int color = WHITE;
 };
