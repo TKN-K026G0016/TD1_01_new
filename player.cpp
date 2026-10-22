@@ -152,7 +152,7 @@ constexpr float kShootDisLength = 15.0f;
 
 //チャージタイマー
 Timer chargeElecBulletTimer = { 40, 0 };
-float consumptionShootNormal = 0.5f;
+float consumptionShootNormal = 0.3f;
 float consumptionShootCharge = 10.0f;
 static bool isCharge = false;
 
@@ -175,9 +175,6 @@ static constexpr float kConsumptionEnergy = 0.05f;
 
 //シールドが消えるエネルギー量のライン
 static constexpr float kBreakShieldLine = 5.0f;
-
-////故障時のenergy回復量
-//constexpr float kRecoveryEnergyDuringEmpty = 0.15f;
 
 #pragma endregion
 
@@ -750,6 +747,7 @@ static void ShootElecBullet(void) {
 			PlaySe(SeType::ShootElecBulletCharge);
 
 			isCharge = false;
+			createChargeOrbTimer.count = 0;
 		}
 
 		chargeElecBulletTimer.count = 0;
@@ -827,7 +825,7 @@ static void UpdatePlayerEffect(void) {
 /// <param name=""></param>
 static void CreateChargeOrbEffect(void) {
 
-	if (chargeElecBulletTimer.count > kStartCreateChargeChipTime) {
+	if ((chargeElecBulletTimer.count > kStartCreateChargeChipTime && player.remainEnergy > consumptionShootCharge) || isCharge) {
 
 		createChargeChipTimer.count++;
 		if (createChargeChipTimer.count >= createChargeChipTimer.time) {
@@ -842,8 +840,7 @@ static void CreateChargeOrbEffect(void) {
 		StopPlayingSe(SeType::Charge);
 	}
 
-	if (chargeElecBulletTimer.count >= chargeElecBulletTimer.time) {
-
+	if (isCharge) {
 		createChargeOrbTimer.count++;
 		if (createChargeOrbTimer.count >= createChargeOrbTimer.time) {
 			createChargeOrbTimer.count = 0;
@@ -898,9 +895,8 @@ static void UpdateElecShield(void) {
 					elecShield.isScaleUp = false;
 				}
 			}
-			
-		} 
-		else {
+
+		} else {
 			float t = std::clamp(energyRate / 0.8f, 0.0f, 1.0f);
 
 			float easingSpeed = elecShield.easingSpeedMin * t + elecShield.easingSpeedMax * (1.0f - t);
