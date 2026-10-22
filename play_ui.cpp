@@ -217,6 +217,8 @@ struct ShockComboIcon {
 	bool isInvisible = false;
 	Timer invisibleTimer = { 3, 0 };
 
+	int countStopValue = 10000;
+
 	Texture texture = {};
 };
 ShockComboIcon comboIcon;
@@ -721,6 +723,9 @@ static void UpdateShockCombo(void) {
 	//コンボ持続中
 	if (!comboIcon.isShowPreCombo) {
 		comboIcon.nowCombo = GetShockCombo();
+		if (comboIcon.nowCombo > comboIcon.countStopValue) {
+			comboIcon.nowCombo = 9999;
+		}
 
 		for (int i = 0; i < kComboNumbersLimit; i++) {
 			comboNumbers[i].animNum = GetValueAtDigit(comboIcon.nowCombo, i);
