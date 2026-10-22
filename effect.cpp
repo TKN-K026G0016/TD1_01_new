@@ -93,9 +93,9 @@ struct SmokeEffect {
 	float moveSpeed = 5.0f;
 
 	//<サイズ関係>
-	float firstSizeValue = 8;
+	float firstSizeValue = 0;
 	float sizeValue = firstSizeValue;
-	float changeSizeSpeed = 4;
+	float changeSizeSpeed = 0;
 
 	//<回転関係>
 	float rotateTheta = 0.0f;
@@ -116,9 +116,34 @@ struct SmokeEffect {
 	int diffAlpha = 30;
 
 	Texture texture = {};
-	unsigned int color = 0x555555FF;
+	unsigned int color = WHITE;
 };
 SmokeEffect smokeEffect[kSmokeEffectLimit];
+
+struct PlayerSmoke {
+	float moveSpeed = 5.0f;
+	float firstSizeValue = 8;
+	float changeSizeSpeed = 4;
+	int changeAlphaSpeed = 12;
+
+	float posOffset = 10;
+
+	unsigned int color = 0x555555FF;
+};
+PlayerSmoke playerSmoke;
+
+struct EnemyBombSmoke {
+	float moveSpeed = 7.0f;
+	float firstSizeValue = 10;
+	float changeSizeSpeed = 4;
+	int changeAlphaSpeed = 8;
+
+	float posOffset = 20;
+
+	unsigned int color = WHITE;
+};
+EnemyBombSmoke enemyBombSmoke;
+
 
 #pragma endregion
 
@@ -169,59 +194,6 @@ struct ElecLineEffect {
 };
 ElecLineEffect elecLineEffect[kElecLineEffectLimit];
 
-#pragma region 廃棄予定
-//constexpr int kElecShockEffectLimit = 30;
-//struct ElecShockEffect {
-//	Vector2 pos = {};
-//
-//	bool isShoot = false;
-//
-//	//サイズ関係
-//	float firstSizeValue = 10.0f;
-//	float endSizeValue = 300.0f;
-//	float sizeValue = firstSizeValue;
-//
-//	//不透明度
-//	int alphaMax = 255;
-//	int alphaMin = 0;
-//	int alpha = alphaMax;
-//
-//	float keepAlphaT = 0.4f;
-//
-//	//サイズなどの変更速度
-//	float easingT = 0.0f;
-//	float changeSpeed = 0.08f;
-//
-//	Texture texture = {};
-//};
-//ElecShockEffect elecShockEffect[kElecShockEffectLimit];
-//
-//struct ElecShockChargedEffect {
-//	Vector2 pos = {};
-//
-//	bool isShoot = false;
-//
-//	//サイズ関係
-//	float firstSizeValue = 10.0f;
-//	float endSizeValue = 500.0f;
-//	float sizeValue = firstSizeValue;
-//
-//	//不透明度
-//	int alphaMax = 255;
-//	int alphaMin = 0;
-//	int alpha = alphaMax;
-//
-//	float keepAlphaT = 0.4f;
-//
-//	//サイズなどの変更速度
-//	float easingT = 0.0f;
-//	float changeSpeed = 0.08f;
-//
-//	Texture texture = {};
-//};
-//ElecShockChargedEffect elecShockChargedEffect[kElecShockEffectLimit];
-
-#pragma endregion
 
 #pragma endregion
 
@@ -886,13 +858,32 @@ static void DrawSmokeEffectAsUI(void) {
 	}
 }
 
-void CreateSmokeEffect(Vector2 pos, TypeDrawEffect drawType) {
+void CreateSmokeEffect(Vector2 pos, TypeDrawEffect drawType, TypeSmoke smokeType) {
 	for (int i = 0; i < kSmokeEffectLimit; i++) {
 		if (smokeEffect[i].isShoot) continue;
 
 		smokeEffect[i].isShoot = true;
 		smokeEffect[i].pos = pos;
 		smokeEffect[i].drawType = drawType;
+
+		//変数変更
+		if (smokeType == TypeSmoke::EnergyGauge) {
+			smokeEffect[i].moveSpeed = playerSmoke.moveSpeed;
+			smokeEffect[i].changeSizeSpeed = playerSmoke.changeSizeSpeed;
+			smokeEffect[i].firstSizeValue = playerSmoke.firstSizeValue;
+			smokeEffect[i].changeAlphaSpeed = playerSmoke.changeAlphaSpeed;
+			smokeEffect[i].posOffset = playerSmoke.posOffset;
+
+			smokeEffect[i].color = playerSmoke.color;
+		} else {
+			smokeEffect[i].moveSpeed = enemyBombSmoke.moveSpeed;
+			smokeEffect[i].changeSizeSpeed = enemyBombSmoke.changeSizeSpeed;
+			smokeEffect[i].firstSizeValue = enemyBombSmoke.firstSizeValue;
+			smokeEffect[i].changeAlphaSpeed = enemyBombSmoke.changeAlphaSpeed;
+			smokeEffect[i].posOffset = enemyBombSmoke.posOffset;
+
+			smokeEffect[i].color = enemyBombSmoke.color;
+		}
 
 		//初期化
 		smokeEffect[i].sizeValue = smokeEffect[i].firstSizeValue;

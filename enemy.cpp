@@ -857,14 +857,14 @@ static void MoveEnemyBomb(void) {
 				if (enemyBomb[i].createSmokeTimer.count >= enemyBomb[i].createSmokeTimer.time) {
 					enemyBomb[i].createSmokeTimer.count = 0;
 					Vector2 createPos = { enemyBomb[i].pos.x + enemyBomb[i].createSmokePosOffset.x, enemyBomb[i].pos.y + enemyBomb[i].createSmokePosOffset.y };
-					CreateSmokeEffect(createPos, TypeDrawEffect::Obj);
+					CreateSmokeEffect(createPos, TypeDrawEffect::Obj, TypeSmoke::EnemyBomb);
 				}
 			} else {
 				enemyBomb[i].createSmokeReadyBurstTimer.count++;
 				if (enemyBomb[i].createSmokeReadyBurstTimer.count >= enemyBomb[i].createSmokeReadyBurstTimer.time) {
 					enemyBomb[i].createSmokeReadyBurstTimer.count = 0;
 					Vector2 createPos = { enemyBomb[i].pos.x + enemyBomb[i].createSmokePosOffset.x, enemyBomb[i].pos.y + enemyBomb[i].createSmokePosOffset.y };
-					CreateSmokeEffect(createPos, TypeDrawEffect::Obj);
+					CreateSmokeEffect(createPos, TypeDrawEffect::Obj, TypeSmoke::EnemyBomb);
 				}
 			}
 
