@@ -977,7 +977,7 @@ static void DrawEnemyBomb(void) {
 		//爆発範囲の描画
 		if (enemyBomb[i].burst.count <= enemyBomb[i].burst.time - 90) {
 			Texture burstTexture = enemyBomb[i].burstTexture;
-			burstTexture.color = (burstTexture.color & 0xFFFFFF00) | enemyBomb[i].arpha;
+			burstTexture.color = (burstTexture.color & 0xFFFFFF00) | enemyBomb[i].alpha;
 
 			DrawTextureObj(burstTexture, enemyBomb[i].pos, enemyBomb[i].bustSize);
 		}
@@ -985,7 +985,7 @@ static void DrawEnemyBomb(void) {
 			for (int j = 0;j < 45;j++) {
 				if (enemyBomb[i].burst.time - enemyBomb[i].burst.count == j * 2) {
 					Texture burstTexture = enemyBomb[i].burstTexture;
-					burstTexture.color = (burstTexture.color & 0xFFFFFF00) | enemyBomb[i].arphaReadyBarst;
+					burstTexture.color = (burstTexture.color & 0xFFFFFF00) | enemyBomb[i].alphaReadyBarst;
 					DrawTextureObj(enemyBomb[i].burstTexture, enemyBomb[i].pos, enemyBomb[i].bustSize);
 				}
 			}
@@ -1188,8 +1188,6 @@ void InitEnemy(void) {
 	InitEnemySniper();
 
 	GetMovablePos(spawner.spawnRange);
-
-	SpawnEnemy({ 200, 200 }, EnemyType::EnemyBomb);
 }
 
 void UpdateEnemy(void) {

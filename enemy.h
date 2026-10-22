@@ -249,8 +249,8 @@ struct EnemyBomb {
 
 	float pow = 40.0f;
 	
-	int arphaReadyBarst=255;
-	int arpha=15;
+	int alphaReadyBarst=255;
+	int alpha=15;
 
 	//<爆発関係>
 	//爆発までの時間
