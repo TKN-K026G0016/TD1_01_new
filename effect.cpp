@@ -402,6 +402,7 @@ struct CircleEffect {
 	//イージング関係
 	float easingT = 0.0f;
 	float easingSpeed = 0.1f;
+	float easingSpeedDefault = 0.1f;
 	//透明化が始まるタイミング
 	float startFadeEasingT = 0.1f;
 
@@ -545,7 +546,10 @@ static RecoveryEnergyEffect recoveryEffect[kRecoveryEnergyEffectLimit];
 #pragma region データ: BreakGemEffect
 
 struct BreakGemEffect {
-	float endSizeValue = 64;
+	float endSizeValue = 80;
+
+	float easingSpeed = 0.06f;
+
 	unsigned int color = WHITE;
 };
 BreakGemEffect breakGemEffect;
@@ -1484,9 +1488,9 @@ void DrawTriangleEffect2() {
 }
 #pragma endregion
 
-#pragma region 関数: circleeffect
+#pragma region 関数: circleEffect
 
-void CreateCircleEffect(Vector2 pos, float endSizeValue, unsigned int color) {
+void CreateCircleEffect(Vector2 pos, float endSizeValue, float easingSpeed, unsigned int color) {
 	for (int i = 0; i < kCircleEffectNumber; i++) {
 		if (circleEffect[i].appear) continue;
 
@@ -1494,6 +1498,13 @@ void CreateCircleEffect(Vector2 pos, float endSizeValue, unsigned int color) {
 
 		circleEffect[i].pos = pos;
 		circleEffect[i].endSizeValue = endSizeValue;
+
+		if (easingSpeed <= 0.0f || easingSpeed >= 1.0f) {
+			circleEffect[i].easingSpeed = circleEffect[i].easingSpeedDefault;
+		} else {
+			circleEffect[i].easingSpeed = easingSpeed;
+		}
+
 		circleEffect[i].color = color;
 
 		circleEffect[i].easingT = 0.0f;
@@ -1663,7 +1674,7 @@ void CreateElecLine(Vector2 startPos, Vector2 endPos, bool charged) {
 
 void CreateElecShockEffect(Vector2 pos) {
 	//円を生成
-	CreateCircleEffect(pos, elecShockEffect.circleSize, kPlayerColor);
+	CreateCircleEffect(pos, elecShockEffect.circleSize, 0.0f, kPlayerColor);
 
 	//三角を生成
 	for (int i = 0; i < elecShockEffect.createTriangleLimit; i++) {
@@ -1674,7 +1685,7 @@ void CreateElecShockEffect(Vector2 pos) {
 
 void CreateElecShockChargedEffect(Vector2 pos) {
 	//円を生成
-	CreateCircleEffect(pos, elecShockChargedEffect.circleSize, kPlayerChargedColor);
+	CreateCircleEffect(pos, elecShockChargedEffect.circleSize, 0.0f, kPlayerChargedColor);
 
 	//三角を生成
 	for (int i = 0; i < elecShockChargedEffect.createTriangleLimit; i++) {
@@ -1911,7 +1922,7 @@ static void DrawRecoveryEffect(void) {
 #pragma region 関数: BreakGemEffect
 
 void CreateBreakGemEffect(Vector2 pos) {
-	CreateCircleEffect(pos, breakGemEffect.endSizeValue, breakGemEffect.color);
+	CreateCircleEffect(pos, breakGemEffect.endSizeValue, breakGemEffect.easingSpeed, breakGemEffect.color);
 }
 
 #pragma endregion
