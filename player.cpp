@@ -845,63 +845,7 @@ static void UpdateElecShield(void) {
 }
 
 static void UpdateElecShieldEffect(void) {
-	//シールドが十分な量存在したら
-	if (player.remainEnergy > kBreakShieldLine && player.isEquipShield) {
 
-		//イージング処理
-		float energyRate = std::clamp(player.remainEnergy / kEnergyMax, 0.0f, 1.0f);
-
-		if (energyRate >= 0.8f) {
-			if (elecShield.easingT < 1.0f) {
-				elecShield.easingT += elecShield.easingSpeedMax;
-
-				if (elecShield.easingT > 1.0f) {
-					elecShield.easingT = 1.0f;
-					elecShield.isScaleUp = false;
-				}
-			}
-
-		} else {
-			float t = std::clamp(energyRate / 0.8f, 0.0f, 1.0f);
-
-			float easingSpeed = elecShield.easingSpeedMin * t + elecShield.easingSpeedMax * (1.0f - t);
-
-			if (elecShield.isScaleUp) {
-				elecShield.easingT += easingSpeed;
-				if (elecShield.easingT >= 1.0f) {
-					elecShield.easingT = 1.0f;
-					elecShield.isScaleUp = false;
-				}
-			} else {
-				elecShield.easingT -= easingSpeed;
-				if (elecShield.easingT < 0.0f) {
-					elecShield.easingT = 0.0f;
-					elecShield.isScaleUp = true;
-				}
-			}
-		}
-	} 
-	else {
-		elecShield.easingT -= elecShield.easingSpeedMax;
-		if (elecShield.easingT < 0.0f) {
-			elecShield.easingT = 0.0f;
-		}
-
-		elecShield.isScaleUp = true;
-	}
-
-	//サイズの変更
-	if (player.remainEnergy > kWarnEnergyLine) {
-		elecShield.size = MoveByEasing(elecShield.sizeValueMin, elecShield.sizeValueMax, elecShield.easingT, elecShield.easingMode);
-
-		//透明度の変更
-		elecShield.alpha = UpdateValueByEasing(elecShield.alphaMin, elecShield.alphaMax, elecShield.easingT, elecShield.easingMode);
-	} else {
-		elecShield.size = MoveByEasing(elecShield.sizeValueMinDanger, elecShield.sizeValueMax, elecShield.easingT, elecShield.easingMode);
-
-		//透明度の変更
-		elecShield.alpha = UpdateValueByEasing(elecShield.alphaMinDanger, elecShield.alphaMax, elecShield.easingT, elecShield.easingMode);
-	}
 }
 
 static void DrawElecShield(void) {
