@@ -200,7 +200,6 @@ struct ElecShield {
 
 	//<イージング関係>
 	float easingT = 0.0f;
-	int alpha = 0;
 
 	//通常時のイージング速度
 	float easingSpeedNormal = 0.01f;
@@ -226,11 +225,15 @@ struct ElecShield {
 	Vector2 sizeValueMinReEquip = { 0.0f, 0.0f };
 
 	//<不透明度関係>
+	int alpha = 0;
 	//通常時の透明度最低値
 	int alphaMin = 100;
 	int alphaMax = 150;
 	int alphaMinRecovery = 0;
 	int alphaMinReEquip = 0;
+
+	//<色関係>
+	unsigned int color = WHITE;
 
 	//色の最小値
 	unsigned int colorMin = 0x04C1E8FF;
@@ -846,11 +849,58 @@ static void UpdateElecShield(void) {
 
 static void UpdateElecShieldEffect(void) {
 
+	switch (elecShield.nowMode) {
+	case ModeElecShield::Standby: {
+		if (elecShield.isScaleUp) {
+			elecShield.easingT += elecShield.easingSpeedNormal;
+			if (elecShield.easingT >= 1.0f) {
+				elecShield.easingT = 1.0f;
+				elecShield.isScaleUp = false;
+			}
+		}
+		else {
+			elecShield.easingT -= elecShield.easingSpeedNormal;
+			if (elecShield.easingT <= 0.0f) {
+				elecShield.easingT = 0.0f;
+				elecShield.isScaleUp = true;
+			}
+		}
+		
+		//サイズの変更
+		elecShield.size = MoveByEasing(elecShield.sizeValueMin, elecShield.sizeValueMax, elecShield.easingT, elecShield.easingModeNormal);
+		//不透明度の変更
+		elecShield.alpha = UpdateValueByEasing(elecShield.alphaMin, elecShield.alphaMax, elecShield.easingT, elecShield.easingModeNormal);
+
+		break;
+	}
+	case ModeElecShield::Recovery: {
+
+		break;
+	}
+	case ModeElecShield::Break: {
+
+		break;
+	}
+	case ModeElecShield::ReEquip: {
+
+		break;
+	}
+	}
+
+#pragma region 色の変更
+
+	float gaugeRate = player.remainEnergy / kEnergyMax;
+	gaugeRate = std::clamp(gaugeRate, 0.0f, 1.0f);
+
+	elecShield.color = UpdateColorByEasing(elecShield.colorMin, elecShield.colorMax, gaugeRate);
+
+#pragma endregio
+
 }
 
 static void DrawElecShield(void) {
 	Texture texture = elecShield.texture;
-	texture.color = (elecShield.colorMin & 0xFFFFFF00) | elecShield.alpha;
+	texture.color = (elecShield.color & 0xFFFFFF00) | elecShield.alpha;
 
 	DrawTextureObj(texture, player.pos, elecShield.size);
 }
