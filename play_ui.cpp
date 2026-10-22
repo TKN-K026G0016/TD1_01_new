@@ -535,7 +535,7 @@ static void UpdateEnergyGauge(void) {
 		float posX = energyGaugeFrame.pos.x + ToFloat(GetRand(-energyGaugeFrame.spawnSmokeRange.x, energyGaugeFrame.spawnSmokeRange.x));
 		float posY = energyGaugeFrame.pos.y + ToFloat(GetRand(0, energyGaugeFrame.spawnSmokeRange.y));
 
-		CreateSmokeEffect({ posX, posY }, TypeDrawEffect::UI);
+		CreateSmokeEffect({ posX, posY }, TypeDrawEffect::UI, TypeSmoke::EnergyGauge);
 	}
 
 #pragma endregion

@@ -276,6 +276,10 @@ struct EnemyBomb {
 	bool isFlash = false;
 	Timer flashTimer = { 7, 0 };
 
+	Timer createSmokeTimer = { 20, 0 };
+	Timer createSmokeReadyBurstTimer = { 7,0 };
+	Vector2 createSmokePosOffset = { 0, 50 };
+
 
 	Texture texture = {};
 	Texture burstTexture = {};

@@ -275,9 +275,9 @@ struct ElecShield {
 
 	//透明度関係
 	int alpha = 0;
-	int alphaMin = 130;
+	int alphaMin = 100;
 	int alphaMinDanger = 0;
-	int alphaMax = 170;
+	int alphaMax = 150;
 
 	unsigned int color = 0x04C1E8FF;
 

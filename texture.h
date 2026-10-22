@@ -109,6 +109,7 @@ enum class TextureType {
 
 	//background
 	BackGround,
+	StageLine,
 
 	//UI
 	LifeIcon,

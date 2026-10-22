@@ -107,9 +107,6 @@ constexpr int enemySniperGemLimit = 4;
 #pragma endregion
 
 
-
-
-
 struct Spawner {
 	Timer spawnTimer = { 0, 0 };
 
@@ -826,6 +823,7 @@ static void InitEnemyBomb(void) {
 
 static void MoveEnemyBomb(void) {
 	for (int i = 0;i < kEnemyBombLimit;i++) {
+
 		if (enemyBomb[i].isAlive == true) {
 			enemyBomb[i].nowSpeed -= enemyBomb[i].decelerationSpeed;
 			if (enemyBomb[i].nowSpeed <= 0) {
@@ -849,6 +847,27 @@ static void MoveEnemyBomb(void) {
 				enemyBomb[i].pos.y = 1440;
 				enemyBomb[i].velocity.y *= -1;
 			}
+
+			int remainTime =
+				enemyBomb[i].burst.time -
+				enemyBomb[i].burst.count;
+
+			if (remainTime > 90) {
+				enemyBomb[i].createSmokeTimer.count++;
+				if (enemyBomb[i].createSmokeTimer.count >= enemyBomb[i].createSmokeTimer.time) {
+					enemyBomb[i].createSmokeTimer.count = 0;
+					Vector2 createPos = { enemyBomb[i].pos.x + enemyBomb[i].createSmokePosOffset.x, enemyBomb[i].pos.y + enemyBomb[i].createSmokePosOffset.y };
+					CreateSmokeEffect(createPos, TypeDrawEffect::Obj, TypeSmoke::EnemyBomb);
+				}
+			} else {
+				enemyBomb[i].createSmokeReadyBurstTimer.count++;
+				if (enemyBomb[i].createSmokeReadyBurstTimer.count >= enemyBomb[i].createSmokeReadyBurstTimer.time) {
+					enemyBomb[i].createSmokeReadyBurstTimer.count = 0;
+					Vector2 createPos = { enemyBomb[i].pos.x + enemyBomb[i].createSmokePosOffset.x, enemyBomb[i].pos.y + enemyBomb[i].createSmokePosOffset.y };
+					CreateSmokeEffect(createPos, TypeDrawEffect::Obj, TypeSmoke::EnemyBomb);
+				}
+			}
+
 		}
 	}
 }
@@ -866,6 +885,7 @@ static void BurstEnemyBomb(void) {
 	Gem* gem = GetGemArray();
 	for (int i = 0;i < kEnemyBombLimit;i++) {
 		enemyBomb[i].burst.count++;
+
 		if (enemyBomb[i].isAlive) {
 			if (enemyBomb[i].burst.count == enemyBomb[i].burst.time) {
 				float PlayerDiffX = enemyBomb[i].pos.x - playerPos.x;
@@ -1163,6 +1183,8 @@ void InitEnemy(void) {
 	InitEnemySniper();
 
 	GetMovablePos(spawner.spawnRange);
+
+	SpawnEnemy({ 200, 200 }, EnemyType::EnemyBomb);
 }
 
 void UpdateEnemy(void) {

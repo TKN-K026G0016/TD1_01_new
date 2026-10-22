@@ -7,6 +7,11 @@ enum class TypeDrawEffect {
 	UI,
 };
 
+enum class TypeSmoke {
+	EnergyGauge,
+	EnemyBomb,
+};
+
 void InitEffect();
 void UpdateEffect();
 void DrawEffect();
@@ -25,7 +30,7 @@ void CreateGageEffect(Vector2 pos, unsigned int color);
 /// 煙エフェクトの生成処理
 /// </summary>
 /// <param name="pos">生成座標</param>
-void CreateSmokeEffect(Vector2 pos, TypeDrawEffect drawType);
+void CreateSmokeEffect(Vector2 pos, TypeDrawEffect drawType, TypeSmoke smokeType);
 
 /// <summary>
 /// ElecShockエフェクト生成処理
