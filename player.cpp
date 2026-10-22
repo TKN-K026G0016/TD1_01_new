@@ -172,7 +172,7 @@ constexpr float kFirstEnergy = kEnergyMax;
 static constexpr float kConsumptionEnergy = 0.05f;
 
 //シールドが消えるエネルギー量のライン
-static constexpr float kBreakShieldLine = 5.0f;
+static constexpr float kBreakShieldLine = 0.0f;
 
 #pragma endregion
 
@@ -231,7 +231,7 @@ struct ElecShield {
 	//色の最小値
 	unsigned int colorMin = 0x04C1E8FF;
 	//色の最大値
-	unsigned int colorMax = 0x5004E8FF;
+	unsigned int colorMax = 0x485793FF;
 
 	Texture texture = {};
 };
@@ -1315,10 +1315,12 @@ void ChangeModeElecShield(ModeElecShield mode) {
 		break;
 	case ModeElecShield::Break:
 		elecShield.alpha = 0;
+		PlaySe(SeType::BreakElecShield);
 
 		break;
 	case ModeElecShield::ReEquip:
 		elecShield.easingT = 0.0f;
+		PlaySe(SeType::ReEquipElecShield);
 
 		break;
 	}

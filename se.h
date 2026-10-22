@@ -38,6 +38,9 @@ enum class SeType {
 	DamagePlayer,
 	DeadPlayer,
 
+	BreakElecShield,
+	ReEquipElecShield,
+
 	GetGem,
 
 	//enemy

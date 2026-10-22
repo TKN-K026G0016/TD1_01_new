@@ -47,6 +47,9 @@ void InitSe(void) {
 		{Novice::LoadAudio("./resources/sound/se/player/damage_player.wav"), 1.0f},
 		{Novice::LoadAudio("./resources/sound/se/player/dead_player.wav"), 1.0f},
 
+		{Novice::LoadAudio("./resources/sound/se/player/break_elec_shield.wav"), 1.0f},
+		{Novice::LoadAudio("./resources/sound/se/player/reequip_elec_shield2.wav"), 1.0f},
+
 		{Novice::LoadAudio("./resources/sound/se/player/get_gem.wav"), 1.0f},
 
 		//enemy
