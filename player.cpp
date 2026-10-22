@@ -181,18 +181,6 @@ static constexpr float kBreakShieldLine = 5.0f;
 //シールドがなくなってから再展開するまでの時間
 Timer reEquipShieldTimer = { 180, 0 };
 
-enum class ModeElecShield {
-	//通常時
-	Standby,
-
-	//回復状態時
-	Recovery,
-	//破壊状態時
-	Break,
-	//復活処理時
-	ReEquip,
-};
-
 struct ElecShield {
 	Vector2 size = {};
 
@@ -207,10 +195,10 @@ struct ElecShield {
 	//拡大中フラグ
 	bool isScaleUp = true;
 	//回復状態時のイージング速度
-	float easingSpeedRecovery = 0.08f;
+	float easingSpeedRecovery = 0.03f;
 	EasingMode easingModeRecovery = EasingMode::EaseOut;
 	//復活処理時のイージング速度
-	float easingSpeedReEquip = 0.06f;
+	float easingSpeedReEquip = 0.01f;
 	EasingMode easingModeReEquip = EasingMode::EaseOutBack;
 
 	
@@ -220,7 +208,7 @@ struct ElecShield {
 	//通常時のサイズ最大値
 	Vector2 sizeValueMax = { 60.0f, 60.0f };
 	//回復状態時のサイズ最大値
-	Vector2 sizeValueMaxRecovery = { 100.0f, 100.0f };
+	Vector2 sizeValueMaxRecovery = { 200.0f, 200.0f };
 	//復活処理時のサイズ最小値
 	Vector2 sizeValueMinReEquip = { 0.0f, 0.0f };
 
@@ -833,20 +821,27 @@ static void UpdateElecShield(void) {
 	if (player.remainEnergy < kBreakShieldLine) {
 		if (player.isEquipShield) {
 			reEquipShieldTimer.count = 0;
+			ChangeModeElecShield(ModeElecShield::Break);
 		}
-
 		player.isEquipShield = false;
 	}
 	//シールドの回復処理
 	else if (!player.isEquipShield) {
 		reEquipShieldTimer.count++;
+
+		//デンリョクが溜まっている状態でしばらく経ったら
 		if (reEquipShieldTimer.count >= reEquipShieldTimer.time) {
 			reEquipShieldTimer.count = 0;
 			player.isEquipShield = true;
+			ChangeModeElecShield(ModeElecShield::ReEquip);
 		}
 	}
 }
 
+/// <summary>
+/// ElecShieldの演出処理
+/// </summary>
+/// <param name=""></param>
 static void UpdateElecShieldEffect(void) {
 
 	switch (elecShield.nowMode) {
@@ -874,6 +869,17 @@ static void UpdateElecShieldEffect(void) {
 		break;
 	}
 	case ModeElecShield::Recovery: {
+		elecShield.easingT += elecShield.easingSpeedRecovery;
+		if (elecShield.easingT >= 1.0f) {
+			elecShield.easingT = 1.0f;
+			elecShield.nowMode = ModeElecShield::Standby;
+			elecShield.isScaleUp = false;
+		}
+
+		//サイズの変更
+		elecShield.size = MoveByEasing(elecShield.sizeValueMaxRecovery, elecShield.sizeValueMax, elecShield.easingT, elecShield.easingModeRecovery);
+		//不透明度の変更
+		elecShield.alpha = UpdateValueByEasing(elecShield.alphaMinRecovery, elecShield.alphaMax, elecShield.easingT, elecShield.easingModeRecovery);
 
 		break;
 	}
@@ -882,6 +888,17 @@ static void UpdateElecShieldEffect(void) {
 		break;
 	}
 	case ModeElecShield::ReEquip: {
+  		elecShield.easingT += elecShield.easingSpeedReEquip;
+		if (elecShield.easingT >= 1.0f) {
+			elecShield.easingT = 1.0f;
+			elecShield.nowMode = ModeElecShield::Standby;
+			elecShield.isScaleUp = true;
+		}
+
+		//サイズの変更
+		elecShield.size = MoveByEasing(elecShield.sizeValueMinReEquip, elecShield.sizeValueMax, elecShield.easingT, elecShield.easingModeReEquip);
+		//不透明度の変更
+		elecShield.alpha = UpdateValueByEasing(elecShield.alphaMinReEquip, elecShield.alphaMax, elecShield.easingT, elecShield.easingModeReEquip);
 
 		break;
 	}
@@ -894,7 +911,7 @@ static void UpdateElecShieldEffect(void) {
 
 	elecShield.color = UpdateColorByEasing(elecShield.colorMin, elecShield.colorMax, gaugeRate);
 
-#pragma endregio
+#pragma endregion
 
 }
 
@@ -1265,8 +1282,27 @@ bool GetPlayerIsInvincible(void) {
 	return player.isInvincible;
 }
 
-//PlayerState GetPlayerNowState(void) {
-//	return player.nowState;
-//}
+void ChangeModeElecShield(ModeElecShield mode) {
+
+	if (elecShield.nowMode == ModeElecShield::Break && mode == ModeElecShield::Recovery) return;
+
+	elecShield.nowMode = mode;
+
+	switch (mode) {
+	case ModeElecShield::Recovery:
+		elecShield.easingT = 0.0f;
+
+		break;
+	case ModeElecShield::Break:
+		elecShield.alpha = 0;
+
+		break;
+	case ModeElecShield::ReEquip:
+		elecShield.easingT = 0.0f;
+
+		break;
+	}
+
+}
 
 #pragma endregion

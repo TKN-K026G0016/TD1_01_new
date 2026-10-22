@@ -16,6 +16,18 @@ enum class PlayerState {
 	Count
 };
 
+enum class ModeElecShield {
+	//通常時
+	Standby,
+
+	//回復状態時
+	Recovery,
+	//破壊状態時
+	Break,
+	//復活処理時
+	ReEquip,
+};
+
 void InitPlayer(void);
 void UpdatePlayer(void);
 void DrawPlayer(void);
@@ -122,3 +134,9 @@ void TriggerDodgeClose(Vector2 eBulletPos);
 PlayerState GetPlayerNowState(void);
 
 bool GetPlayerIsInvincible(void);
+
+/// <summary>
+/// ElecShieldの状態を変更
+/// </summary>
+/// <param name="mode">次の状態</param>
+void ChangeModeElecShield(ModeElecShield mode);

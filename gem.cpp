@@ -136,7 +136,7 @@ static void CheckHitVSPlayer(void) {
 
 		//接触したら、エネルギー回復させる
 		if (CheckCollisionCircleVSCircle(playerPos, playerHitRadius, gem[i].pos, gem[i].hitRadius)) {
-			CreateJemEffect();
+			
 			BreakGem(i);
 
 			AddScore(kGetGemScore);
@@ -145,7 +145,11 @@ static void CheckHitVSPlayer(void) {
 
 			//SEの再生
 			PlaySe(SeType::GetGem);
+			CreateJemEffect();
 			TriggerCreateRecoveryEffect();
+
+			//シールドの回復エフェクト
+			ChangeModeElecShield(ModeElecShield::Recovery);
 		}
 	}
 
