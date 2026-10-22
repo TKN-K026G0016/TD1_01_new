@@ -794,7 +794,12 @@ static void UpdateElecShield(void) {
 	if (!player.isAlive) return;
 	if (GetBossEnemyIsDead()) return;
 
+	//シールドの破壊処理
 	if (player.remainEnergy < kBreakShieldLine) {
+		if (player.isEquipShield) {
+			recoveryShieldTimer.count = 0;
+		}
+
 		player.isEquipShield = false;
 	}
 	//シールドの回復処理
@@ -1078,7 +1083,6 @@ void UpdatePlayer(void) {
 	CheckDeadPlayer();
 
 	UpdateStartEffect();
-	UpdateElecShield();
 }
 
 void DrawPlayer(void) {
@@ -1161,7 +1165,7 @@ void PlayerDamage(Vector2 hitPos, float damage) {
 	if (!player.isAlive || player.isInvincible) return;
 
 	//シールドがない状態で被弾したら
-	if (player.isEquipShield) {
+	if (!player.isEquipShield) {
 		player.hp--;
 	}
 
