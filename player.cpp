@@ -198,8 +198,10 @@ struct ElecShield {
 	float easingSpeedRecovery = 0.03f;
 	EasingMode easingModeRecovery = EasingMode::EaseOut;
 	//復活処理時のイージング速度
-	float easingSpeedReEquip = 0.01f;
+	float easingSpeedReEquip = 0.03f;
+	float easingTLineReEquipScaleDown = 0.7f;
 	EasingMode easingModeReEquip = EasingMode::EaseOutBack;
+	EasingMode easingModeReEquipAfter = EasingMode::EaseIn;
 
 	
 	//<サイズ関係>
@@ -208,9 +210,11 @@ struct ElecShield {
 	//通常時のサイズ最大値
 	Vector2 sizeValueMax = { 60.0f, 60.0f };
 	//回復状態時のサイズ最大値
-	Vector2 sizeValueMaxRecovery = { 200.0f, 200.0f };
+	Vector2 sizeValueMaxRecovery = { 180.0f, 180.0f };
 	//復活処理時のサイズ最小値
 	Vector2 sizeValueMinReEquip = { 0.0f, 0.0f };
+	//復活処理時のサイズ最大値
+	Vector2 sizeValueMaxReEquip = { 180.0f, 180.0f };
 
 	//<不透明度関係>
 	int alpha = 0;
@@ -219,6 +223,7 @@ struct ElecShield {
 	int alphaMax = 150;
 	int alphaMinRecovery = 0;
 	int alphaMinReEquip = 0;
+	int alphaMaxReEquip = 200;
 
 	//<色関係>
 	unsigned int color = WHITE;
@@ -889,16 +894,31 @@ static void UpdateElecShieldEffect(void) {
 	}
 	case ModeElecShield::ReEquip: {
   		elecShield.easingT += elecShield.easingSpeedReEquip;
+
+
+
 		if (elecShield.easingT >= 1.0f) {
 			elecShield.easingT = 1.0f;
 			elecShield.nowMode = ModeElecShield::Standby;
 			elecShield.isScaleUp = true;
 		}
 
-		//サイズの変更
-		elecShield.size = MoveByEasing(elecShield.sizeValueMinReEquip, elecShield.sizeValueMax, elecShield.easingT, elecShield.easingModeReEquip);
-		//不透明度の変更
-		elecShield.alpha = UpdateValueByEasing(elecShield.alphaMinReEquip, elecShield.alphaMax, elecShield.easingT, elecShield.easingModeReEquip);
+		// 第1段階
+		if (elecShield.easingT < elecShield.easingTLineReEquipScaleDown) {
+
+			float localT = elecShield.easingT / elecShield.easingTLineReEquipScaleDown;
+
+			elecShield.size = MoveByEasing(elecShield.sizeValueMinReEquip, elecShield.sizeValueMaxReEquip, localT, elecShield.easingModeReEquip);
+			elecShield.alpha = UpdateValueByEasing(elecShield.alphaMinReEquip, elecShield.alphaMaxReEquip, localT, elecShield.easingModeReEquip);
+		}
+		// 第2段階
+		else {
+
+			float localT = (elecShield.easingT - elecShield.easingTLineReEquipScaleDown) / (1.0f - elecShield.easingTLineReEquipScaleDown);
+
+			elecShield.size = MoveByEasing(elecShield.sizeValueMaxReEquip, elecShield.sizeValueMax, localT, elecShield.easingModeReEquipAfter);
+			elecShield.alpha = UpdateValueByEasing(elecShield.alphaMaxReEquip, elecShield.alphaMax, localT, elecShield.easingModeReEquipAfter);
+		}
 
 		break;
 	}
