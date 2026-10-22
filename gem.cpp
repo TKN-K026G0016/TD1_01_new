@@ -54,9 +54,9 @@ struct GemSpec {
 
 GemSpec spec[ToInt(GemType::Count)] = {
 	//type //size //hitRadius // //回復量
-	{GemType::S, {32,32}, 30.0f, 8.0f, {}},
-	{GemType::M, {32,32}, 30.0f, 15.0f, {}},
-	{GemType::L, {40,40}, 15.0f, 40.0f, {}},
+	{GemType::S, {32,32}, 20.0f, 8.0f, {}},
+	{GemType::M, {32,32}, 20.0f, 15.0f, {}},
+	{GemType::L, {40,40}, 20.0f, 40.0f, {}},
 };
 
 
@@ -77,18 +77,28 @@ static void MoveGem(void) {
 			disY /= disLength;
 		}
 
-		if (disLength <= kStartVacumeRange) {
+		//吸い込みフラグON
+		if (disLength <= kStartVacumeRange && !GetPlayerIsInvincible()) {
+			gem[i].isVacume = true;
 
+		}
+
+		//吸い込みでの移動処理
+		if (gem[i].isVacume) {
 			gem[i].moveVec.x = gem[i].moveVec.x * (1 - kVacumeLerpRate) + disX * kVacumeLerpRate;
 			gem[i].moveVec.y = gem[i].moveVec.y * (1 - kVacumeLerpRate) + disY * kVacumeLerpRate;
 
 			float length = sqrtf(gem[i].moveVec.x * gem[i].moveVec.x + gem[i].moveVec.y * gem[i].moveVec.y);
-			gem[i].moveVec.x /= length;
-			gem[i].moveVec.y /= length;
-			
+
+			if (length != 0.0f) {
+				gem[i].moveVec.x /= length;
+				gem[i].moveVec.y /= length;
+			}
+
 			gem[i].pos.x += gem[i].moveVec.x * kVacumeSpeed;
 			gem[i].pos.y += gem[i].moveVec.y * kVacumeSpeed;
 		}
+
 
 		//ステージから出ないように補正を掛ける
 		gem[i].pos.x = std::clamp(gem[i].pos.x, movablePos[0].x, movablePos[1].x);
@@ -228,6 +238,8 @@ void SpawnGem(Vector2 pos, GemType type) {
 		gem[i].isAlive = true;
 		gem[i].pos = CreateScatterPos(pos);
 		gem[i].hp = kHpMax;
+
+		gem[i].isVacume = false;
 
 		gem[i].type = type;
 		gem[i].size = spec[ToInt(type)].size;
