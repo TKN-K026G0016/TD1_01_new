@@ -174,6 +174,7 @@ struct BackGround {
 	unsigned int combo1000Color = 0x70AFCBFF;
 
 	Texture texture = {};
+	Texture lineTexture = {};
 };
 BackGround backGround;
 
@@ -302,6 +303,7 @@ static void ClampCameraPos(void) {
 static void InitBackGround(void) {
 	backGround = {};
 	backGround.texture = GetTexture(TextureType::BackGround);
+	backGround.lineTexture = GetTexture(TextureType::StageLine);
 
 	//走査線
 	for (int i = 0; i < kScanLineLimit; i++) {
@@ -398,7 +400,7 @@ static void DrawBackGround(void) {
 	texture.color = backGround.nowColor;
 
 	DrawTextureBG(texture, backGround.pos, backGround.size, backGround.scrollRate);
-
+	DrawTextureBG(backGround.lineTexture, backGround.pos, backGround.size, backGround.scrollRate);
 	DrawScanLine();
 }
 

@@ -101,6 +101,7 @@ void InitTexture(void) {
 
 		//background
 		{ Novice::LoadTexture("./resources/texture/stage/background_white.png"), { 2960, 1840 }, {0, 0}, 0, 0, WHITE },
+		{ Novice::LoadTexture("./resources/texture/stage/stage_line.png"), { 2960, 1840 }, {0, 0}, 0, 0, WHITE },
 
 		//UI
 		{ Novice::LoadTexture("./resources/texture/ui/play/life_icon.png"), { 64, 64 }, {0, 0}, 0, 0, WHITE },
