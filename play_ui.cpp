@@ -16,16 +16,16 @@
 #include <Novice.h>
 
 #pragma region データ: HPアイコン
-struct LifeIcon {
-	Vector2 startPos = { 30, 690 };
-	Vector2 size = { 40, 40 };
-
-	float intervalX = 10;
-
-	Texture texture = {};
-};
-LifeIcon lifeIcon;
-
+//struct LifeIcon {
+//	Vector2 startPos = { 30, 690 };
+//	Vector2 size = { 40, 40 };
+//
+//	float intervalX = 10;
+//
+//	Texture texture = {};
+//};
+//LifeIcon lifeIcon;
+//
 #pragma endregion
 
 #pragma region データ: エネルギーゲージ
@@ -43,9 +43,6 @@ struct EnergyGaugeFrame {
 	float warnDeadEnergy = 30.0f;
 	float dangerEnergy = 15.0f;
 
-	////過ジュウデン警告表示のタイミング
-	//float warnOverHeat = 75.0f;
-
 	//ケムリの生成範囲(frameのposを中心に)
 	Vector2i spawnSmokeRange = { 250, 60 };
 	//警告中の煙エフェクト生成スパン
@@ -55,9 +52,9 @@ struct EnergyGaugeFrame {
 
 	//ゲージエフェクトの生成スパン
 	Timer createGaugeEffectTimer = { 3, 0 };
-
-	////警告音SEのスパン
-	//Timer alarmSeTimer = { 60, 0 };
+	//振動の強さ
+	int shakeAmpNormal = 3;
+	int shakeAmpDamage = 5;
 
 	Texture texture = {};
 };
@@ -324,9 +321,28 @@ Texture displayEffectTexture = {};
 
 #pragma region データ: 開始演出
 
+enum class ModeStartTelop {
+	Standby,
+	FrameIn,
+	FrameOut,
+};
+
 struct StartTelop {
 	Vector2 pos = { 640, 550 };
 	Vector2 size = { 512, 128 };
+
+	ModeStartTelop nowMode = ModeStartTelop::Standby;
+
+	//<イージング関係>
+	float easingT = 0.0f;
+	float easingSpeedFrameIn = 0.02f;
+	float easingSpeedFrameOut = 0.05f;
+	EasingMode easingMode = EasingMode::EaseOut;
+
+	//座標
+	Vector2 standbyPos = { 640, 800 };
+	Vector2 showPos = { 640, 550 };
+
 };
 StartTelop startTelop;
 Texture readyTexture = {};
@@ -365,19 +381,19 @@ WarningBossTelop bossTelop;
 #pragma region 関数: ライフアイコン
 
 static void InitLifeIcon(void) {
-	lifeIcon.texture = GetTexture(TextureType::LifeIcon);
+	//lifeIcon.texture = GetTexture(TextureType::LifeIcon);
 }
 
 static void DrawLifeIcon(void) {
-	if (GetLifeGaugeSwitch()) return;
+	//if (GetLifeGaugeSwitch()) return;
 
-	int remainLife = GetPlayerHp();
+	//int remainLife = GetPlayerHp();
 
-	for (int i = 0; i < remainLife; i++) {
-		Vector2 posS = { lifeIcon.startPos.x + (lifeIcon.size.x + lifeIcon.intervalX) * i, lifeIcon.startPos.y };
+	//for (int i = 0; i < remainLife; i++) {
+	//	Vector2 posS = { lifeIcon.startPos.x + (lifeIcon.size.x + lifeIcon.intervalX) * i, lifeIcon.startPos.y };
 
-		DrawTextureUI(lifeIcon.texture, posS, lifeIcon.size);
-	}
+	//	DrawTextureUI(lifeIcon.texture, posS, lifeIcon.size);
+	//}
 }
 
 #pragma endregion
@@ -446,7 +462,7 @@ static void UpdateEnergyGauge(void) {
 
 #pragma region GaugeEffectの生成
 
-	if (remainEnergy <= energyGaugeFrame.warnDeadEnergy) {
+	if (remainEnergy <= energyGaugeFrame.warnDeadEnergy && remainEnergy > 0) {
 		energyGaugeFrame.createGaugeEffectTimer.count++;
 		if (energyGaugeFrame.createGaugeEffectTimer.count >= energyGaugeFrame.createGaugeEffectTimer.time) {
 			energyGaugeFrame.createGaugeEffectTimer.count = 0;
@@ -466,16 +482,9 @@ static void UpdateEnergyGauge(void) {
 
 		//振動処理
 		if (kGaugeShakeSwitch) {
-			energyGaugeFrame.viewPos.x = energyGaugeFrame.pos.x + GetRand(-2, 2);
-			energyGaugeFrame.viewPos.y = energyGaugeFrame.pos.y + GetRand(-2, 2);
+			energyGaugeFrame.viewPos.x = energyGaugeFrame.pos.x + GetRand(-energyGaugeFrame.shakeAmpNormal, energyGaugeFrame.shakeAmpNormal);
+			energyGaugeFrame.viewPos.y = energyGaugeFrame.pos.y + GetRand(-energyGaugeFrame.shakeAmpNormal, energyGaugeFrame.shakeAmpNormal);
 		}
-
-		////alramSE
-		//energyGaugeFrame.alarmSeTimer.count++;
-		//if (energyGaugeFrame.alarmSeTimer.count >= energyGaugeFrame.alarmSeTimer.time) {
-		//	energyGaugeFrame.alarmSeTimer.count = 0;
-		//	PlaySe(SeType::GaugeAlarm);
-		//}
 
 		//displayEFfect
 		TriggerDangerDisplayEffect();
@@ -489,8 +498,6 @@ static void UpdateEnergyGauge(void) {
 
 		energyGaugeFrame.viewPos = energyGaugeFrame.pos;
 
-		//energyGaugeFrame.alarmSeTimer.count = 0;
-
 		if (!GetIsWarningBoss()) {
 			CancelDangerDisplayEffect();
 		}
@@ -501,8 +508,8 @@ static void UpdateEnergyGauge(void) {
 		gaugeShakeDamageTimer.count++;
 
 		if (kGaugeShakeSwitch) {
-			energyGaugeFrame.viewPos.x = energyGaugeFrame.pos.x + GetRand(-4, 4);
-			energyGaugeFrame.viewPos.y = energyGaugeFrame.pos.y + GetRand(-4, 4);
+			energyGaugeFrame.viewPos.x = energyGaugeFrame.pos.x + GetRand(-energyGaugeFrame.shakeAmpDamage, energyGaugeFrame.shakeAmpDamage);
+			energyGaugeFrame.viewPos.y = energyGaugeFrame.pos.y + GetRand(-energyGaugeFrame.shakeAmpDamage, energyGaugeFrame.shakeAmpDamage);
 		}
 
 	}
@@ -822,12 +829,16 @@ static void UpdateScore(void) {
 
 		scoreIcon.easingT += scoreIcon.easingSpeed;
 		if (scoreIcon.easingT > 1.0f) {
- 			scoreIcon.easingT = 1.0f;
-
-
+			scoreIcon.easingT = 1.0f;
 		}
 
- 		scoreIcon.showScore = UpdateValueByEasing(scoreIcon.startScore, scoreIcon.endScore, scoreIcon.easingT, EasingMode::Linear);
+		scoreIcon.showScore = UpdateValueByEasing(scoreIcon.startScore, scoreIcon.endScore, scoreIcon.easingT, EasingMode::Linear);
+
+		if (scoreIcon.easingT >= 1.0f) { 
+			scoreIcon.easingT = 0.0f; 
+			scoreIcon.showScore = scoreIcon.endScore;
+		}
+
 
 		PlaySe(SeType::CountUpScore);
 
@@ -979,19 +990,50 @@ static void InitStartTelop(void) {
 }
 
 static void UpdateStartTelop(void) {
+	//イージング処理
+	switch (startTelop.nowMode) {
+	case ModeStartTelop::FrameIn:
+		startTelop.easingT += startTelop.easingSpeedFrameIn;
+		if (startTelop.easingT >= 1.0f) {
+			startTelop.easingT = 1.0f;
+		}
 
+		break;
+	case ModeStartTelop::FrameOut:
+		startTelop.easingT -= startTelop.easingSpeedFrameOut;
+		if (startTelop.easingT <= 0.0f) {
+			startTelop.easingT = 0.0f;
+			startTelop.nowMode = ModeStartTelop::Standby;
+		}
+
+		break;
+	}
+
+	//座標の移動
+	startTelop.pos = MoveByEasing(startTelop.standbyPos, startTelop.showPos, startTelop.easingT, startTelop.easingMode);
 }
 
 static void DrawStartTelop(void) {
-	ModeStartEffect nowMode = GetNowModeStart();
+	if (startTelop.nowMode == ModeStartTelop::Standby) return;
 
-	if (nowMode == ModeStartEffect::WaitPlayerSpawn || nowMode == ModeStartEffect::Standby) return;
+	ModeStartEffect nowMode = GetNowModeStart();
 
 	Texture texture;
 	texture = (nowMode == ModeStartEffect::Ready) ? readyTexture : goTexture;
 
 	DrawTextureUI(texture, startTelop.pos, startTelop.size);
 }
+
+void TriggerStartIconFrameIn(void) {
+	startTelop.nowMode = ModeStartTelop::FrameIn;
+	startTelop.easingT = 0.0f;
+}
+
+void TriggerStartIconFrameOut(void) {
+	startTelop.nowMode = ModeStartTelop::FrameOut;
+	startTelop.easingT = 1.0f;
+}
+
 
 #pragma endregion
 
@@ -1012,9 +1054,6 @@ static void UpdateBossTelop(void) {
 		if (bossTelop.easingT >= 1.0f) {
 			bossTelop.easingT = 1.0f;
 			bossTelop.isFadeIn = false;
-
-			/*PlaySe(SeType::WarningBossAlarm);*/
-
 		}
 
 	} else {
@@ -1110,7 +1149,7 @@ void TriggerEndCombo(void) {
 	comboIcon.showPreComboTimer.count = 0;
 }
 
-void TriggerGaugeShackByDamage(void) {
+void TriggerGaugeShakeByDamage(void) {
 	gaugeShakeDamageTimer.count = 0;
 }
 

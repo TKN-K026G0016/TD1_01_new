@@ -7,6 +7,7 @@
 #include "score_data.h"
 #include "scene_manager.h"
 #include "se.h"
+#include "stage.h"
 
 #include "vector2.h"
 #include "timer.h"
@@ -233,12 +234,16 @@ static void UpdateShockCombo(void) {
 			//コンボ終了ジングル
 			if (nowCombo > jingle3Combo) {
 				PlaySe(SeType::ComboJingle1000);
+
+				//フラッシュ演出
+				TriggerBackgroundFlash();
 			}
 			else if (nowCombo > jingle2Combo) {
 				PlaySe(SeType::ComboJingle100);
 			}
 			else if (nowCombo > jingle1Combo) {
 				PlaySe(SeType::ComboJingle10);
+	/*			TriggerBackgroundFlash();*/
 			}
 			
 			totalComboInCombo = 0;
@@ -328,14 +333,14 @@ void SpawnElecShock(Vector2 pos, ElecBulletType type, ElecShockOriginType origin
 		if (type == ElecBulletType::Normal) {
 			CreateElecShockEffect(pos);
 			//Se
-			if (CheckIsPlayingSe(SeType::SpawnElecShock)) {
+			if (!CheckIsPlayingSe(SeType::SpawnElecShock)) {
 				PlaySe(SeType::SpawnElecShock);
 			}
 
 		} else if(type == ElecBulletType::Charge){
 			CreateElecShockChargedEffect(pos);
 			//Se
-			if (CheckIsPlayingSe(SeType::SpawnElecShockCharge)) {
+			if (!CheckIsPlayingSe(SeType::SpawnElecShockCharge)) {
 				PlaySe(SeType::SpawnElecShockCharge);
 			}
 		}

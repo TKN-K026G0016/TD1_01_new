@@ -5,6 +5,7 @@
 #include "title_player.h"
 #include "elec_bullet.h"
 #include "effect.h"
+#include "bgm.h"
 
 #include "texture.h"
 #include "se.h"
@@ -75,13 +76,13 @@ struct TitleLogoAfterimage {
 	//透明度関係
 	int alpha = 0;
 	int alphaMin = 0;
-	int alphaMax = 140;
+	int alphaMax = 120;
 };
 TitleLogoAfterimage logoAfterimage;
 
 struct TitleInst {
 	Vector2 pos = { 640, 200 };
-	Vector2 size = { 640, 64 };
+	Vector2 size = { 640, 128 };
 
 	//<イージング>
 	float easingT = 0.0f;
@@ -90,7 +91,7 @@ struct TitleInst {
 	EasingMode easingMode = EasingMode::EaseInOut;
 	float isFadeIn = true;
 
-	Timer waitEasingTimer = { 120, 0 };
+	Timer waitEasingTimer = { 100, 0 };
 
 	//透明度
 	int alpha = 0;
@@ -108,7 +109,8 @@ TitleInst instStart;
 
 struct Button {
 	Vector2 pos = { };
-	Vector2 size = { 80, 80 };
+	Vector2 showPos = {};
+	Vector2 size = { 256, 128 };
 
 	float hitRadius = 64.0f;
 
@@ -122,11 +124,27 @@ struct Button {
 	unsigned int lightOutColor = 0x222222FF;
 
 	Texture texture = {};
+
+	//<残像関係>
+	float easingT = 0.0f;
+	float easingSpeed = 0.01f;
+	bool isScaleUp = true;
+	EasingMode easingMode = EasingMode::EaseInOut;
+
+	Vector2 afterimageSize = {};
+	Vector2 startSize = size;
+	Vector2 endSize = { size.x + 20, size.y + 20 };
+
+	//透明度
+	int alpha = 0;
+	int alphaMin = 0;
+	int alphaMax = 170;
 };
 Button creditsButton;
-Vector2 creditsPos = { 80, 640 };
+Vector2 creditsPos = { 90, 630 };
 Button resetButton;
-Vector2 resetPos = { 1200, 640 };
+Vector2 resetPos = { 1190, 630 };
+
 
 #pragma endregion
 
@@ -165,6 +183,12 @@ FlashPanel flashPanel;
 
 #pragma endregion
 
+#pragma region データ: 音量
+
+//消灯時のBgm音量
+static constexpr float lightOutVolume = 0.2f;
+
+#pragma endregion
 
 #pragma region 関数: 項目決定
 
@@ -175,6 +199,8 @@ static void ChangeMode(void) {
 
 		PlaySe(SeType::DeadEnemy);
 
+		ResetBgmVolume();
+
 	}
 	//シーン切り替え
 	else {
@@ -182,7 +208,11 @@ static void ChangeMode(void) {
 		ChangeModeFade(ModeFade::FadeOut);
 		ChangeFadeTarget(FadeTarget::Guide);
 
+		PlaySe(SeType::DeadEnemy);
 		PlaySe(SeType::Confirm);
+
+		//Bgmをフェード
+		ChangeModeBgmFade(ModeBgmFade::FadeOut);
 	}
 }
 
@@ -404,11 +434,11 @@ static void DrawInst(void) {
 static void InitButton(void) {
 	creditsButton = {};
 	creditsButton.pos = creditsPos;
-	creditsButton.texture = GetTexture(TextureType::White1x1);
+	creditsButton.texture = GetTexture(TextureType::CreditsButtonNew);
 
 	resetButton = {};
 	resetButton.pos = resetPos;
-	resetButton.texture = GetTexture(TextureType::White1x1);
+	resetButton.texture = GetTexture(TextureType::ResetScoreButtonNew);
 }
 
 static void ChangeModeByCredits(void) {
@@ -418,6 +448,8 @@ static void ChangeModeByCredits(void) {
 
 		PlaySe(SeType::DeadEnemy);
 
+		ResetBgmVolume();
+
 	}
 	//シーン切り替え
 	else {
@@ -425,6 +457,9 @@ static void ChangeModeByCredits(void) {
 		ChangeScene(Scene::Credits);
 
 		PlaySe(SeType::Confirm);
+		PlaySe(SeType::DeadEnemy);
+
+		ChangeBgmVolume(lightOutVolume);
 	}
 }
 
@@ -435,13 +470,17 @@ static void ChangeModeByReset(void) {
 
 		PlaySe(SeType::DeadEnemy);
 
+		ResetBgmVolume();
 	}
 	//シーン切り替え
 	else {
 		if (GetNowModeFade() != ModeFade::Standby) return;
 		ChangeScene(Scene::ResetScore);
 
+		PlaySe(SeType::DeadEnemy);
 		PlaySe(SeType::Confirm);
+
+		ChangeBgmVolume(lightOutVolume);
 	}
 }
 
@@ -508,28 +547,99 @@ static void UpdateButton(void) {
 		resetButton.hitTimer.count--;
 	}
 
-}
+#pragma region 振動処理
 
-static void DrawButton(void) {
-	Vector2 showPos;
-	Texture texture;
-
-#pragma region CreditsButton
-
-	showPos = creditsButton.pos;
+	creditsButton.showPos = creditsButton.pos;
 
 	if (creditsButton.hitTimer.count > 0) {
-		showPos.x += GetRand(-creditsButton.shakeDurationHit, creditsButton.shakeDurationHit);
-		showPos.y += GetRand(-creditsButton.shakeDurationHit, creditsButton.shakeDurationHit);
+		creditsButton.showPos.x += GetRand(-creditsButton.shakeDurationHit, creditsButton.shakeDurationHit);
+		creditsButton.showPos.y += GetRand(-creditsButton.shakeDurationHit, creditsButton.shakeDurationHit);
 	} else if (nowMode != ModeTitle::MovePlayer) {
 		creditsButton.shakeTimer.count++;
 		if (creditsButton.shakeTimer.count >= creditsButton.shakeTimer.time) {
 			creditsButton.shakeTimer.count = 0;
 
-			showPos.x += GetRand(-creditsButton.shakeDuration, creditsButton.shakeDuration);
-			showPos.y += GetRand(-creditsButton.shakeDuration, creditsButton.shakeDuration);
+			creditsButton.showPos.x += GetRand(-creditsButton.shakeDuration, creditsButton.shakeDuration);
+			creditsButton.showPos.y += GetRand(-creditsButton.shakeDuration, creditsButton.shakeDuration);
 		}
 	}
+
+	resetButton.showPos = resetButton.pos;
+
+	if (resetButton.hitTimer.count > 0) {
+		resetButton.showPos.x += GetRand(-resetButton.shakeDurationHit, resetButton.shakeDurationHit);
+		resetButton.showPos.y += GetRand(-resetButton.shakeDurationHit, resetButton.shakeDurationHit);
+	} else if (nowMode != ModeTitle::MovePlayer) {
+		resetButton.shakeTimer.count++;
+		if (resetButton.shakeTimer.count >= resetButton.shakeTimer.time) {
+			resetButton.shakeTimer.count = 0;
+
+			resetButton.showPos.x += GetRand(-resetButton.shakeDuration, resetButton.shakeDuration);
+			resetButton.showPos.y += GetRand(-resetButton.shakeDuration, resetButton.shakeDuration);
+		}
+	}
+
+#pragma endregion
+
+#pragma region 残像の処理
+	if (nowMode == ModeTitle::MovePlayer) return;
+
+#pragma region CreditsButton
+	if (creditsButton.isScaleUp) {
+		creditsButton.easingT += creditsButton.easingSpeed;
+		if (creditsButton.easingT >= 1.0f) {
+			creditsButton.easingT = 1.0f;
+			creditsButton.isScaleUp = false;
+		}
+	} else {
+		creditsButton.easingT -= creditsButton.easingSpeed;
+		if (creditsButton.easingT < 0.0f) {
+			creditsButton.easingT = 0.0f;
+			creditsButton.isScaleUp = true;
+		}
+	}
+
+	creditsButton.afterimageSize = MoveByEasing(creditsButton.startSize, creditsButton.endSize, creditsButton.easingT, creditsButton.easingMode);
+	creditsButton.alpha = UpdateValueByEasing(creditsButton.alphaMin, creditsButton.alphaMax, creditsButton.easingT, creditsButton.easingMode);
+
+#pragma endregion
+
+#pragma region resetButton
+	if (resetButton.isScaleUp) {
+		resetButton.easingT += resetButton.easingSpeed;
+		if (resetButton.easingT >= 1.0f) {
+			resetButton.easingT = 1.0f;
+			resetButton.isScaleUp = false;
+		}
+	} else {
+		resetButton.easingT -= resetButton.easingSpeed;
+		if (resetButton.easingT < 0.0f) {
+			resetButton.easingT = 0.0f;
+			resetButton.isScaleUp = true;
+		}
+	}
+
+	resetButton.afterimageSize = MoveByEasing(resetButton.startSize, resetButton.endSize, resetButton.easingT, resetButton.easingMode);
+	resetButton.alpha = UpdateValueByEasing(resetButton.alphaMin, resetButton.alphaMax, resetButton.easingT, resetButton.easingMode);
+
+#pragma endregion
+
+#pragma endregion
+
+}
+
+static void DrawButton(void) {
+	Texture texture;
+
+#pragma region Credits afterimage
+
+	texture = creditsButton.texture;
+	texture.color = (texture.color & 0xFFFFFF00) | creditsButton.alpha;
+	DrawTextureUI(texture, creditsButton.pos, creditsButton.afterimageSize);
+
+#pragma endregion
+
+#pragma region CreditsButton
 
 	//colorの変更
 	texture = creditsButton.texture;
@@ -537,26 +647,19 @@ static void DrawButton(void) {
 		texture.color = creditsButton.lightOutColor;
 	}
 
-	DrawTextureUI(texture, showPos, creditsButton.size);
+	DrawTextureUI(texture, creditsButton.showPos, creditsButton.size);
+
+#pragma endregion
+
+#pragma region Credits afterimage
+
+	texture = resetButton.texture;
+	texture.color = (texture.color & 0xFFFFFF00) | resetButton.alpha;
+	DrawTextureUI(texture, resetButton.pos, resetButton.afterimageSize);
 
 #pragma endregion
 
 #pragma region resetButton
-
-	showPos = resetButton.pos;
-
-	if (resetButton.hitTimer.count > 0) {
-		showPos.x += GetRand(-resetButton.shakeDurationHit, resetButton.shakeDurationHit);
-		showPos.y += GetRand(-resetButton.shakeDurationHit, resetButton.shakeDurationHit);
-	} else if (nowMode != ModeTitle::MovePlayer) {
-		resetButton.shakeTimer.count++;
-		if (resetButton.shakeTimer.count >= resetButton.shakeTimer.time) {
-			resetButton.shakeTimer.count = 0;
-
-			showPos.x += GetRand(-resetButton.shakeDuration, resetButton.shakeDuration);
-			showPos.y += GetRand(-resetButton.shakeDuration, resetButton.shakeDuration);
-		}
-	}
 
 	//colorの変更
 	texture = resetButton.texture;
@@ -564,7 +667,7 @@ static void DrawButton(void) {
 		texture.color = resetButton.lightOutColor;
 	}
 
-	DrawTextureUI(texture, showPos, resetButton.size);
+	DrawTextureUI(texture, resetButton.showPos, resetButton.size);
 
 #pragma endregion
 
@@ -619,6 +722,10 @@ static void UpdateFlashPanel(void) {
 		blackPanel.isShow = false;
 	}
 
+	if (flashPanel.easingT == flashPanel.startFadeOutEasingT) {
+		PlaySe(SeType::Flash);
+	}
+
 }
 
 static void DrawFlashPanel(void) {
@@ -630,8 +737,18 @@ static void DrawFlashPanel(void) {
 
 #pragma endregion
 
+#pragma region 関数: Bgm関係
+
+static void InitTitleBgm(void) {
+	ChangeBgmVolume(lightOutVolume);
+	PlayBgm(BgmType::Title);
+}
+
+#pragma endregion
+
 void InitTitle(void) {
 	nowMode = ModeTitle::MovePlayer;
+	InitTitleBgm();
 
 	InitTitleBackground();
 

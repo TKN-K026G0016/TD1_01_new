@@ -32,8 +32,20 @@ void InitTexture(void) {
 		//Title
 		//===============
 		{ Novice::LoadTexture("./resources/texture/ui/title/title_logo.png"), { 640, 256 }, {0, 0}, 0, 0, WHITE },
-		{ Novice::LoadTexture("./resources/texture/ui/title/inst_shot.png"), { 640, 64 }, {0, 0}, 0, 0, WHITE },
-			{ Novice::LoadTexture("./resources/texture/ui/title/inst_start.png"), { 640, 64 }, {0, 0}, 0, 0, WHITE },
+		{ Novice::LoadTexture("./resources/texture/ui/title/inst_shot.png"), { 640, 128 }, {0, 0}, 0, 0, WHITE },
+		{ Novice::LoadTexture("./resources/texture/ui/title/inst_start.png"), { 640, 128 }, {0, 0}, 0, 0, WHITE },
+
+		{ Novice::LoadTexture("./resources/texture/ui/title/credits_button.png"), { 80, 80 }, {0, 0}, 0, 0, WHITE },
+		{ Novice::LoadTexture("./resources/texture/ui/title/credits_button_new.png"), { 256, 128 }, {0, 0}, 0, 0, WHITE },
+		{ Novice::LoadTexture("./resources/texture/ui/title/reset_score_button.png"), { 80, 80 }, {0, 0}, 0, 0, WHITE },
+		{ Novice::LoadTexture("./resources/texture/ui/title/reset_score_button_new.png"), { 256, 128 }, {0, 0}, 0, 0, WHITE },
+
+		{ Novice::LoadTexture("./resources/texture/ui/title/credits_icon.png"), { 600, 150 }, {0, 0}, 0, 0, WHITE },
+		{ Novice::LoadTexture("./resources/texture/ui/title/credits_exit_button.png"), { 256, 64 }, {0, 0}, 0, 0, WHITE },
+		{ Novice::LoadTexture("./resources/texture/ui/title/credits_content.png"), { 600, 400 }, {0, 0}, 0, 0, WHITE },
+
+		{ Novice::LoadTexture("./resources/texture/ui/title/reset_icon.png"), { 600, 256 }, {0, 0}, 0, 0, WHITE },
+		{ Novice::LoadTexture("./resources/texture/ui/title/reset_button.png"), { 256, 64 }, {0, 0}, 0, 0, WHITE },
 
 		{ Novice::LoadTexture("./resources/texture/ui/title/title_line.png"), { 1280, 2 }, {0, 0}, 0, 0, WHITE },
 		{ Novice::LoadTexture("./resources/texture/ui/title/title_effect.png"), { 1280, 720 }, {0, 0}, 0, 0, WHITE },
@@ -86,7 +98,7 @@ void InitTexture(void) {
 		//MapChip
 
 		//background
-		{ Novice::LoadTexture("./resources/texture/stage/background.png"), { 2560, 1440 }, {0, 0}, 0, 0, WHITE },
+		{ Novice::LoadTexture("./resources/texture/stage/background_white.png"), { 2960, 1840 }, {0, 0}, 0, 0, WHITE },
 
 		//UI
 		{ Novice::LoadTexture("./resources/texture/ui/play/life_icon.png"), { 64, 64 }, {0, 0}, 0, 0, WHITE },
@@ -143,6 +155,8 @@ void InitTexture(void) {
 		{ Novice::LoadTexture("./resources/texture/ui/clear/score_icon.png"), { 512, 64 }, {0, 0}, 0, 0, WHITE },
 		{ Novice::LoadTexture("./resources/texture/ui/clear/max_combo_icon.png"), { 512, 64 }, {0, 0}, 0, 0, WHITE },
 		{ Novice::LoadTexture("./resources/texture/ui/clear/best_score_icon.png"), { 512, 64 }, {0, 0}, 0, 0, WHITE },
+
+		{ Novice::LoadTexture("./resources/texture/ui/clear/break_score_telop.png"), { 512, 64 }, {0, 0}, 0, 0, WHITE },
 
 		//===============
 		//Gameover

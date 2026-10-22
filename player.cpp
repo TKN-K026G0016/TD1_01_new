@@ -8,6 +8,7 @@
 #include "boss_enemy.h"
 #include "play_ui.h"
 #include "se.h"
+#include "bgm.h"
 
 #include "vector2.h"
 #include "tool.h"
@@ -25,20 +26,20 @@ constexpr bool kDodgeCloseSwitch = false;
 constexpr bool kGemLockOnSwitch = true;
 //一定範囲内に敵がいなければ、ジェムをロックオンするスイッチ
 constexpr bool KCancelLockOnEnemySwitch = true;
-//エネルギー=HPモードのスイッチ
-constexpr bool kLifeGaugeSwitch = true;
+//シールド制スイッチ
+constexpr bool kElecShieldSwitch = true;
 
 #pragma region データ: player本体
 struct Player {
-	Vector2 pos = { 600, 600 };
+	Vector2 pos = { 1280, 720 };
 	Vector2 size = { 32, 32 };
 
 	//<生存関係>
 	bool isAlive = true;
 	//当たり判定の大きさ
 	float hitRadius = 10.0f;
-	int hp = 5;
-	int hpMax = 5;
+	int hp = 1;
+	int hpMax = 1;
 
 	//<ギリ避け関係>
 	float dodgeCloseRadius = 50.0f;
@@ -61,7 +62,7 @@ struct Player {
 	float decelerationSpeed = 0.15f;
 
 	//移動速度(等速)
-	float moveSpeed[2] = { 6.0f, 1.3f };
+	float moveSpeed[2] = { 6.0f, 2.0f };
 
 	Vector2 inputVec = { 0, 0 };
 
@@ -79,8 +80,8 @@ struct Player {
 	float lockOnRotateSpeed = 0.2f;
 
 
-	//<プレイヤー状態>
-	PlayerState nowState = PlayerState::Normal;
+	////<プレイヤー状態>
+	//PlayerState nowState = PlayerState::Normal;
 
 	//<射撃関係>
 	//射撃スパン
@@ -147,19 +148,13 @@ static Vector2 shootPos = {};
 //プレイヤーの中心からの発射位置の距離
 constexpr float kShootDisLength = 15.0f;
 
-//Lv2レーザーの持続時間
-int sustainLv2Count = 0;
-//Lv2レーザーの攻撃力倍率
-float laserPowRate = 1.0f;
-constexpr float kLaserPowRateMin = 1.0f;
-constexpr float kLaserPowRateMax = 3.0f;
-//火力の上昇速度
-constexpr float kLaserPowRateIncreaseSpeed = 0.01f;
-
 //チャージタイマー
 Timer chargeElecBulletTimer = { 40, 0 };
 float consumptionShootNormal = 0.5f;
 float consumptionShootCharge = 10.0f;
+static bool isCharge = false;
+
+float laserPowRate;
 
 #pragma endregion
 
@@ -174,12 +169,13 @@ constexpr float kEnergyCenter = (kEnergyMax - kEnergyMin) / 2;
 constexpr float kFirstEnergy = kEnergyMax;
 
 //エネルギー消費量(常時)
-constexpr float kConsumptionEnergy = 0.05f;
-//エネルギー消費量(レベルごと)
-constexpr float kConsumptionEnergys[ToInt(PlayerLaserLevel::Count)] = { 0.0f, 0.1f, 0.7f };
+static constexpr float kConsumptionEnergy = 0.05f;
 
-//故障時のenergy回復量
-constexpr float kRecoveryEnergyDuringEmpty = 0.15f;
+//シールドが消えるエネルギー量のライン
+static constexpr float kBreakShieldLine = 5.0f;
+
+////故障時のenergy回復量
+//constexpr float kRecoveryEnergyDuringEmpty = 0.15f;
 
 #pragma endregion
 
@@ -217,6 +213,9 @@ ColorManager colorManager;
 
 //チャージの破片表示を開始する時間
 constexpr int kStartCreateChargeChipTime = 7;
+Timer createChargeOrbTimer = { 10, 0 };
+Timer createChargeChipTimer = { 10, 0 };
+
 
 //オーバーヒート時の生成範囲(player中心で)
 constexpr int kCreateSmokeRange = 45;
@@ -225,8 +224,8 @@ constexpr int kCreateSmokeNum = 4;
 //オーバーヒート時のケムリ生成スパン
 Timer createSmokeTimer = { 15, 0 };
 
-Timer createChargeOrbTimer = { 10, 0 };
-Timer createChargeChipTimer = { 10, 0 };
+//警告演出が出てくるエネルギーの量
+static constexpr float kWarnEnergyLine = 30.0f;
 
 //開始演出処理
 struct StartEffectManager {
@@ -259,6 +258,33 @@ struct DeadEffectManager {
 	int createExploseRange = 100;
 };
 DeadEffectManager deadEffectManager;
+
+struct ElecShield {
+	Vector2 size = {};
+
+	//イージング関係
+	float easingT = 0.0f;
+	float easingSpeedNormal = 0.02f;
+	float easingSpeedDanger = 0.03f;
+	bool isScaleUp = true;
+	EasingMode easingMode = EasingMode::EaseInOut;
+
+	//サイズ関係
+	Vector2 sizeValueMin = { 35.0f, 35.0f };
+	Vector2 sizeValueMinDanger = { 10.0f, 10.0f };
+	Vector2 sizeValueMax = { 60.0f, 60.0f };
+
+	//透明度関係
+	int alpha = 0;
+	int alphaMin = 50;
+	int alphaMinDanger = 0;
+	int alphaMax = 170;
+
+	unsigned int color = 0x04C1E8FF;
+
+	Texture texture = {};
+};
+ElecShield elecShield;
 
 #pragma endregion
 
@@ -303,12 +329,14 @@ static void MovePlayer(void) {
 		moveVec.y /= moveVecLength;
 	}
 
-	//異常発生時は移動速度を変更
-	float moveSpeed = (player.nowState == PlayerState::Normal) ? player.moveSpeed[0] : player.moveSpeed[1];
+	//energy量で移動速度を変更
+	float moveSpeed = (player.remainEnergy > 0.0f) ? player.moveSpeed[0] : player.moveSpeed[1];
 
 	player.pos.x += moveSpeed * moveVec.x;
 	player.pos.y += moveSpeed * moveVec.y;
 
+	//playerの移動エフェクト
+	CreatePlayerMoveEffect(player.pos, moveVec);
 }
 
 static void ClampPlayerPos(void) {
@@ -642,8 +670,8 @@ static void UpdateShootPos(void) {
 static void ShootElecBullet(void) {
 	if (!player.isAlive) return;
 
-	//異常発生時は発射しない
-	if (player.nowState != PlayerState::Normal) return;
+	////異常発生時は発射しない
+	//if (player.nowState != PlayerState::Normal) return;
 
 	//押し
 	if (CheckInputAction(InputAction::Charge)) {
@@ -656,7 +684,15 @@ static void ShootElecBullet(void) {
 		//チャージ完了したら、エネルギー消費
 		if (chargeElecBulletTimer.count >= chargeElecBulletTimer.time) {
 
+			//一定量たまっていないと打てない
+			if (player.remainEnergy < consumptionShootCharge) return;
+
 			player.remainEnergy -= consumptionShootCharge;
+			isCharge = true;
+
+			if (player.remainEnergy < 0.0f) {
+				player.remainEnergy = 0.0f;
+			}
 		}
 	}
 	//離す
@@ -664,7 +700,7 @@ static void ShootElecBullet(void) {
 		if (chargeElecBulletTimer.count <= 0) return;
 
 		//通常弾
-		if (chargeElecBulletTimer.count < chargeElecBulletTimer.time) {
+		if (!isCharge) {
 			ShootElecBullet(shootPos, player.rotateTheta, ElecBulletType::Normal);
 			player.remainEnergy -= consumptionShootNormal;
 
@@ -677,6 +713,8 @@ static void ShootElecBullet(void) {
 
 			//SEの再生
 			PlaySe(SeType::ShootElecBulletCharge);
+
+			isCharge = false;
 		}
 
 		chargeElecBulletTimer.count = 0;
@@ -692,8 +730,6 @@ static void ConsumptionEnergy(void) {
 	if (!player.isAlive) return;
 	if (startEffectManager.nowMode != ModeStartEffect::Standby) return;
 
-	if (player.nowState != PlayerState::Normal) return;
-
 	player.remainEnergy -= kConsumptionEnergy;
 
 	if (player.remainEnergy <= 0.0f) {
@@ -707,83 +743,47 @@ static void ConsumptionEnergy(void) {
 /// </summary>
 /// <param name=""></param>
 static void CheckFailedMaintenance(void) {
-	if (!player.isAlive) return;
-	if (GetBossEnemyIsDead()) return;
+	//if (!player.isAlive) return;
+	//if (GetBossEnemyIsDead()) return;
 
-	if (kLifeGaugeSwitch) return;
+	///*if (player.nowState != PlayerState::Normal) return;*/
 
-	if (player.nowState != PlayerState::Normal) return;
-
-	//デンリョク不足
-	if (player.remainEnergy <= kEnergyMin) {
-		player.nowState = PlayerState::DeadEnergy;
-		player.remainEnergy = 0.0f;
-		chargeElecBulletTimer.count = 0;
-	}
+	////デンリョク不足
+	//if (player.remainEnergy <= kEnergyMin) {
+	//	player.nowState = PlayerState::DeadEnergy;
+	//	player.remainEnergy = 0.0f;
+	//	chargeElecBulletTimer.count = 0;
+	//}
 
 }
 
-/// <summary>
-/// 故障中のエネルギー回復処理
-/// </summary>
-/// <param name=""></param>
-static void RecoveryPlayerState(void) {
-	if (!player.isAlive) return;
-
-	if (kLifeGaugeSwitch) return;
-
-	if (player.nowState == PlayerState::DeadEnergy) {
-		player.remainEnergy += kRecoveryEnergyDuringEmpty;
-		if (player.remainEnergy >= kEnergyCenter) {
-			player.nowState = PlayerState::Normal;
-		}
-	}
-}
+///// <summary>
+///// 故障中のエネルギー回復処理
+///// </summary>
+///// <param name=""></param>
+//static void RecoveryPlayerState(void) {
+//	if (!player.isAlive) return;
+//
+//	if (kLifeGaugeSwitch) return;
+//
+//	if (player.nowState == PlayerState::DeadEnergy) {
+//		player.remainEnergy += kRecoveryEnergyDuringEmpty;
+//		if (player.remainEnergy >= kEnergyCenter) {
+//			player.nowState = PlayerState::Normal;
+//		}
+//	}
+//}
 
 #pragma endregion
 
 #pragma region 関数: 演出関係
 
+/// <summary>
+/// playerの点滅処理など
+/// </summary>
+/// <param name=""></param>
 static void UpdatePlayerEffect(void) {
-	//モードごとによる演出
-	switch (player.nowState) {
-	case PlayerState::DeadEnergy: {
-		//プレイヤーを青・黒に点灯させる処理
 
-#pragma region イージングでの点滅
-		if (colorManager.isGoToBlack) {
-			colorManager.easingT += colorManager.changeSpeed;
-			if (colorManager.easingT > 1.0f) {
-				colorManager.easingT = 1.0f;
-				//反転
-				colorManager.isGoToBlack = false;
-			}
-		} else {
-			colorManager.easingT -= colorManager.changeSpeed;
-			if (colorManager.easingT < 0.0f) {
-				colorManager.easingT = 0.0f;
-				//反転
-				colorManager.isGoToBlack = true;
-			}
-		}
-
-		colorManager.colorValue = UpdateValueByEasing(colorManager.colorValueMax, colorManager.colorValueMin, colorManager.easingT, EasingMode::EaseInOut);
-
-#pragma endregion
-
-		unsigned int newColor = (colorManager.colorValue << 24) | (colorManager.colorValue << 16) | (colorManager.colorValue << 8) | (0xFF);
-		player.texture.color = newColor;
-
-		break;
-	}
-	case PlayerState::Normal: {
-		player.texture.color = WHITE;
-		colorManager.isGoToBlack = true;
-		colorManager.easingT = 0.0f;
-
-		break;
-	}
-	}
 }
 
 /// <summary>
@@ -817,6 +817,10 @@ static void CreateChargeOrbEffect(void) {
 	}
 }
 
+/// <summary>
+/// 開始演出時の処理
+/// </summary>
+/// <param name=""></param>
 static void UpdateStartEffect(void) {
 	startEffectManager.nowMode = GetNowModeStart();
 
@@ -836,6 +840,64 @@ static void UpdateStartEffect(void) {
 
 	//フェード処理
 	startEffectManager.alpha = UpdateValueByEasing(startEffectManager.alphaMin, startEffectManager.alphaMax, startEffectManager.easingT, startEffectManager.easingMode);
+}
+
+static void InitElecShield(void) {
+	elecShield = {};
+	elecShield.texture = GetTexture(TextureType::EffectCircle);
+}
+
+static void UpdateElecShield(void) {
+	//シールドが十分な量存在したら
+	if (player.remainEnergy > kBreakShieldLine) {
+
+		//イージング処理
+		float easingSpeed = (player.remainEnergy >= kWarnEnergyLine) ? elecShield.easingSpeedNormal : elecShield.easingSpeedDanger;
+		if (elecShield.isScaleUp) {
+			elecShield.easingT += easingSpeed;
+			if (elecShield.easingT >= 1.0f) {
+				elecShield.easingT = 1.0f;
+				elecShield.isScaleUp = false;
+			}
+		} else {
+			elecShield.easingT -= easingSpeed;
+			if (elecShield.easingT < 0.0f) {
+				elecShield.easingT = 0.0f;
+				elecShield.isScaleUp = true;
+			}
+		}
+	} else {
+
+		elecShield.easingT -= elecShield.easingSpeedDanger;
+		if (elecShield.easingT < 0.0f) {
+			elecShield.easingT = 0.0f;
+		}
+
+		elecShield.isScaleUp = true;
+	}
+
+	//サイズの変更
+	if (player.remainEnergy > kWarnEnergyLine) {
+		elecShield.size = MoveByEasing(elecShield.sizeValueMin, elecShield.sizeValueMax, elecShield.easingT, elecShield.easingMode);
+
+		//透明度の変更
+		elecShield.alpha = UpdateValueByEasing(elecShield.alphaMin, elecShield.alphaMax, elecShield.easingT, elecShield.easingMode);
+	} 
+	else {
+		elecShield.size = MoveByEasing(elecShield.sizeValueMinDanger, elecShield.sizeValueMax, elecShield.easingT, elecShield.easingMode);
+
+		//透明度の変更
+		elecShield.alpha = UpdateValueByEasing(elecShield.alphaMinDanger, elecShield.alphaMax, elecShield.easingT, elecShield.easingMode);
+	}
+
+	
+}
+
+static void DrawElecShield(void) {
+	Texture texture = elecShield.texture;
+	texture.color = (elecShield.color & 0xFFFFFF00) | elecShield.alpha;
+
+	DrawTextureObj(texture, player.pos, elecShield.size);
 }
 
 #pragma endregion
@@ -905,7 +967,7 @@ static void CheckDeadPlayer(void) {
 	if (!player.isAlive) return;
 	if (GetBossEnemyIsDead()) return;
 
-	if (player.remainEnergy <= 0 || player.hp <= 0) {
+	if (player.hp <= 0) {
 		player.remainEnergy = 0;
 		player.hp = 0;
 
@@ -924,6 +986,8 @@ static void CheckDeadPlayer(void) {
 		//SE
 		PlaySe(SeType::DeadPlayer);
 
+		ChangeModeBgmFade(ModeBgmFade::FadeOut);
+
 	}
 }
 
@@ -940,6 +1004,7 @@ void InitPlayer(void) {
 
 	GetMovablePos(movablePos);
 	InitLockSign();
+	InitElecShield();
 }
 
 void UpdatePlayer(void) {
@@ -955,7 +1020,7 @@ void UpdatePlayer(void) {
 	ShootElecBullet();
 
 	CheckFailedMaintenance();
-	RecoveryPlayerState();
+	//RecoveryPlayerState();
 
 	ConsumptionEnergy();
 
@@ -967,6 +1032,7 @@ void UpdatePlayer(void) {
 	CheckDeadPlayer();
 
 	UpdateStartEffect();
+	UpdateElecShield();
 }
 
 void DrawPlayer(void) {
@@ -987,6 +1053,7 @@ void DrawPlayer(void) {
 	}
 
 	DrawLockOnSign();
+	DrawElecShield();
 
 #ifdef _DEBUG
 	//DrawHitEllipse(player.pos, player.dodgeCloseRadius, BLUE, false);
@@ -1047,20 +1114,24 @@ PlayerLaserLevel GetPlayerNowLaserLevel(void) {
 void PlayerDamage(Vector2 hitPos, float damage) {
 	if (!player.isAlive || player.isInvincible) return;
 
-	//エネルギーを減らす
-	player.remainEnergy -= damage;
-	if (player.remainEnergy > 0.0f) {
-		player.isInvincible = true;
+	//エネルギーが足りていない状況で接触したら
+	if (player.remainEnergy < kBreakShieldLine) {
+		player.hp--;
 	}
 
+	//エネルギーを減らす
+	player.remainEnergy -= damage;
 
-	CreatePlayerDamageEffect(player.pos);
-
+	//まだ生存していたら無敵にする
 	if (player.hp > 0) {
+		player.isInvincible = true;
 		PlaySe(SeType::DamagePlayer);
 	}
 
-	TriggerGaugeShackByDamage();
+	//ダメージエフェクトを生成
+	CreatePlayerDamageEffect(player.pos);
+
+	TriggerGaugeShakeByDamage();
 
 #pragma region ノックバック方向設定
 
@@ -1114,12 +1185,8 @@ void TriggerDodgeClose(Vector2 eBulletPos) {
 	}
 }
 
-PlayerState GetPlayerNowState(void) {
-	return player.nowState;
-}
-
-bool GetLifeGaugeSwitch(void) {
-	return kLifeGaugeSwitch;
-}
+//PlayerState GetPlayerNowState(void) {
+//	return player.nowState;
+//}
 
 #pragma endregion

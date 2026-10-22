@@ -43,6 +43,18 @@ enum class TextureType {
 	TitleInstShot,
 	TitleInstStart,
 
+	CreditsButton,
+	CreditsButtonNew,
+	ResetScoreButton,
+	ResetScoreButtonNew,
+
+	CreditsIcon,
+	CreditsExitIcon,
+	CreditsContent,
+
+	ResetIcon,
+	ResetConfirmIcon,
+
 	TitleLine,
 	TitleEffect,
 	TitleTriangle,
@@ -152,6 +164,7 @@ enum class TextureType {
 	ClearScoreIcon,
 	ClearMaxComboIcon,
 	ClearBestScoreIcon,
+	NewRecordIcon,
 
 	//===============
 	//Gameover

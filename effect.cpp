@@ -443,20 +443,113 @@ EnemyDamageEffect enemyDamageEffect;
 
 #pragma endregion
 
-#pragma region データ: PlayerFootprintsEffect
-const int kFootprintsEffectNumber = 20;
-struct FootprintsEffect {
-	Vector2 pos;
-	Vector2 move;
-	Vector2 size;
-	float speed;
-	float width;
-	bool isAppear;
-	unsigned int color;
-	Texture texture = {};
+#pragma region データ: PlayerMoveEffect
+
+static constexpr int kPlayerMoveEffectLimit = 7;
+static Timer createPlayerMoveEffectTimer = { 7, 0 };
+//ブレる量
+int playerMoveEffectShakeAmp = 10;
+
+struct PlayerMoveEffect {
+	Vector2 pos = {};
+
+	bool isShoot = false;
+
+	//移動関係
+	float moveTheta = 0.0f;
+
+	//回転関係
+	float rotateTheta = 0.0f;
+	float rotateSpeed = ToFloat(M_PI) / 20.0f;
+
+	//<イージング関係>
+	float easingT = 0;
+	float easingSpeed = 0.03f;
+	EasingMode easingMode = EasingMode::EaseOut;
+
+	//サイズ関係
+	Vector2 size = {};
+	Vector2 sizeMax = { 15, 15 };
+	Vector2 sizeMin = { 2,2 };
+
+	//移動速度関係
+	float moveSpeed = 0;
+	float moveSpeedMax = 8.0f;
+	float moveSpeedMin = 0.1f;
+
+	//透明度関係
+	int alpha = 0;
+	int alphaMax = 80;
 };
-FootprintsEffect footprintsEffect[kFootprintsEffectNumber] = {};
-int footprintsEffectTimer = 0;
+static PlayerMoveEffect playerMoveEffect[kPlayerMoveEffectLimit];
+
+
+#pragma endregion
+
+#pragma region データ: RecoveryEnergyEffect
+
+static constexpr int kRecoveryEnergyEffectLimit = 20;
+//残像の数
+static constexpr int kRecoveryEffectAfterimageLimit = 2;
+
+//何個生成するか
+static constexpr int kCreateRecoveryEffectLimit = 3;
+static int createRecoveryEffectCount = 0;
+//生成中フラグ
+static bool isCreateRecoveryEffect = false;
+static Timer createRecoveryEffectTimer = { 5, 0 };
+
+//recoveryEffectを生成する範囲
+static constexpr Vector2i kCreateRecoveryEffectPosRange = { 30, 20 };
+
+
+struct RecoveryEnergyEffect {
+	Vector2 pos = {};
+	
+
+	bool isShoot = false;
+
+	//移動速度
+	float moveSpeed = 8.0f;
+
+	//<回転関係>
+	float rotateTheta = 0.0f;
+	float rotateSpeed = ToFloat(M_PI) / 20.0f;
+
+	//<イージング関係>
+	float easingT = 0.0f;
+	float easingSpeed = 0.04f;
+	EasingMode easingMode = EasingMode::EaseOut;
+
+	//サイズ関係
+	Vector2 size = { 16, 16 };
+	Vector2 sizeMax = { 40, 40 };
+	Vector2 sizeMin = { 16,16 };
+
+	//透明度関係
+	int alpha = 0;
+	int alphaMax = 180;
+	int alphaMin = 0;
+
+	//<残像関係>
+	float preRotateTheta[kRecoveryEffectAfterimageLimit] = {};
+	//本体との座標のずれ
+	float posOffset = 10;
+	//本体との透明度のズレ
+	int diffAlpha = 30;
+};
+static RecoveryEnergyEffect recoveryEffect[kRecoveryEnergyEffectLimit];
+
+#pragma endregion
+
+#pragma region データ: BreakGemEffect
+
+struct BreakGemEffect {
+	float endSizeValue = 64;
+	unsigned int color = WHITE;
+};
+BreakGemEffect breakGemEffect;
+
 #pragma endregion
 
 #pragma region データ: BombExplosionEffect
@@ -534,6 +627,8 @@ struct FlashPanel {
 static FlashPanel flashPanel;
 
 #pragma endregion
+
+
 
 #pragma region 関数: ジェム取得effect
 
@@ -1611,62 +1706,214 @@ void CreateEnemyDamageEffect(Vector2 pos) {
 
 #pragma endregion
 
-#pragma region 関数: PlayerFootprintEffect
+#pragma region 関数: PlayerMoveEffectEffect
 
-void CreatePlayerFootprintsEffect(Vector2 pos, Vector2 inputVec) {
+void CreatePlayerMoveEffect(Vector2 pos, Vector2 moveVec) {
+	if (moveVec.x == 0.0f && moveVec.y == 0.0f) return;
 
-	if (footprintsEffectTimer > 0) {
-		footprintsEffectTimer--;
+	createPlayerMoveEffectTimer.count++;
+	if (createPlayerMoveEffectTimer.count < createPlayerMoveEffectTimer.time) return;
+
+	for (int i = 0; i < kPlayerMoveEffectLimit; i++) {
+		if (playerMoveEffect[i].isShoot) continue;
+
+		playerMoveEffect[i].isShoot = true;
+		playerMoveEffect[i].pos = pos;
+
+		//移動方向設定
+		Vector2 effectMoveVec = { -moveVec.x, -moveVec.y };
+		playerMoveEffect[i].moveTheta = atan2f(effectMoveVec.y, effectMoveVec.x);
+
+		//ブレさせる処理
+		float shakeValue = ToFloat(GetRand(-playerMoveEffectShakeAmp, playerMoveEffectShakeAmp)) * (ToFloat(M_PI) / 180.0f);
+		playerMoveEffect[i].moveTheta += shakeValue;
+
+		//初期化処理
+		playerMoveEffect[i].easingT = 0.0f;
+		playerMoveEffect[i].moveSpeed = playerMoveEffect[i].moveSpeedMax;
+
+		createPlayerMoveEffectTimer.count = 0;
+
+		break;
 	}
+}
+static void InitPlayerMoveEffect(void) {
+	for (int i = 0; i < kPlayerMoveEffectLimit; i++) {
+		playerMoveEffect[i] = {};
+	}
+}
 
-	if (footprintsEffectTimer <= 0) {
-		for (int i = 0; i < kFootprintsEffectNumber; i++) {
-			if (footprintsEffect[i].isAppear == false) continue;
-			footprintsEffect[i].isAppear = true;
-			footprintsEffectTimer = 5;
-			footprintsEffect[i].pos.x = pos.x + static_cast<float>((rand() % 30) - 15);
-			footprintsEffect[i].pos.y = pos.y;
-			footprintsEffect[i].color = 0xffffffff;
-			footprintsEffect[i].move.x = -inputVec.x;
-			footprintsEffect[i].move.y = -inputVec.y;
-			footprintsEffect[i].speed = 5;
-			footprintsEffect[i].size.x = 32;
-			footprintsEffect[i].size.y = 32;
+void UpdatePlayerMoveEffect() {
+	for (int i = 0; i < kPlayerMoveEffectLimit; i++) {
+		if (!playerMoveEffect[i].isShoot) continue;
+
+		//移動処理
+		playerMoveEffect[i].pos.x += cosf(playerMoveEffect[i].moveTheta) * playerMoveEffect[i].moveSpeed;
+		playerMoveEffect[i].pos.y += sinf(playerMoveEffect[i].moveTheta) * playerMoveEffect[i].moveSpeed;
+
+		//回転処理
+		playerMoveEffect[i].rotateTheta += playerMoveEffect[i].rotateSpeed;
+
+#pragma region イージング関係
+
+		playerMoveEffect[i].easingT += playerMoveEffect[i].easingSpeed;
+		if (playerMoveEffect[i].easingT >= 1.0f) {
+			playerMoveEffect[i].easingT = 1.0f;
+			playerMoveEffect[i].isShoot = false;
+		}
+
+		//サイズ
+		playerMoveEffect[i].size = MoveByEasing(playerMoveEffect[i].sizeMax, playerMoveEffect[i].sizeMin, playerMoveEffect[i].easingT, playerMoveEffect[i].easingMode);
+
+		//移動速度
+		playerMoveEffect[i].moveSpeed = UpdateValueByEasing(playerMoveEffect[i].moveSpeedMax, playerMoveEffect[i].moveSpeedMin, playerMoveEffect[i].easingT, playerMoveEffect[i].easingMode);
+
+		//透明度
+		playerMoveEffect[i].alpha = UpdateValueByEasing(playerMoveEffect[i].alphaMax, kAlphaMin, playerMoveEffect[i].easingT, playerMoveEffect[i].easingMode);
+
+#pragma endregion
+
+	}
+}
+void DrawPlayerMoveEffect() {
+	for (int i = 0; i < kPlayerMoveEffectLimit; i++) {
+		if (!playerMoveEffect[i].isShoot) continue;
+
+		Texture texture = triangleTexture;
+		texture.color = (kPlayerColor & 0xFFFFFF00) | playerMoveEffect[i].alpha;
+
+		if (nowScene == Scene::Play) {
+			DrawTextureRotateObj(texture, playerMoveEffect[i].pos, playerMoveEffect[i].size, playerMoveEffect[i].rotateTheta);
+		} else {
+			DrawTextureRotateUI(texture, playerMoveEffect[i].pos, playerMoveEffect[i].size, playerMoveEffect[i].rotateTheta);
+		}
+	}
+}
+#pragma endregion
+
+#pragma region 関数: RecoveryEffect
+
+void TriggerCreateRecoveryEffect(void) {
+	isCreateRecoveryEffect = true;
+	createRecoveryEffectCount = 0;
+	createRecoveryEffectTimer.count = createRecoveryEffectTimer.time;
+}
+
+static void CreateRecoveryEffect(void) {
+	if (!isCreateRecoveryEffect) return;
+
+	createRecoveryEffectTimer.count++;
+	if (createRecoveryEffectTimer.count >= createRecoveryEffectTimer.time) {
+		createRecoveryEffectTimer.count = 0;
+
+		//生成処理
+		for (int j = 0; j < kRecoveryEnergyEffectLimit; j++) {
+			if (recoveryEffect[j].isShoot) continue;
+
+			Vector2 createPos = GetPlayerPos();
+			createPos.x += ToFloat(GetRand(-kCreateRecoveryEffectPosRange.x, kCreateRecoveryEffectPosRange.x));
+			createPos.y += ToFloat(GetRand(0, kCreateRecoveryEffectPosRange.y));
+
+			recoveryEffect[j].isShoot = true;
+			recoveryEffect[j].pos = createPos;
+
+			//初期化処理
+			recoveryEffect[j].easingT = 0.0f;
+
+			//一定数生成したら
+			createRecoveryEffectCount++;
+			if (createRecoveryEffectCount >= kCreateRecoveryEffectLimit) {
+				isCreateRecoveryEffect = false;
+			}
 
 			break;
-
-		}
-	}
-
-}
-static void InitPlayerFootprintsEffect(void) {
-	for (int i = 0; i < kFootprintsEffectNumber; i++) {
-		footprintsEffect[i] = {};
-		footprintsEffect[i].texture = GetTexture(TextureType::EffectSquareMini);
-	}
-}
-
-void UpdatePlayerFootprintsEffect() {
-	for (int i = 0; i < kFootprintsEffectNumber; i++) {
-		if (!footprintsEffect[i].isAppear) continue;
-		footprintsEffect[i].pos.x += footprintsEffect[i].move.x * footprintsEffect[i].speed;
-		footprintsEffect[i].pos.y += footprintsEffect[i].move.y * footprintsEffect[i].speed;
-		if (footprintsEffect[i].color >= 0xffffff10) {
-			footprintsEffect[i].color -= 0x00000010;
-		} else {
-			footprintsEffect[i].color = 0xffffffff;
-			footprintsEffect[i].isAppear = false;
 		}
 	}
 }
-void DrawPlayerFootprints() {
-	for (int i = 0; i < kFootprintsEffectNumber; i++) {
-		if (!footprintsEffect[i].isAppear) continue;
 
-		Texture texture = footprintsEffect[i].texture;
-		DrawTextureObj(texture, footprintsEffect[i].pos, footprintsEffect[i].size);
+static void InitRecoveryEffect(void) {
+	for (int i = 0; i < kRecoveryEnergyEffectLimit; i++) {
+		recoveryEffect[i] = {};
 	}
 }
+
+static void UpdateRecoveryEffect(void) {
+	for (int i = 0; i < kRecoveryEnergyEffectLimit; i++) {
+		if (!recoveryEffect[i].isShoot) continue;
+
+#pragma region 残像の更新処理
+		//prePos(残像位置の更新)
+		for (int j = 0; j < kRecoveryEffectAfterimageLimit; j++) {
+			if (j == 0) {
+				recoveryEffect[i].preRotateTheta[j] = recoveryEffect[i].rotateTheta;
+			} else {
+				recoveryEffect[i].preRotateTheta[j] = recoveryEffect[i].preRotateTheta[j - 1];
+			}
+		}
+
+#pragma endregion
+
+		recoveryEffect[i].pos.y += recoveryEffect[i].moveSpeed;
+
+		recoveryEffect[i].rotateTheta += recoveryEffect[i].rotateSpeed;
+
+#pragma region イージング処理
+
+		recoveryEffect[i].easingT += recoveryEffect[i].easingSpeed;
+		if (recoveryEffect[i].easingT >= 1.0f) {
+			recoveryEffect[i].easingT = 1.0f;
+			recoveryEffect[i].isShoot = false;
+		}
+
+		//サイズ変更
+		recoveryEffect[i].size = MoveByEasing(recoveryEffect[i].sizeMax, recoveryEffect[i].sizeMin, recoveryEffect[i].easingT, recoveryEffect[i].easingMode);
+
+		//透明度変更
+		recoveryEffect[i].alpha = UpdateValueByEasing(recoveryEffect[i].alphaMax, recoveryEffect[i].alphaMin, recoveryEffect[i].easingT, recoveryEffect[i].easingMode);
+
+#pragma endregion
+
+	}
+}
+
+static void DrawRecoveryEffect(void) {
+	for (int i = 0; i < kRecoveryEnergyEffectLimit; i++) {
+		if (!recoveryEffect[i].isShoot) continue;
+
+		//残像の描写
+		for (int j = 0; j < kRecoveryEffectAfterimageLimit; j++) {
+			Vector2 pos = { recoveryEffect[i].pos.x, recoveryEffect[i].pos.y - recoveryEffect[i].posOffset * (j + 1) };
+
+			Texture afterFadeTexture = whiteBoxTexture;
+
+			//透明度の変更
+			int alpha = recoveryEffect[i].alpha - recoveryEffect[i].diffAlpha * (j + 1);
+			if (alpha < 0) {
+				alpha = 0;
+			}
+			unsigned int color = (kPlayerColor & 0xFFFFFF00) | alpha;
+			afterFadeTexture.color = color;
+
+
+			DrawTextureRotateObj(afterFadeTexture, pos, recoveryEffect[i].size, recoveryEffect[i].preRotateTheta[j]);
+		}
+
+		//本体の描写
+		Texture texture = whiteBoxTexture;
+		texture.color = (kPlayerColor & 0xFFFFFF00) | recoveryEffect[i].alpha;
+		DrawTextureRotateObj(texture, recoveryEffect[i].pos, recoveryEffect[i].size, recoveryEffect[i].rotateTheta);
+	}
+}
+
+
+#pragma endregion
+
+#pragma region 関数: BreakGemEffect
+
+void CreateBreakGemEffect(Vector2 pos) {
+	CreateCircleEffect(pos, breakGemEffect.endSizeValue, breakGemEffect.color);
+}
+
 #pragma endregion
 
 #pragma region 関数: BombExplosionEffect
@@ -1691,8 +1938,7 @@ void CreateBombExplosionEffect(Vector2 pos, float endSizeValue, unsigned int col
 
 		bombBlastEffect[i][3].pos.x = pos.x + static_cast<float>((rand() % 374) - 374);
 		bombBlastEffect[i][3].pos.y = pos.y + static_cast<float>((rand() % 374));
-		for (int j = 0; j < kBombBlastEffectNumber; j++)
-		{
+		for (int j = 0; j < kBombBlastEffectNumber; j++) {
 			bombBlastEffect[i][j].endSizeValue = endSizeValue;
 			bombBlastEffect[i][j].color = color;
 			bombBlastEffect[i][j].easingT = 0.0f;
@@ -1704,8 +1950,7 @@ static void InitBombExplosionEffect(void) {
 	for (int i = 0; i < kBombExplosionEffectNumber; i++) {
 		bombExplosionEffect[i] = {};
 		bombExplosionEffect[i].texture = GetTexture(TextureType::EffectExplosion);
-		for (int j = 0; j < kBombBlastEffectNumber; j++)
-		{
+		for (int j = 0; j < kBombBlastEffectNumber; j++) {
 			bombBlastEffect[i][j] = {};
 			bombBlastEffect[i][j].texture = GetTexture(TextureType::EffectCircle);
 		}
@@ -1768,10 +2013,9 @@ void DrawBombExplosionEffect() {
 		texture.color = (bombExplosionEffect[i].color & 0xFFFFFF00) | bombExplosionEffect[i].alpha;
 
 		DrawTextureObj(texture, bombExplosionEffect[i].pos, size);
-		
-		for (int j = 0; j < kBombBlastEffectNumber; j++)
-		{
-			Vector2 Blostsize = { bombBlastEffect[i][j].sizeValue,bombBlastEffect[i][j].sizeValue};
+
+		for (int j = 0; j < kBombBlastEffectNumber; j++) {
+			Vector2 Blostsize = { bombBlastEffect[i][j].sizeValue,bombBlastEffect[i][j].sizeValue };
 
 			Texture Blosttexture = bombBlastEffect[i][j].texture;
 			Blosttexture.color = (bombBlastEffect[i][j].color & 0xFFFFFF00) | bombBlastEffect[i][j].alpha;
@@ -1851,11 +2095,12 @@ void InitEffect() {
 	InitTriangleEffect();
 	InitTriangleEffect2();
 	InitCircleEffect();
-	InitPlayerFootprintsEffect();
+	InitPlayerMoveEffect();
+	InitRecoveryEffect();
 	InitElecLineEffect();
 	InitBombExplosionEffect();
 	InitFlashPanel();
-	
+
 	/*CreateBombExplosionEffect({100,100}, 768,WHITE);*/
 
 #ifdef _DEBUG
@@ -1882,7 +2127,9 @@ void UpdateEffect() {
 	UpdateTriangleEffect();
 	UpdateTriangleEffect2();
 	UpdateCircleEffect();
-	UpdatePlayerFootprintsEffect();
+	UpdatePlayerMoveEffect();
+	UpdateRecoveryEffect();
+	CreateRecoveryEffect();
 	UpdateElecLineEffect();
 	UpdateBombExplosionEffect();
 	UpdateFlashPanel();
@@ -1900,7 +2147,8 @@ void DrawEffect() {
 	DrawTriangleEffect2();
 	DrawCircleEffect();
 	DrawElecLineEffect();
-	DrawPlayerFootprints();
+	DrawPlayerMoveEffect();
+	DrawRecoveryEffect();
 	DrawBombExplosionEffect();
 }
 

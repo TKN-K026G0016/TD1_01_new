@@ -28,6 +28,8 @@ void InitSe(void) {
 		{Novice::LoadAudio("./resources/sound/se/menu/move_cursor.wav"), 1.0f},
 		{Novice::LoadAudio("./resources/sound/se/menu/pause.wav"), 1.0f},
 
+		{Novice::LoadAudio("./resources/sound/se/menu/flash.wav"), 0.6f},
+
 		{Novice::LoadAudio("./resources/sound/se/menu/reset_score.wav"), 1.0f},
 
 		{Novice::LoadAudio("./resources/sound/se/menu/stage_clear_jingle.wav"), 1.0f},
@@ -38,7 +40,7 @@ void InitSe(void) {
 		//player
 		{Novice::LoadAudio("./resources/sound/se/player/shoot_bullet.wav"), 1.0f},
 		{Novice::LoadAudio("./resources/sound/se/player/shoot_charge_bullet.wav"), 1.0f},
-		{Novice::LoadAudio("./resources/sound/se/player/elec_shock.wav"), 0.5f},
+		{Novice::LoadAudio("./resources/sound/se/player/elec_shock.wav"), 0.4f},
 		{Novice::LoadAudio("./resources/sound/se/player/elec_shock_charge.wav"), 0.5f},
 		{Novice::LoadAudio("./resources/sound/se/player/charge.wav"), 0.5f},
 

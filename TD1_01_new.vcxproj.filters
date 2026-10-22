@@ -23,6 +23,90 @@
     <Filter Include="audio\bgm">
       <UniqueIdentifier>{1e1694d4-a0b4-4453-8c9f-7fa97320e5c4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="boss_enemy">
+      <UniqueIdentifier>{3c071f8b-13a2-498e-888c-9db162fe17f9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="enemy">
+      <UniqueIdentifier>{276f058a-e057-4f5d-b453-31ace8f7c1e9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="enemy\enemy_bullet">
+      <UniqueIdentifier>{39fbc579-caec-4631-b0d6-09c3e5abacd5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="effect">
+      <UniqueIdentifier>{c6848193-ee73-40fb-b931-365a135e19c6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="gem">
+      <UniqueIdentifier>{4945e8bf-01a1-4280-9743-e655adc7e40f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="collision_manager">
+      <UniqueIdentifier>{41a2d594-ef8c-4e5b-ab4a-882882c5580b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="scene">
+      <UniqueIdentifier>{e8c5c39d-db28-4468-8d6e-b95c6aa323f2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="scene\clear">
+      <UniqueIdentifier>{13449d9c-5819-4702-8219-67493ca65cac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="scene\credits">
+      <UniqueIdentifier>{9a04f0f1-3521-4404-a6a3-8c8f3d1c656a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="scene\gameover">
+      <UniqueIdentifier>{74fd8dcc-ee9e-4182-9628-0fb243c21e46}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="scene\scene_manager">
+      <UniqueIdentifier>{3b83b0f3-1107-46e7-8996-9d61f8ef0da4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="scene\title">
+      <UniqueIdentifier>{a8b139cd-cd83-4894-bbc1-66b8d5d000d6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="scene\play">
+      <UniqueIdentifier>{bc1443c7-f18b-4474-88bb-af82467dd4e3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="scene\title\title_player">
+      <UniqueIdentifier>{f678c36d-8156-438f-a946-79514d5bff89}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="scene\title\title_background">
+      <UniqueIdentifier>{ee71c914-8578-4c82-ae4f-742e91d27b5a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="scene\reset_score">
+      <UniqueIdentifier>{4160687d-780c-4d73-81e9-fc2a8fd14eda}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="scene\guide">
+      <UniqueIdentifier>{5d22c9e4-3eb7-43e9-b251-6c21b8c9213c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="scene\pause">
+      <UniqueIdentifier>{0fa245a6-10dc-4983-b09c-bcc435793b9f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="input">
+      <UniqueIdentifier>{24f3bb33-9cec-4bd3-b01b-eea46bcf4e7e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="play_ui">
+      <UniqueIdentifier>{b994b9aa-5e82-4449-8b1e-c6a7954c4c43}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="player">
+      <UniqueIdentifier>{24832969-17e4-4bce-9d22-b71b2a2d7113}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="player\player_laser">
+      <UniqueIdentifier>{4fcbca65-2fa8-4731-b900-6d43793c0070}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="player\elec_bullet">
+      <UniqueIdentifier>{70bd84a6-3fa0-46a1-a20a-093c6a668027}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="score_data">
+      <UniqueIdentifier>{9ca600e2-e729-4d34-9daa-25323fcb626a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="stage">
+      <UniqueIdentifier>{6c5b4c18-2532-4998-8664-f2ac8bef78ad}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="timer">
+      <UniqueIdentifier>{b8e51081-66dc-43ab-a34c-448613bd81b4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="texture">
+      <UniqueIdentifier>{c01bbfe5-97d9-49ed-971e-f4dc28fef2ef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="tool">
+      <UniqueIdentifier>{cb7a26a9-9142-45d6-b15b-30ae0fe1f99f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
@@ -32,89 +116,89 @@
     <ClCompile Include="bgm.cpp">
       <Filter>audio\bgm</Filter>
     </ClCompile>
-    <ClCompile Include="boss_enemy.cpp">
-      <Filter>KamataEngine</Filter>
-    </ClCompile>
-    <ClCompile Include="clear.cpp">
-      <Filter>KamataEngine</Filter>
-    </ClCompile>
-    <ClCompile Include="collision_manager.cpp">
-      <Filter>KamataEngine</Filter>
-    </ClCompile>
-    <ClCompile Include="credits.cpp">
-      <Filter>KamataEngine</Filter>
-    </ClCompile>
-    <ClCompile Include="effect.cpp">
-      <Filter>KamataEngine</Filter>
-    </ClCompile>
-    <ClCompile Include="elec_bullet.cpp">
-      <Filter>KamataEngine</Filter>
-    </ClCompile>
-    <ClCompile Include="enemy.cpp">
-      <Filter>KamataEngine</Filter>
-    </ClCompile>
-    <ClCompile Include="enemy_bullet.cpp">
-      <Filter>KamataEngine</Filter>
-    </ClCompile>
-    <ClCompile Include="gameover.cpp">
-      <Filter>KamataEngine</Filter>
-    </ClCompile>
-    <ClCompile Include="gem.cpp">
-      <Filter>KamataEngine</Filter>
-    </ClCompile>
-    <ClCompile Include="guide.cpp">
-      <Filter>KamataEngine</Filter>
-    </ClCompile>
-    <ClCompile Include="input.cpp">
-      <Filter>KamataEngine</Filter>
-    </ClCompile>
-    <ClCompile Include="pause.cpp">
-      <Filter>KamataEngine</Filter>
-    </ClCompile>
-    <ClCompile Include="play.cpp">
-      <Filter>KamataEngine</Filter>
-    </ClCompile>
-    <ClCompile Include="play_ui.cpp">
-      <Filter>KamataEngine</Filter>
-    </ClCompile>
-    <ClCompile Include="player.cpp">
-      <Filter>KamataEngine</Filter>
-    </ClCompile>
-    <ClCompile Include="player_laser.cpp">
-      <Filter>KamataEngine</Filter>
-    </ClCompile>
-    <ClCompile Include="reset_score.cpp">
-      <Filter>KamataEngine</Filter>
-    </ClCompile>
-    <ClCompile Include="scene_manager.cpp">
-      <Filter>KamataEngine</Filter>
-    </ClCompile>
-    <ClCompile Include="score_data.cpp">
-      <Filter>KamataEngine</Filter>
-    </ClCompile>
-    <ClCompile Include="stage.cpp">
-      <Filter>KamataEngine</Filter>
-    </ClCompile>
-    <ClCompile Include="texture.cpp">
-      <Filter>KamataEngine</Filter>
-    </ClCompile>
-    <ClCompile Include="timer.cpp">
-      <Filter>KamataEngine</Filter>
-    </ClCompile>
-    <ClCompile Include="title.cpp">
-      <Filter>KamataEngine</Filter>
-    </ClCompile>
-    <ClCompile Include="title_background.cpp">
-      <Filter>KamataEngine</Filter>
-    </ClCompile>
-    <ClCompile Include="title_player.cpp">
-      <Filter>KamataEngine</Filter>
-    </ClCompile>
-    <ClCompile Include="tool.cpp">
-      <Filter>KamataEngine</Filter>
-    </ClCompile>
     <ClCompile Include="se.cpp">
       <Filter>audio\se</Filter>
+    </ClCompile>
+    <ClCompile Include="boss_enemy.cpp">
+      <Filter>boss_enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="enemy_bullet.cpp">
+      <Filter>enemy\enemy_bullet</Filter>
+    </ClCompile>
+    <ClCompile Include="enemy.cpp">
+      <Filter>enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="effect.cpp">
+      <Filter>effect</Filter>
+    </ClCompile>
+    <ClCompile Include="gem.cpp">
+      <Filter>gem</Filter>
+    </ClCompile>
+    <ClCompile Include="collision_manager.cpp">
+      <Filter>collision_manager</Filter>
+    </ClCompile>
+    <ClCompile Include="clear.cpp">
+      <Filter>scene\clear</Filter>
+    </ClCompile>
+    <ClCompile Include="credits.cpp">
+      <Filter>scene\credits</Filter>
+    </ClCompile>
+    <ClCompile Include="gameover.cpp">
+      <Filter>scene\gameover</Filter>
+    </ClCompile>
+    <ClCompile Include="guide.cpp">
+      <Filter>scene\guide</Filter>
+    </ClCompile>
+    <ClCompile Include="pause.cpp">
+      <Filter>scene\pause</Filter>
+    </ClCompile>
+    <ClCompile Include="play.cpp">
+      <Filter>scene\play</Filter>
+    </ClCompile>
+    <ClCompile Include="reset_score.cpp">
+      <Filter>scene\reset_score</Filter>
+    </ClCompile>
+    <ClCompile Include="scene_manager.cpp">
+      <Filter>scene\scene_manager</Filter>
+    </ClCompile>
+    <ClCompile Include="title.cpp">
+      <Filter>scene\title</Filter>
+    </ClCompile>
+    <ClCompile Include="title_background.cpp">
+      <Filter>scene\title\title_background</Filter>
+    </ClCompile>
+    <ClCompile Include="title_player.cpp">
+      <Filter>scene\title\title_player</Filter>
+    </ClCompile>
+    <ClCompile Include="input.cpp">
+      <Filter>input</Filter>
+    </ClCompile>
+    <ClCompile Include="play_ui.cpp">
+      <Filter>play_ui</Filter>
+    </ClCompile>
+    <ClCompile Include="player.cpp">
+      <Filter>player</Filter>
+    </ClCompile>
+    <ClCompile Include="player_laser.cpp">
+      <Filter>player\player_laser</Filter>
+    </ClCompile>
+    <ClCompile Include="elec_bullet.cpp">
+      <Filter>player\elec_bullet</Filter>
+    </ClCompile>
+    <ClCompile Include="score_data.cpp">
+      <Filter>score_data</Filter>
+    </ClCompile>
+    <ClCompile Include="stage.cpp">
+      <Filter>stage</Filter>
+    </ClCompile>
+    <ClCompile Include="timer.cpp">
+      <Filter>timer</Filter>
+    </ClCompile>
+    <ClCompile Include="texture.cpp">
+      <Filter>texture</Filter>
+    </ClCompile>
+    <ClCompile Include="tool.cpp">
+      <Filter>tool</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -205,35 +289,89 @@
     <ClInclude Include="common.h" />
     <ClInclude Include="matrix.h" />
     <ClInclude Include="vector2.h" />
-    <ClInclude Include="boss_enemy.h" />
-    <ClInclude Include="clear.h" />
-    <ClInclude Include="collision_manager.h" />
-    <ClInclude Include="credits.h" />
-    <ClInclude Include="effect.h" />
-    <ClInclude Include="elec_bullet.h" />
-    <ClInclude Include="enemy.h" />
-    <ClInclude Include="enemy_bullet.h" />
-    <ClInclude Include="gameover.h" />
-    <ClInclude Include="gem.h" />
-    <ClInclude Include="guide.h" />
-    <ClInclude Include="input.h" />
-    <ClInclude Include="pause.h" />
-    <ClInclude Include="play.h" />
-    <ClInclude Include="play_ui.h" />
-    <ClInclude Include="player.h" />
-    <ClInclude Include="player_laser.h" />
-    <ClInclude Include="reset_score.h" />
-    <ClInclude Include="scene_manager.h" />
-    <ClInclude Include="score_data.h" />
-    <ClInclude Include="stage.h" />
-    <ClInclude Include="texture.h" />
-    <ClInclude Include="timer.h" />
-    <ClInclude Include="title.h" />
-    <ClInclude Include="title_background.h" />
-    <ClInclude Include="title_player.h" />
-    <ClInclude Include="tool.h" />
     <ClInclude Include="se.h">
       <Filter>audio\se</Filter>
+    </ClInclude>
+    <ClInclude Include="boss_enemy.h">
+      <Filter>boss_enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="enemy_bullet.h">
+      <Filter>enemy\enemy_bullet</Filter>
+    </ClInclude>
+    <ClInclude Include="enemy.h">
+      <Filter>enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="effect.h">
+      <Filter>effect</Filter>
+    </ClInclude>
+    <ClInclude Include="gem.h">
+      <Filter>gem</Filter>
+    </ClInclude>
+    <ClInclude Include="collision_manager.h">
+      <Filter>collision_manager</Filter>
+    </ClInclude>
+    <ClInclude Include="clear.h">
+      <Filter>scene\clear</Filter>
+    </ClInclude>
+    <ClInclude Include="credits.h">
+      <Filter>scene\credits</Filter>
+    </ClInclude>
+    <ClInclude Include="gameover.h">
+      <Filter>scene\gameover</Filter>
+    </ClInclude>
+    <ClInclude Include="guide.h">
+      <Filter>scene\guide</Filter>
+    </ClInclude>
+    <ClInclude Include="pause.h">
+      <Filter>scene\pause</Filter>
+    </ClInclude>
+    <ClInclude Include="play.h">
+      <Filter>scene\play</Filter>
+    </ClInclude>
+    <ClInclude Include="reset_score.h">
+      <Filter>scene\reset_score</Filter>
+    </ClInclude>
+    <ClInclude Include="scene_manager.h">
+      <Filter>scene\scene_manager</Filter>
+    </ClInclude>
+    <ClInclude Include="title.h">
+      <Filter>scene\title</Filter>
+    </ClInclude>
+    <ClInclude Include="title_background.h">
+      <Filter>scene\title\title_background</Filter>
+    </ClInclude>
+    <ClInclude Include="title_player.h">
+      <Filter>scene\title\title_player</Filter>
+    </ClInclude>
+    <ClInclude Include="input.h">
+      <Filter>input</Filter>
+    </ClInclude>
+    <ClInclude Include="play_ui.h">
+      <Filter>play_ui</Filter>
+    </ClInclude>
+    <ClInclude Include="player.h">
+      <Filter>player</Filter>
+    </ClInclude>
+    <ClInclude Include="player_laser.h">
+      <Filter>player\player_laser</Filter>
+    </ClInclude>
+    <ClInclude Include="elec_bullet.h">
+      <Filter>player\elec_bullet</Filter>
+    </ClInclude>
+    <ClInclude Include="score_data.h">
+      <Filter>score_data</Filter>
+    </ClInclude>
+    <ClInclude Include="stage.h">
+      <Filter>stage</Filter>
+    </ClInclude>
+    <ClInclude Include="timer.h">
+      <Filter>timer</Filter>
+    </ClInclude>
+    <ClInclude Include="texture.h">
+      <Filter>texture</Filter>
+    </ClInclude>
+    <ClInclude Include="tool.h">
+      <Filter>tool</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

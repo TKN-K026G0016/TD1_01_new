@@ -7,6 +7,7 @@
 #include "effect.h"
 #include "play_ui.h"
 #include "se.h"
+#include "bgm.h"
 
 #include "texture.h"
 #include "vector2.h"
@@ -146,15 +147,50 @@ float spawnPosOffset = 100;
 #pragma endregion
 
 #pragma region データ: 背景
+
+//背景本体
 struct BackGround {
 	Vector2 pos = { 1280, 720 };
-	Vector2 size = { 2560, 1440 };
+	Vector2 size = { 2960, 1840 };
 
 	float scrollRate = 1.0f;
+
+	bool isFlash = true;
+
+	float easingT = 0.0f;
+	float easingSpeed = 0.03f;
+	EasingMode easingMode = EasingMode::EaseInOut;
+	bool isFadeIn = true;
+
+	unsigned int nowColor = 0x240912FF;
+	unsigned int normalColor = 0x240912FF;
+	unsigned int combo1000Color = 0x91D2E8FF;
 
 	Texture texture = {};
 };
 BackGround backGround;
+
+
+//走査線
+static constexpr int kScanLineLimit = 21;
+
+struct ScanLine {
+	Vector2 pos = {};
+	Vector2 size = { 1280, 2 };
+
+	float moveSpeed = 0.5f;
+	float posYMin = -0.2f;
+	float posYMax = 722;
+
+	float intervalY = 36.0f;
+
+	int shakeDuration = 1;
+
+	unsigned int color = 0x340314AA;
+
+};
+static ScanLine scanLine[kScanLineLimit];
+static Texture scanLineTexture = {};
 
 #pragma endregion
 
@@ -259,10 +295,95 @@ static void ClampCameraPos(void) {
 static void InitBackGround(void) {
 	backGround = {};
 	backGround.texture = GetTexture(TextureType::BackGround);
+
+	//走査線
+	for (int i = 0; i < kScanLineLimit; i++) {
+		scanLine[i] = {};
+		scanLine[i].pos = { 640, scanLine[i].intervalY * i };
+	}
+	scanLineTexture = GetTexture(TextureType::TitleLine);
+}
+
+static unsigned int LerpColor(
+	unsigned int startColor,
+	unsigned int endColor,
+	float t) {
+	int sr = (startColor >> 24) & 0xFF;
+	int sg = (startColor >> 16) & 0xFF;
+	int sb = (startColor >> 8) & 0xFF;
+	int sa = (startColor) & 0xFF;
+
+	int er = (endColor >> 24) & 0xFF;
+	int eg = (endColor >> 16) & 0xFF;
+	int eb = (endColor >> 8) & 0xFF;
+	int ea = (endColor) & 0xFF;
+
+	int r = static_cast<int>(sr + (er - sr) * t);
+	int g = static_cast<int>(sg + (eg - sg) * t);
+	int b = static_cast<int>(sb + (eb - sb) * t);
+	int a = static_cast<int>(sa + (ea - sa) * t);
+
+	return (r << 24) | (g << 16) | (b << 8) | a;
+}
+
+static void UpdateBackGround(void) {
+	if (!backGround.isFlash) return;
+
+	if (backGround.isFadeIn) {
+		backGround.easingT += backGround.easingSpeed;
+		if (backGround.easingT >= 1.0f) {
+			backGround.easingT = 1.0f;
+			backGround.isFadeIn = false;
+		}
+	} else {
+		backGround.easingT -= backGround.easingSpeed;
+		if (backGround.easingT <= 0.0f) {
+			backGround.easingT = 0.0f;
+			backGround.isFadeIn = true;
+			backGround.isFlash = false;
+		}
+	}
+
+	//色の変更
+
+	backGround.nowColor = LerpColor(backGround.normalColor, backGround.combo1000Color, backGround.easingT);
+}
+
+static void UpdateScanLine(void) {
+	for (int i = 0; i < kScanLineLimit; i++) {
+		scanLine[i].pos.y += scanLine[i].moveSpeed;
+
+		if (scanLine[i].pos.y >= scanLine[i].posYMax) {
+			scanLine[i].pos.y = scanLine[i].posYMin;
+		}
+	}
+}
+
+static void DrawScanLine(void) {
+	for (int i = 0; i < kScanLineLimit; i++) {
+		Vector2 pos;
+		pos.y = scanLine[i].pos.y + ToFloat(GetRand(-scanLine[i].shakeDuration, scanLine[i].shakeDuration));
+
+		Texture texture = scanLineTexture;
+		texture.color = scanLine[i].color;
+
+		DrawTextureUI(texture, scanLine[i].pos, scanLine[i].size);
+	}
 }
 
 static void DrawBackGround(void) {
-	DrawTextureBG(backGround.texture, backGround.pos, backGround.size, backGround.scrollRate);
+	Texture texture = backGround.texture;
+	texture.color = backGround.nowColor;
+
+	DrawTextureBG(texture, backGround.pos, backGround.size, backGround.scrollRate);
+
+	DrawScanLine();
+}
+
+void TriggerBackgroundFlash(void) {
+	backGround.isFlash = true;
+	backGround.isFadeIn = true;
+	backGround.easingT = 0.0f;
 }
 
 #pragma endregion
@@ -302,6 +423,9 @@ static void ChangeRound(void) {
 			//ボスの警告演出
 			isWarningBoss = true;
 			TriggerDangerDisplayEffect();
+
+			//Bgmの変更
+			ChangeModeBgmFade(ModeBgmFade::FadeOut);
 		}
 	}
 
@@ -398,11 +522,13 @@ static void UpdateStartEffect(void) {
 	switch (nowModeStart) {
 	case ModeStartEffect::WaitPlayerSpawn: {
 		waitPlayerTimer.count++;
+
 		if (waitPlayerTimer.count >= waitPlayerTimer.time) {
 			waitPlayerTimer.count = 0;
 			nowModeStart = ModeStartEffect::Ready;
 
 			PlaySe(SeType::Ready);
+			TriggerStartIconFrameIn();
 		}
 
 		break;
@@ -423,6 +549,10 @@ static void UpdateStartEffect(void) {
 		if (goTelopTimer.count >= goTelopTimer.time) {
 			goTelopTimer.count = 0;
 			nowModeStart = ModeStartEffect::Standby;
+
+			//Bgm再生
+			PlayBgm(BgmType::Stage);
+			TriggerStartIconFrameOut();
 		}
 
 		break;
@@ -466,6 +596,8 @@ static void UpdateWarningBoss(void) {
 		SpawnBoss({ 1200, 720 });
 		CancelDangerDisplayEffect();
 		CreateFlashPanel();
+
+		PlayBgm(BgmType::Boss);
 	}
 
 }
@@ -478,6 +610,8 @@ static void GoClearScene(void) {
 
 	//フェードアウトし始めたらスキップ
 	if (GetNowModeFade() != ModeFade::Standby) return;
+
+	ChangeModeBgmFade(ModeBgmFade::FadeOut);
 
 	goToClearTimer.count++;
 	if (goToClearTimer.count >= goToClearTimer.time) {
@@ -506,6 +640,9 @@ void UpdateStage(void) {
 	MoveCameraPos();
 	ClampCameraPos();
 
+	//背景関係
+	UpdateBackGround();
+
 	//ラウンド関係
 	ChangeRound();
 	SpawnEnemyByRound();
@@ -515,6 +652,8 @@ void UpdateStage(void) {
 	GoGameoverScene();
 	GoClearScene();
 	UpdateWarningBoss();
+
+	UpdateScanLine();
 }
 
 void DrawStage(void) {

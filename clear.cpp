@@ -50,7 +50,7 @@ static constexpr int kComboNumberLimit = 4;
 struct ScoreNumber {
 	Vector2 size = { 32, 64 };
 
-	Vector2 startPos = {};
+	Vector2 startPosOffset = {};
 	Vector2 interval = { 32, 0 };
 
 	float offsetY = -5;
@@ -192,6 +192,47 @@ ClearMenuCursor clearMenuCursor;
 
 #pragma endregion
 
+#pragma region データ: NewRecordアイコン
+
+struct NewRecordIcon {
+	Vector2 pos = {};
+	Vector2 size = { 512,64 };
+
+	bool isBreakScore = false;
+
+	//<イージング関係>
+	float easingTMove = 0.0f;
+	float easingSpeedMove = 0.03f;
+	EasingMode easingMode = EasingMode::EaseOut;
+
+	Vector2 standbyPos = { -300, 400 };
+	Vector2 showPos = { 350, 400 };
+
+	//<イージング関係(点滅処理)>
+	float easingTAlpha = 0.0f;
+	float easingSpeedAlpha = 0.03f;
+	bool isFadeIn = true;
+
+	int alpha = 0;
+	int alphaMin = 0;
+	int alphaMax = 255;
+
+	Texture texture = {};
+};
+NewRecordIcon newRecordIcon;
+
+struct ShockSpawner {
+	Vector2i createPosRange[2] = { {200, 100}, {1080, 620} };
+
+	Timer createTimer = { 24, 0 };
+
+	int createLimit = 8;
+	int createCount = 0;
+
+};
+static ShockSpawner shockSpawner;
+
+#pragma endregion
 
 #pragma region 関数: アイコン落下
 
@@ -252,6 +293,8 @@ static void InitScore(void) {
 	bestScoreIcon.pos.y = bestScoreIconPosY;
 	bestScoreIcon.showPosX = bestScoreIconShowPosX;
 
+	scoreManager = {};
+
 	//必要なデータ取得
 	scoreManager.nowScore = GetNowScore();
 	scoreManager.maxCombo = GetMaxCombo();
@@ -260,8 +303,6 @@ static void InitScore(void) {
 }
 
 static void MoveScoreIcon(void) {
-
-
 	//アイコンの移動処理
 	scoreIcon.pos.x = UpdateValueByEasing(scoreIcon.standbyPosX, scoreIcon.showPosX, clearIcon.easingT, clearIcon.easingMode);
 	maxComboIcon.pos.x = UpdateValueByEasing(maxComboIcon.standbyPosX, maxComboIcon.showPosX, clearIcon.easingT, clearIcon.easingMode);
@@ -269,11 +310,11 @@ static void MoveScoreIcon(void) {
 
 	//numberのstartPos変更
 	for (int i = 0; i < kScoreNumberLimit; i++) {
-		nowScoreNumbers[i].startPos = { scoreIcon.pos.x + nowScoreStartPosOffset,  scoreIcon.pos.y + nowScoreNumbers[i].offsetY };
-		bestScoreNumbers[i].startPos = { bestScoreIcon.pos.x + bestScoreStartPosOffset,  bestScoreIcon.pos.y + bestScoreNumbers[i].offsetY };
+		nowScoreNumbers[i].startPosOffset = { scoreIcon.pos.x + nowScoreStartPosOffset,  scoreIcon.pos.y + nowScoreNumbers[i].offsetY };
+		bestScoreNumbers[i].startPosOffset = { bestScoreIcon.pos.x + bestScoreStartPosOffset,  bestScoreIcon.pos.y + bestScoreNumbers[i].offsetY };
 	}
 	for (int i = 0; i < kComboNumberLimit; i++) {
-		maxComboNumbers[i].startPos = { maxComboIcon.pos.x + maxComboStartPosOffset,  maxComboIcon.pos.y + maxComboNumbers[i].offsetY };
+		maxComboNumbers[i].startPosOffset = { maxComboIcon.pos.x + maxComboStartPosOffset,  maxComboIcon.pos.y + maxComboNumbers[i].offsetY };
 	}
 }
 
@@ -319,7 +360,7 @@ static void DrawScore(void) {
 	for (int i = 0; i < kScoreNumberLimit; i++) {
 		nowScoreNumbers[i].animNum = GetValueAtDigit(scoreManager.showScore, i);
 
-		Vector2 pos = { nowScoreNumbers[i].startPos.x + nowScoreNumbers[i].interval.x * (kScoreNumberLimit - i - 1), nowScoreNumbers[i].startPos.y };
+		Vector2 pos = { nowScoreNumbers[i].startPosOffset.x + nowScoreNumbers[i].interval.x * (kScoreNumberLimit - i - 1), nowScoreNumbers[i].startPosOffset.y };
 
 		Texture texture = clearScoreNumbersTexture;
 		texture.animNum = nowScoreNumbers[i].animNum;
@@ -331,7 +372,7 @@ static void DrawScore(void) {
 	for (int i = 0; i < kComboNumberLimit; i++) {
 		maxComboNumbers[i].animNum = GetValueAtDigit(scoreManager.showMaxCombo, i);
 
-		Vector2 pos = { maxComboNumbers[i].startPos.x + maxComboNumbers[i].interval.x * (kScoreNumberLimit - i - 1), maxComboNumbers[i].startPos.y };
+		Vector2 pos = { maxComboNumbers[i].startPosOffset.x + maxComboNumbers[i].interval.x * (kScoreNumberLimit - i - 1), maxComboNumbers[i].startPosOffset.y };
 
 		Texture texture = clearScoreNumbersTexture;
 		texture.animNum = maxComboNumbers[i].animNum;
@@ -343,7 +384,7 @@ static void DrawScore(void) {
 	for (int i = 0; i < kScoreNumberLimit; i++) {
 		bestScoreNumbers[i].animNum = GetValueAtDigit(scoreManager.bestScore, i);
 
-		Vector2 pos = { bestScoreNumbers[i].startPos.x + bestScoreNumbers[i].interval.x * (kScoreNumberLimit - i - 1), bestScoreNumbers[i].startPos.y };
+		Vector2 pos = { bestScoreNumbers[i].startPosOffset.x + bestScoreNumbers[i].interval.x * (kScoreNumberLimit - i - 1), bestScoreNumbers[i].startPosOffset.y };
 
 		Texture texture = clearScoreNumbersTexture;
 		texture.animNum = bestScoreNumbers[i].animNum;
@@ -363,9 +404,14 @@ static void CheckBreakScore(void) {
 		//演出実装
 		CreateFlashPanel();
 
+		if (CheckIsPlayingSe(SeType::StageClearJingle)) {
+			StopPlayingSe(SeType::StageClearJingle);
+		}
+
 		PlaySe(SeType::BreakScoreJingle);
 
 		scoreManager.breakScore = true;
+		newRecordIcon.isBreakScore = true;
 	}
 
 	//スコア更新時
@@ -385,6 +431,80 @@ static void CheckBreakScore(void) {
 		nowMode = ModeClear::Select;
 	}
 	
+}
+
+#pragma endregion
+
+#pragma region 関数: ハイスコア更新演出
+
+static void InitNewRecordIcon(void) {
+	newRecordIcon = {};
+	newRecordIcon.texture = GetTexture(TextureType::NewRecordIcon);
+}
+
+static void UpdateNewRecordIcon(void) {
+	if (!newRecordIcon.isBreakScore) return;
+
+	//移動処理
+	if (!onceSelect) {
+		newRecordIcon.easingTMove += newRecordIcon.easingSpeedMove;
+		if (newRecordIcon.easingTMove >= 1.0f) {
+			newRecordIcon.easingTMove = 1.0f;
+		}
+
+		newRecordIcon.pos = MoveByEasing(newRecordIcon.standbyPos, newRecordIcon.showPos, newRecordIcon.easingTMove, newRecordIcon.easingMode);
+	} else {
+		newRecordIcon.pos = MoveByEasing(newRecordIcon.standbyPos, newRecordIcon.showPos, menuBackground.easingT, newRecordIcon.easingMode);
+	}
+
+	//点滅処理
+	if (newRecordIcon.isFadeIn) {
+		newRecordIcon.easingTAlpha += newRecordIcon.easingSpeedAlpha;
+		if (newRecordIcon.easingTAlpha >= 1.0f) {
+			newRecordIcon.easingTAlpha = 1.0f;
+			newRecordIcon.isFadeIn = false;
+		}
+	} else {
+		newRecordIcon.easingTAlpha -= newRecordIcon.easingSpeedAlpha;
+		if (newRecordIcon.easingTAlpha <= 0.0f) {
+			newRecordIcon.easingTAlpha = 0.0f;
+			newRecordIcon.isFadeIn = true;
+		}
+	}
+	newRecordIcon.alpha = UpdateValueByEasing(newRecordIcon.alphaMin, newRecordIcon.alphaMax, newRecordIcon.easingTAlpha, newRecordIcon.easingMode);
+
+}
+
+static void DrawNewRecordIcon(void) {
+	if (!newRecordIcon.isBreakScore) return;
+
+	Texture texture = newRecordIcon.texture;
+	texture.color = (texture.color & 0xFFFFFF00) | newRecordIcon.alpha;
+	DrawTextureUI(texture, newRecordIcon.pos, newRecordIcon.size);
+}
+
+static void InitShockSpawner(void) {
+	shockSpawner = {};
+}
+
+static void UpdateShockSpawner(void) {
+	if (!newRecordIcon.isBreakScore) return;
+
+	if (shockSpawner.createCount >= shockSpawner.createLimit) return;
+
+	shockSpawner.createTimer.count++;
+	if (shockSpawner.createTimer.count >= shockSpawner.createTimer.time) {
+		shockSpawner.createTimer.count = 0;
+
+		Vector2 createPos;
+		createPos.x = ToFloat(GetRand(shockSpawner.createPosRange[0].x, shockSpawner.createPosRange[1].x));
+		createPos.y = ToFloat(GetRand(shockSpawner.createPosRange[0].y, shockSpawner.createPosRange[1].y));
+
+		CreateElecShockChargedEffect(createPos);
+
+		shockSpawner.createCount++;
+	}
+
 }
 
 #pragma endregion
@@ -494,6 +614,7 @@ static void Confirm(void) {
 		}
 
 		PlaySe(SeType::Confirm);
+		onceSelect = true;
 	}
 }
 
@@ -566,7 +687,14 @@ static void DrawButton(void) {
 
 #pragma endregion
 
+
 void InitClear(void) {
+#ifdef _DEBUG
+
+	//AddScore(1000005);
+
+#endif
+
 	nowMode = ModeClear::IconFrameIn;
 
 	PlaySe(SeType::StageClearJingle);
@@ -576,6 +704,9 @@ void InitClear(void) {
 	InitMenuBackground();
 	InitButton();
 	InitSelect();
+	InitNewRecordIcon();
+	InitShockSpawner();
+	InitEffect();
 
 	InitTitleBackground();
 }
@@ -609,6 +740,9 @@ void UpdateClear(void) {
 	MoveScoreIcon();
 	UpdateButton();
 	UpdateCursor();
+	UpdateNewRecordIcon();
+	UpdateShockSpawner();
+	UpdateEffect();
 
 	UpdateTitleBackground();
 }
@@ -616,11 +750,14 @@ void UpdateClear(void) {
 void DrawClear(void) {
 	DrawTitleBackground();
 
+	DrawEffectAsUI();
+
 	DrawMenuBackground();
 
 	DrawIcon();
 	DrawScore();
 	DrawButton();
+	DrawNewRecordIcon();
 
 	DrawEffect();
 }
