@@ -27,7 +27,7 @@ static Vector2 movablePos[2] = {};
 //吸引の範囲(距離)
 static constexpr float kStartVacumeRange = 75.0f;
 //吸引速度
-static constexpr float kVacumeSpeed = 5.0f;
+static constexpr float kVacumeSpeed = 6.5f;
 //吸引の追従割合
 static constexpr float kVacumeLerpRate = 0.3f;
 
