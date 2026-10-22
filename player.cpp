@@ -37,6 +37,8 @@ struct Player {
 
 	//<生存関係>
 	bool isAlive = true;
+	bool isEquipShield = true;
+
 	//当たり判定の大きさ
 	float hitRadius = 10.0f;
 	int hp = 1;
@@ -64,7 +66,6 @@ struct Player {
 
 	//移動速度(等速)
 	float moveSpeed[2] = { 6.0f, 3.0f };
-
 	Vector2 inputVec = { 0, 0 };
 
 
@@ -80,9 +81,6 @@ struct Player {
 	//回転速度
 	float lockOnRotateSpeed = 0.2f;
 
-
-	////<プレイヤー状態>
-	//PlayerState nowState = PlayerState::Normal;
 
 	//<射撃関係>
 	//射撃スパン
@@ -178,6 +176,40 @@ static constexpr float kBreakShieldLine = 5.0f;
 
 #pragma endregion
 
+#pragma region データ: ElecShield
+
+//シールドがなくなってから再展開するまでの時間
+Timer recoveryShieldTimer = { 60, 0 };
+
+struct ElecShield {
+	Vector2 size = {};
+
+	//イージング関係
+	float easingT = 0.0f;
+	float easingSpeedMin = 0.01f;
+	float easingSpeedMax = 0.05f;
+	bool isScaleUp = true;
+	EasingMode easingMode = EasingMode::EaseInOut;
+
+	//サイズ関係
+	Vector2 sizeValueMin = { 40.0f, 40.0f };
+	Vector2 sizeValueMinDanger = { 10.0f, 10.0f };
+	Vector2 sizeValueMax = { 60.0f, 60.0f };
+
+	//透明度関係
+	int alpha = 0;
+	int alphaMin = 100;
+	int alphaMinDanger = 0;
+	int alphaMax = 150;
+
+	unsigned int color = 0x04C1E8FF;
+
+	Texture texture = {};
+};
+static ElecShield elecShield;
+
+#pragma endregion
+
 #pragma region データ: ギリ避け・ノックバック関係
 
 //ギリ避け時のボーナススパン
@@ -257,33 +289,6 @@ struct DeadEffectManager {
 	int createExploseRange = 100;
 };
 DeadEffectManager deadEffectManager;
-
-struct ElecShield {
-	Vector2 size = {};
-
-	//イージング関係
-	float easingT = 0.0f;
-	float easingSpeedMin = 0.01f;
-	float easingSpeedMax = 0.05f;
-	bool isScaleUp = true;
-	EasingMode easingMode = EasingMode::EaseInOut;
-
-	//サイズ関係
-	Vector2 sizeValueMin = { 40.0f, 40.0f };
-	Vector2 sizeValueMinDanger = { 10.0f, 10.0f };
-	Vector2 sizeValueMax = { 60.0f, 60.0f };
-
-	//透明度関係
-	int alpha = 0;
-	int alphaMin = 100;
-	int alphaMinDanger = 0;
-	int alphaMax = 150;
-
-	unsigned int color = 0x04C1E8FF;
-
-	Texture texture = {};
-};
-ElecShield elecShield;
 
 #pragma endregion
 
@@ -771,41 +776,104 @@ static void ConsumptionEnergy(void) {
 
 }
 
-/// <summary>
-/// ゲージ維持失敗の確認処理
-/// </summary>
-/// <param name=""></param>
-static void CheckFailedMaintenance(void) {
-	//if (!player.isAlive) return;
-	//if (GetBossEnemyIsDead()) return;
+#pragma endregion
 
-	///*if (player.nowState != PlayerState::Normal) return;*/
+#pragma region 関数: ElecShield関係
 
-	////デンリョク不足
-	//if (player.remainEnergy <= kEnergyMin) {
-	//	player.nowState = PlayerState::DeadEnergy;
-	//	player.remainEnergy = 0.0f;
-	//	chargeElecBulletTimer.count = 0;
-	//}
-
+static void InitElecShield(void) {
+	elecShield = {};
+	elecShield.texture = GetTexture(TextureType::ElecShield);
 }
 
-///// <summary>
-///// 故障中のエネルギー回復処理
-///// </summary>
-///// <param name=""></param>
-//static void RecoveryPlayerState(void) {
-//	if (!player.isAlive) return;
-//
-//	if (kLifeGaugeSwitch) return;
-//
-//	if (player.nowState == PlayerState::DeadEnergy) {
-//		player.remainEnergy += kRecoveryEnergyDuringEmpty;
-//		if (player.remainEnergy >= kEnergyCenter) {
-//			player.nowState = PlayerState::Normal;
-//		}
-//	}
-//}
+
+/// <summary>
+/// ElecShieldの更新処理
+/// </summary>
+/// <param name=""></param>
+static void UpdateElecShield(void) {
+	if (!player.isAlive) return;
+	if (GetBossEnemyIsDead()) return;
+
+	if (player.remainEnergy < kBreakShieldLine) {
+		player.isEquipShield = false;
+	}
+	//シールドの回復処理
+	else if (!player.isEquipShield) {
+		recoveryShieldTimer.count++;
+		if (recoveryShieldTimer.count >= recoveryShieldTimer.time) {
+			recoveryShieldTimer.count = 0;
+			player.isEquipShield = true;
+		}
+	}
+}
+
+static void UpdateElecShieldEffect(void) {
+	//シールドが十分な量存在したら
+	if (player.remainEnergy > kBreakShieldLine) {
+
+		//イージング処理
+		float energyRate = std::clamp(player.remainEnergy / kEnergyMax, 0.0f, 1.0f);
+
+		if (energyRate >= 0.8f) {
+			if (elecShield.easingT < 1.0f) {
+				elecShield.easingT += elecShield.easingSpeedMax;
+
+				if (elecShield.easingT > 1.0f) {
+					elecShield.easingT = 1.0f;
+					elecShield.isScaleUp = false;
+				}
+			}
+
+		} else {
+			float t = std::clamp(energyRate / 0.8f, 0.0f, 1.0f);
+
+			float easingSpeed = elecShield.easingSpeedMin * t + elecShield.easingSpeedMax * (1.0f - t);
+
+			if (elecShield.isScaleUp) {
+				elecShield.easingT += easingSpeed;
+				if (elecShield.easingT >= 1.0f) {
+					elecShield.easingT = 1.0f;
+					elecShield.isScaleUp = false;
+				}
+			} else {
+				elecShield.easingT -= easingSpeed;
+				if (elecShield.easingT < 0.0f) {
+					elecShield.easingT = 0.0f;
+					elecShield.isScaleUp = true;
+				}
+			}
+		}
+	}
+	else if (!player.isEquipShield) {
+		elecShield.easingT -= elecShield.easingSpeedMax;
+		if (elecShield.easingT < 0.0f) {
+			elecShield.easingT = 0.0f;
+		}
+
+		elecShield.isScaleUp = true;
+	}
+
+	//サイズの変更
+	if (player.remainEnergy > kWarnEnergyLine) {
+		elecShield.size = MoveByEasing(elecShield.sizeValueMin, elecShield.sizeValueMax, elecShield.easingT, elecShield.easingMode);
+
+		//透明度の変更
+		elecShield.alpha = UpdateValueByEasing(elecShield.alphaMin, elecShield.alphaMax, elecShield.easingT, elecShield.easingMode);
+	} else {
+		elecShield.size = MoveByEasing(elecShield.sizeValueMinDanger, elecShield.sizeValueMax, elecShield.easingT, elecShield.easingMode);
+
+		//透明度の変更
+		elecShield.alpha = UpdateValueByEasing(elecShield.alphaMinDanger, elecShield.alphaMax, elecShield.easingT, elecShield.easingMode);
+	}
+}
+
+static void DrawElecShield(void) {
+	Texture texture = elecShield.texture;
+	texture.color = (elecShield.color & 0xFFFFFF00) | elecShield.alpha;
+
+	DrawTextureObj(texture, player.pos, elecShield.size);
+}
+
 
 #pragma endregion
 
@@ -874,79 +942,8 @@ static void UpdateStartEffect(void) {
 	startEffectManager.alpha = UpdateValueByEasing(startEffectManager.alphaMin, startEffectManager.alphaMax, startEffectManager.easingT, startEffectManager.easingMode);
 }
 
-static void InitElecShield(void) {
-	elecShield = {};
-	elecShield.texture = GetTexture(TextureType::ElecShield);
-}
-
-static void UpdateElecShield(void) {
-	//シールドが十分な量存在したら
-	if (player.remainEnergy > kBreakShieldLine) {
-
-		//イージング処理
-		float energyRate = std::clamp(player.remainEnergy / kEnergyMax, 0.0f, 1.0f);
-
-		if (energyRate >= 0.8f) {
-			if (elecShield.easingT < 1.0f) {
-				elecShield.easingT += elecShield.easingSpeedMax;
-
-				if (elecShield.easingT > 1.0f) {
-					elecShield.easingT = 1.0f;
-					elecShield.isScaleUp = false;
-				}
-			}
-
-		} else {
-			float t = std::clamp(energyRate / 0.8f, 0.0f, 1.0f);
-
-			float easingSpeed = elecShield.easingSpeedMin * t + elecShield.easingSpeedMax * (1.0f - t);
-
-			if (elecShield.isScaleUp) {
-				elecShield.easingT += easingSpeed;
-				if (elecShield.easingT >= 1.0f) {
-					elecShield.easingT = 1.0f;
-					elecShield.isScaleUp = false;
-				}
-			} else {
-				elecShield.easingT -= easingSpeed;
-				if (elecShield.easingT < 0.0f) {
-					elecShield.easingT = 0.0f;
-					elecShield.isScaleUp = true;
-				}
-			}
-		}
-	} else {
-
-		elecShield.easingT -= elecShield.easingSpeedMax;
-		if (elecShield.easingT < 0.0f) {
-			elecShield.easingT = 0.0f;
-		}
-
-		elecShield.isScaleUp = true;
-	}
-
-	//サイズの変更
-	if (player.remainEnergy > kWarnEnergyLine) {
-		elecShield.size = MoveByEasing(elecShield.sizeValueMin, elecShield.sizeValueMax, elecShield.easingT, elecShield.easingMode);
-
-		//透明度の変更
-		elecShield.alpha = UpdateValueByEasing(elecShield.alphaMin, elecShield.alphaMax, elecShield.easingT, elecShield.easingMode);
-	} else {
-		elecShield.size = MoveByEasing(elecShield.sizeValueMinDanger, elecShield.sizeValueMax, elecShield.easingT, elecShield.easingMode);
-
-		//透明度の変更
-		elecShield.alpha = UpdateValueByEasing(elecShield.alphaMinDanger, elecShield.alphaMax, elecShield.easingT, elecShield.easingMode);
-	}
 
 
-}
-
-static void DrawElecShield(void) {
-	Texture texture = elecShield.texture;
-	texture.color = (elecShield.color & 0xFFFFFF00) | elecShield.alpha;
-
-	DrawTextureObj(texture, player.pos, elecShield.size);
-}
 
 #pragma endregion
 
@@ -1067,7 +1064,8 @@ void UpdatePlayer(void) {
 	UpdateShootPos();
 	ShootElecBullet();
 
-	CheckFailedMaintenance();
+	UpdateElecShield();
+	UpdateElecShieldEffect();
 	//RecoveryPlayerState();
 
 	ConsumptionEnergy();
@@ -1162,8 +1160,8 @@ PlayerLaserLevel GetPlayerNowLaserLevel(void) {
 void PlayerDamage(Vector2 hitPos, float damage) {
 	if (!player.isAlive || player.isInvincible) return;
 
-	//エネルギーが足りていない状況で接触したら
-	if (player.remainEnergy < kBreakShieldLine) {
+	//シールドがない状態で被弾したら
+	if (player.isEquipShield) {
 		player.hp--;
 	}
 
