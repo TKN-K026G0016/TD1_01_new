@@ -246,7 +246,7 @@ static void UpdateShockCombo(void) {
 				PlaySe(SeType::ComboJingle500);
 			}
 			else if (nowCombo > jingle1Combo) {
-				PlaySe(SeType::ComboJingle500);
+				PlaySe(SeType::ComboJingle100);
 			}
 			
 			totalComboInCombo = 0;
@@ -254,7 +254,7 @@ static void UpdateShockCombo(void) {
 		}
 	}
 
-	if (CheckIsPlayingSe(SeType::ComboJingle1000) || CheckIsPlayingSe(SeType::ComboJingle500) || CheckIsPlayingSe(SeType::ComboJingle500)) {
+	if (CheckIsPlayingSe(SeType::ComboJingle1000) || CheckIsPlayingSe(SeType::ComboJingle500) || CheckIsPlayingSe(SeType::ComboJingle100)) {
 		ChangeBgmVolume(bgmVolumePlayingJingle);
 	} else {
 		ResetBgmVolume();

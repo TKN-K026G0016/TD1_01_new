@@ -65,7 +65,7 @@ enum class SeType {
 	Combo9,
 	Combo10,
 
-	ComboJingle500,
+	ComboJingle100,
 	ComboJingle500,
 	ComboJingle1000,
 
