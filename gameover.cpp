@@ -262,6 +262,9 @@ static void InitScoreCount(void) {
 	scoreManager = {};
 
 	scoreManager.score = GetNowScore();
+	if (scoreManager.score > kCountStopScore) {
+		scoreManager.score = kCountStopScore;
+	}
 
 	scoreNumberTexture = GetTexture(TextureType::ScoreNumbers);
 }

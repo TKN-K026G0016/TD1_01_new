@@ -847,10 +847,15 @@ static void UpdateScore(void) {
 
 		PlaySe(SeType::CountUpScore);
 
-	} else {
+	} 
+	else {
 		scoreIcon.showScore = nowScore;
 		scoreIcon.easingT = 0.0f;
 
+	}
+
+	if (scoreIcon.showScore > kCountStopScore) {
+		scoreIcon.showScore = kCountStopScore;
 	}
 
 	for (int i = 0; i < kScoreNumbersLimit; i++) {

@@ -403,6 +403,9 @@ static void UpdateScoreCount(void) {
 #pragma endregion
 
 	scoreManager.showScore = GetHighScore();
+	if (scoreManager.showScore > kCountStopScore) {
+		scoreManager.showScore = kCountStopScore;
+	}
 
 	for (int i = 0; i < kScoreNumberLimit; i++) {
 		scoreNumbers[i].animNum = GetValueAtDigit(scoreManager.showScore, i);

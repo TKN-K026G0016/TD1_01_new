@@ -1,5 +1,8 @@
 #pragma once
 
+//カウントストップ後の表示数値
+constexpr int kCountStopScore = 999999999;
+
 void InitScoreData(void);
 void UpdateScoreData(void);
 

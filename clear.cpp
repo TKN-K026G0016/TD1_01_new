@@ -297,8 +297,18 @@ static void InitScore(void) {
 
 	//必要なデータ取得
 	scoreManager.nowScore = GetNowScore();
+	if (scoreManager.nowScore > kCountStopScore) {
+		scoreManager.nowScore = kCountStopScore;
+	}
 	scoreManager.maxCombo = GetMaxCombo();
+	if (scoreManager.maxCombo > 9999) {
+		scoreManager.maxCombo = 9999;
+	}
+
 	scoreManager.bestScore = GetHighScore();
+	if (scoreManager.bestScore > kCountStopScore) {
+		scoreManager.bestScore = kCountStopScore;
+	}
 
 }
 
@@ -423,6 +433,9 @@ static void CheckBreakScore(void) {
 			nowMode = ModeClear::Select;
 
 			scoreManager.bestScore = GetHighScore();
+			if (scoreManager.bestScore > kCountStopScore) {
+				scoreManager.bestScore = kCountStopScore;
+			}
 		}
 
 	}
