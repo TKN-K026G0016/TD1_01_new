@@ -155,7 +155,7 @@ struct BackGround {
 
 	float scrollRate = 1.0f;
 
-	bool isFlash = true;
+	bool isFlash = false;
 
 	float easingT = 0.0f;
 	float easingSpeed = 0.03f;

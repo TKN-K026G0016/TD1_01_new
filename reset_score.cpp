@@ -183,6 +183,7 @@ static void MoveCursor(void) {
 
 static void Confirm(void) {
 	if (!CheckInputAction(InputAction::Confirm)) return;
+	if (menuBackground.easingT != 1.0f) return;
 
 	if (nowMode == ModeResetScore::Select) {
 		if (nowSelect == ModeResetScoreSelect::Confirm) {

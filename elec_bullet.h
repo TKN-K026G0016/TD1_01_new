@@ -98,6 +98,12 @@ void ShootElecBullet(Vector2 pos, float moveTheta, ElecBulletType type);
 void BreakElecBullet(int index);
 
 /// <summary>
+/// 全ElecBuleltの消去処理
+/// </summary>
+/// <param name=""></param>
+void BreakAllElecBullet(void);
+
+/// <summary>
 /// elecBullet配列の取得
 /// </summary>
 /// <param name=""></param>

@@ -80,8 +80,9 @@ void CreateTriangleEffect2(Vector2 pos, float sizeValue, float moveSpeed, unsign
 /// </summary>
 /// <param name="pos">生成座標</param>
 /// <param name="endSizeValue">最終的なサイズ</param>
+/// <param name="easingSpeed">イージング速度(defaultは0.0f)</param>
 /// <param name="color">色</param>
-void CreateCircleEffect(Vector2 pos, float endSizeValue, unsigned int color);
+void CreateCircleEffect(Vector2 pos, float endSizeValue, float easingSpeed, unsigned int color);
 
 /// <summary>
 /// playerのダメージエフェクト生成処理

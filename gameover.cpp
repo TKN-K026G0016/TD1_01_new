@@ -465,6 +465,9 @@ static void InitButton(void) {
 	exitIcon.texture = GetTexture(TextureType::ExitIcon);
 
 	gameoverMenuCursor.texture = GetTexture(TextureType::MenuCursor);
+
+	retryIcon.pos = { gameoverMenuBackground.pos.x + retryIconOffset.x, gameoverMenuBackground.pos.y + retryIconOffset.y };
+	exitIcon.pos = { gameoverMenuBackground.pos.x + exitIconOffset.x, gameoverMenuBackground.pos.y + exitIconOffset.y };
 }
 
 static void UpdateCursor(void) {

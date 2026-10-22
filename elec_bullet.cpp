@@ -243,7 +243,6 @@ static void UpdateShockCombo(void) {
 			}
 			else if (nowCombo > jingle1Combo) {
 				PlaySe(SeType::ComboJingle10);
-	/*			TriggerBackgroundFlash();*/
 			}
 			
 			totalComboInCombo = 0;
@@ -304,6 +303,17 @@ void ShootElecBullet(Vector2 pos, float moveTheta, ElecBulletType type) {
 void BreakElecBullet(int index) {
 	elecBullet[index].isShoot = false;
 	elecBullet[index].breakTimer.count = 0;
+}
+
+void BreakAllElecBullet(void) {
+	for (int i = 0; i < kElecBulletLimit; i++) {
+		BreakElecBullet(i);
+		if (elecBullet[i].type == ElecBulletType::Normal) {
+			CreateElecShockEffect(elecBullet[i].pos);
+		} else {
+			CreateElecShockChargedEffect(elecBullet[i].pos);
+		}
+	}
 }
 
 ElecBullet* GetElecBulletArray(void) {

@@ -169,6 +169,7 @@ static void DrawMenuBackground(void) {
 
 static void Confirm(void) {
 	if (onceSelect) return;
+	if (menuBackground.easingT != 1.0f) return;
 
 	if (CheckInputAction(InputAction::Confirm)) {
 		onceSelect = true;

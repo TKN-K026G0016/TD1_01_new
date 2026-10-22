@@ -16,8 +16,6 @@ struct TitlePlayer {
 	Vector2 pos = { 640, -200 };
 	Vector2 size = { 32, 32 };
 
-
-
 	//<移動関係>
 	Vector2 velocity = { 0.0f, 0.0f };
 	//移動速度(等速)
@@ -37,6 +35,8 @@ struct TitlePlayer {
 	EasingMode easingMode = EasingMode::EaseOut;
 	Vector2 startPos = { 640, -200 };
 	Vector2 endPos = { 640, 100 };
+
+	bool isGameStart = false;
 
 	Texture texture = {};
 };
@@ -162,7 +162,9 @@ static void CreateChargeOrbEffect(void) {
 			CreateChargeChipEffect();
 		}
 
-		PlaySeContinuous(SeType::Charge);
+		if (!player.isGameStart) {
+			PlaySeContinuous(SeType::Charge);
+		}
 	}
 	else {
 		StopPlayingSe(SeType::Charge);
@@ -219,4 +221,9 @@ Vector2 GetTitlePlayerPos() {
 
 Vector2 GetTitlePlayerShootPos() {
 	return shootPos;
+}
+
+void NoticeTitlePlayerGameStart(void) {
+	player.isGameStart = true;
+	chargeElecBulletTimer.count = 0;
 }
