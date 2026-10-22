@@ -198,7 +198,7 @@ void MoveAttack1(void) {
 
 	playerPos = GetPlayerPos();
 	if (bossEnemy.nowsSates == BossStates::Attack1) {
-		if (statesTimer.attack1ShootBom.count == statesTimer.attack1ShootBom.time) {
+		if (statesTimer.attack1ShootBom.count >= statesTimer.attack1ShootBom.time) {
 			statesTimer.attack1ShootBom.count = 0;
 			SpawnEnemy(bossEnemy.pos, EnemyType::EnemyBomb);
 		}

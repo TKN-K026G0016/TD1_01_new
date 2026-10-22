@@ -128,7 +128,7 @@ struct EnemyBasic {
 	float hitRadius = 30.0f;
 
 	//攻撃力
-	float pow = 20.0f;
+	float pow = 25.0f;
 
 	//移動速度
 	float moveSpeed = 1.5f;

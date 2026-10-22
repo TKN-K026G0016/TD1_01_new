@@ -10,10 +10,10 @@ struct EnemyBullet {
 
 	float hitRadius = 10;
 
-	float pow = 20.0f;
+	float pow = 30.0f;
 
 	//<移動関係>
-	float moveSpeed = 6.0f;
+	float moveSpeed = 4.0f;
 	float moveTheta = 0.0f;
 
 	bool isShoot = false;
