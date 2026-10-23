@@ -145,7 +145,7 @@ static void CheckHitVSPlayer(void) {
 
 			//SEの再生
 			PlaySe(SeType::GetGem);
-			CreateJemEffect();
+			//CreateJemEffect();
 			TriggerCreateRecoveryEffect();
 
 			//シールドの回復エフェクト
