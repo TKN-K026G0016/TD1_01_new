@@ -35,7 +35,7 @@ ControllerGuide controllerGuide;
 
 struct GaugeGuide {
 	Vector2 pos = {};
-	Vector2 size = { 512, 128 };
+	Vector2 size = { 512, 64 };
 
 	//最初の座標
 	Vector2 standbyPos = { 640, 1000 };
@@ -75,7 +75,7 @@ static void InitControllerGuide(void) {
 	controllerGuide.texture = GetTexture(TextureType::ControllerGuide);
 
 	gaugeGuide = {};
-	gaugeGuide.texture = GetTexture(TextureType::GaugeGuide);
+	gaugeGuide.texture = GetTexture(TextureType::ShieldGuide);
 
 	energyGauge = {};
 	energyGauge.frameTexture = GetTexture(TextureType::EnergyGaugeFrame);

@@ -172,6 +172,7 @@ void InitTexture(void) {
 		//===============
 		{ Novice::LoadTexture("./resources/texture/ui/guide/controller_guide.png"), { 1024, 512 }, {0, 0}, 1, 0, WHITE },
 		{ Novice::LoadTexture("./resources/texture/ui/guide/gauge_guide.png"), { 1024, 256 }, {0, 0}, 0, 0, WHITE },
+		{ Novice::LoadTexture("./resources/texture/ui/guide/shield_guide.png"), { 512, 64 }, {0, 0}, 0, 0, WHITE },
 
 
 	};

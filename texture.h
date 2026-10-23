@@ -180,6 +180,7 @@ enum class TextureType {
 	//===============
 	ControllerGuide,
 	GaugeGuide,
+	ShieldGuide,
 
 	Count
 };
