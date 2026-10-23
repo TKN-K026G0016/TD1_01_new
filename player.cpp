@@ -179,7 +179,7 @@ static constexpr float kBreakShieldLine = 0.0f;
 #pragma region データ: ElecShield
 
 //シールドがなくなってから再展開するまでの時間
-Timer reEquipShieldTimer = { 180, 0 };
+Timer reEquipShieldTimer = { 200, 0 };
 
 struct ElecShield {
 	Vector2 size = {};
@@ -229,9 +229,12 @@ struct ElecShield {
 	unsigned int color = WHITE;
 
 	//色の最小値
-	unsigned int colorMin = 0x04C1E8FF;
+	unsigned int colorMinNormal = 0x04C1E8FF;
+	unsigned int colorMinDanger = 0x96083fFF;
 	//色の最大値
 	unsigned int colorMax = 0x485793FF;
+	//危険色に変わるゲージの割合
+	float dangerColorLine = 0.5f;
 
 	Texture texture = {};
 };
@@ -794,8 +797,9 @@ static void ShootElecBullet(void) {
 /// エネルギーの常時消費処理
 /// </summary>
 static void ConsumptionEnergy(void) {
-	if (!player.isAlive) return;
 	if (startEffectManager.nowMode != ModeStartEffect::Standby) return;
+	if (!player.isAlive) return;
+	if (!player.isEquipShield) return;
 
 	player.remainEnergy -= kConsumptionEnergy;
 
@@ -929,7 +933,20 @@ static void UpdateElecShieldEffect(void) {
 	float gaugeRate = player.remainEnergy / kEnergyMax;
 	gaugeRate = std::clamp(gaugeRate, 0.0f, 1.0f);
 
-	elecShield.color = UpdateColorByEasing(elecShield.colorMin, elecShield.colorMax, gaugeRate);
+	if (gaugeRate >= elecShield.dangerColorLine) {
+		float localRate = (gaugeRate - elecShield.dangerColorLine) / (1.0f - elecShield.dangerColorLine);
+
+		elecShield.color = UpdateColorByEasing(elecShield.colorMinNormal, elecShield.colorMax, localRate);
+	}
+	//危険
+	else {
+		float localRate = gaugeRate / elecShield.dangerColorLine;
+		float easedT = CreateEasedT(localRate, EasingMode::EaseIn);
+		elecShield.color = UpdateColorByEasing(elecShield.colorMinDanger, elecShield.colorMinNormal, easedT);
+	}
+	
+
+	
 
 #pragma endregion
 
