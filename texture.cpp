@@ -146,7 +146,7 @@ void InitTexture(void) {
 		{ Novice::LoadTexture("./resources/texture/effect/effect.explosion.png"),{768 , 768}, {0 ,0}, 0, 0, WHITE },
 		{ Novice::LoadTexture("./resources/texture/effect/explode_effect.png"), {128 , 128 }, {2, 0}, 6, 0, WHITE },
 		{ Novice::LoadTexture("./resources/texture/effect/barrier.png"),{ 256,256 },{ 0,0 },0,0,WHITE },
-
+		{ Novice::LoadTexture("./resources/texture/effect/barrierpiece.png"),{ 60,60 },{ 0,0 },0,0,WHITE },
 		//===============
 		//Pause
 		//===============

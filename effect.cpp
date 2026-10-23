@@ -604,6 +604,40 @@ static FlashPanel flashPanel;
 
 #pragma endregion
 
+#pragma region データ: barrierbreak
+
+const int kbarrierBreakNumber = 8;
+struct  BarrierBreakEffect {
+	Vector2 pos = {};
+	Vector2 size = { 26,22 };
+
+	//表示フラグ
+	bool appear = false;
+
+	//加速度
+	Vector2 acceleration = {};
+	//回転量
+	float rotateTheta = 0.0f;
+	float rotateSpeed = ToFloat(M_PI) / 20.0f;
+
+	float easingT = 0.0f;
+	float easingSpeed = 0.4f;
+	//透明化が始まるタイミング
+	float startFadeEasingT = 0.0f;
+
+	//不透明度
+	int alpha = kAlphaMax;
+
+	//色
+	unsigned int color = {};
+
+	Texture texture = {};
+
+};
+BarrierBreakEffect barrierBreakEffect[kbarrierBreakNumber];
+
+
+#pragma endregion
 
 
 #pragma region 関数: ジェム取得effect
@@ -1382,6 +1416,7 @@ void DrawTriangleEffect() {
 
 	}
 }
+
 #pragma endregion
 
 #pragma region 関数: TriangleEffect2
@@ -1919,6 +1954,7 @@ void CreateBreakGemEffect(Vector2 pos) {
 #pragma endregion
 
 #pragma region 関数: BombExplosionEffect
+
 void CreateBombExplosionEffect(Vector2 pos, float endSizeValue, unsigned int color) {
 	for (int i = 0; i < kBombExplosionEffectNumber; i++) {
 		if (bombExplosionEffect[i].appear) continue;
@@ -2074,6 +2110,89 @@ void CreateFlashPanel(void) {
 
 #pragma endregion
 
+#pragma region 関数: BarrierBreak
+void CreateBarrierBreakEffect(Vector2 pos, unsigned int color) {
+	for (int i = 0; i < kbarrierBreakNumber; i++) {
+		if (barrierBreakEffect[i].appear) continue;
+
+		barrierBreakEffect[i].appear = true;
+
+		barrierBreakEffect[i].pos = pos;
+		barrierBreakEffect[i].color = color;
+
+		float randomSpeedX = ToFloat(GetRand(-10, 10));
+		float randomSpeedY = ToFloat(GetRand(-10, 10));
+		barrierBreakEffect[i].rotateTheta = ToFloat(GetRand(1, 4) * (M_PI) / 4);
+		barrierBreakEffect[i].acceleration.x = randomSpeedX;
+		barrierBreakEffect[i].acceleration.y = randomSpeedY;
+
+		barrierBreakEffect[i].easingT = 0.0f;
+		barrierBreakEffect[i].alpha = kAlphaMax;
+
+		break;
+
+	}
+}
+
+static void InitBarrierBreakEffect(void) {
+	for (int i = 0; i < kbarrierBreakNumber; i++) {
+		barrierBreakEffect[i].texture = GetTexture(TextureType::barruerBreakEffect);
+	}
+}
+
+void UpdateBarrierBreakEffect() {
+	for (int i = 0; i < kbarrierBreakNumber; i++) {
+		if (!barrierBreakEffect[i].appear) continue;
+
+		//移動処理
+		barrierBreakEffect[i].pos.x += barrierBreakEffect[i].acceleration.x;
+		barrierBreakEffect[i].pos.y += barrierBreakEffect[i].acceleration.y;
+
+		barrierBreakEffect[i].acceleration.y -= 1;
+
+		//回転処理
+		//barrierBreakEffect[i].rotateTheta += barrierBreakEffect[i].rotateSpeed;
+
+		//イージングを増価させる処理
+		barrierBreakEffect[i].easingT += barrierBreakEffect[i].easingSpeed;
+		if (barrierBreakEffect[i].easingT >= 1.0f) {
+			barrierBreakEffect[i].easingT = 1.0f;
+			barrierBreakEffect[i].appear = false;
+		}
+
+#pragma region 透明化処理
+
+		if (barrierBreakEffect[i].easingT >= barrierBreakEffect[i].startFadeEasingT) {
+			float t = (barrierBreakEffect[i].easingT - barrierBreakEffect[i].startFadeEasingT) / (1.0f - barrierBreakEffect[i].startFadeEasingT);
+			if (t > 1.0f) t = 1.0f;
+
+			barrierBreakEffect[i].alpha = UpdateValueByEasing(kAlphaMax, kAlphaMin, t, EasingMode::EaseIn);
+		}
+
+#pragma endregion
+
+
+	}
+}
+
+void DrawBarrierBreakEffect() {
+	for (int i = 0; i < kbarrierBreakNumber; i++) {
+		if (!barrierBreakEffect[i].appear) continue;
+
+		Texture texture = triangleTexture;
+		texture.color = (barrierBreakEffect[i].color & 0xFFFFFF00) | barrierBreakEffect[i].alpha;
+
+		if (nowScene == Scene::Play) {
+			DrawTextureRotateObj(texture, barrierBreakEffect[i].pos, barrierBreakEffect[i].size, barrierBreakEffect[i].rotateTheta);
+		}
+		else {
+			DrawTextureRotateUI(texture,  barrierBreakEffect[i].pos, barrierBreakEffect[i].size, barrierBreakEffect[i].rotateTheta);
+		}
+
+	}
+}
+#pragma endregion
+
 void InitEffect() {
 	nowScene = GetNowScene();
 
@@ -2102,6 +2221,7 @@ void InitEffect() {
 	InitElecLineEffect();
 	InitBombExplosionEffect();
 	InitFlashPanel();
+	InitBarrierBreakEffect();
 
 	/*CreateBombExplosionEffect({100,100}, 768,WHITE);*/
 
@@ -2112,6 +2232,8 @@ void InitEffect() {
 	//CreateGageEffect();
 
 	//CreateChargeOrbEffect(GetPlayerPos());
+
+	
 
 #endif // _DEBUG
 
@@ -2135,6 +2257,8 @@ void UpdateEffect() {
 	UpdateElecLineEffect();
 	UpdateBombExplosionEffect();
 	UpdateFlashPanel();
+	UpdateBarrierBreakEffect();
+
 }
 void DrawEffect() {
 	DrawGetEffect();
@@ -2152,6 +2276,7 @@ void DrawEffect() {
 	DrawPlayerMoveEffect();
 	DrawRecoveryEffect();
 	DrawBombExplosionEffect();
+	DrawBarrierBreakEffect();
 }
 
 void DrawEffectAsUI() {
