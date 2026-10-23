@@ -606,10 +606,10 @@ static FlashPanel flashPanel;
 
 #pragma region データ: barrierbreak
 
-const int kbarrierBreakNumber = 8;
+const int kbarrierBreakNumber = 4;
 struct  BarrierBreakEffect {
 	Vector2 pos = {};
-	Vector2 size = { 26,22 };
+	Vector2 size = { 60,60 };
 
 	//表示フラグ
 	bool appear = false;

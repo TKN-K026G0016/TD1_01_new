@@ -122,6 +122,8 @@ void CreateBreakGemEffect(Vector2 pos);
 
 void CreateBombExplosionEffect(Vector2 pos, float endSizeValue, unsigned int color);
 
+void CreateBarrierBreakEffect(Vector2 pos, unsigned int color);
+
 void CreateFlashPanel(void);
 
 unsigned int GetPlayerColor(void);
