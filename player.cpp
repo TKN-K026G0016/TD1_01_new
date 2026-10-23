@@ -823,7 +823,7 @@ static void UpdateElecShield(void) {
 	if (GetBossEnemyIsDead()) return;
 
 	//シールドの破壊処理
-	if (player.remainEnergy < kBreakShieldLine) {
+	if (player.remainEnergy <= kBreakShieldLine) {
 		if (player.isEquipShield) {
 			reEquipShieldTimer.count = 0;
 			ChangeModeElecShield(ModeElecShield::Break);
