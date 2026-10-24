@@ -243,6 +243,7 @@ Timer warnBossTimer = { 300, 0 };
 #pragma region 関数: カメラ関係
 
 static void InitCamera(void) {
+	camera.zoom = camera.zoomMin;
 	camera.pos = GetPlayerPos();
 }
 

@@ -518,6 +518,7 @@ static void UpdateShockSpawner(void) {
 		createPos.y = ToFloat(GetRand(shockSpawner.createPosRange[0].y, shockSpawner.createPosRange[1].y));
 
 		CreateElecShockChargedEffect(createPos);
+		TriggerViberationGamePad(ModeViberation::M);
 
 		shockSpawner.createCount++;
 	}

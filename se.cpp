@@ -42,7 +42,7 @@ void InitSe(void) {
 		{Novice::LoadAudio("./resources/sound/se/player/shoot_charge_bullet.wav"), 1.0f},
 		{Novice::LoadAudio("./resources/sound/se/player/elec_shock.wav"), 0.4f},
 		{Novice::LoadAudio("./resources/sound/se/player/elec_shock_charge.wav"), 0.5f},
-		{Novice::LoadAudio("./resources/sound/se/player/charge.wav"), 0.5f},
+		{Novice::LoadAudio("./resources/sound/se/player/charge.wav"), 0.3f},
 
 		{Novice::LoadAudio("./resources/sound/se/player/damage_player.wav"), 1.0f},
 		{Novice::LoadAudio("./resources/sound/se/player/dead_player.wav"), 1.0f},
@@ -81,7 +81,7 @@ void InitSe(void) {
 		{Novice::LoadAudio("./resources/sound/se/ui/combo_jingle_2.wav"), 1.0f},
 		{Novice::LoadAudio("./resources/sound/se/ui/combo_jingle_3.wav"), 1.0f},
 
-		{Novice::LoadAudio("./resources/sound/se/ui/countup_score.wav"), 1.0f},
+		{Novice::LoadAudio("./resources/sound/se/ui/countup_score.wav"), 0.85f},
 
 	};
 
