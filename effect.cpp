@@ -528,6 +528,19 @@ BreakGemEffect breakGemEffect;
 
 #pragma endregion
 
+#pragma region データ: SpawnGemEffect
+
+struct SpawnGemEffect {
+	float endSizeValue = 90;
+
+	float easingSpeed = 0.05f;
+
+	unsigned int color = kPlayerColor;
+};
+SpawnGemEffect spawnGemEffect;
+
+#pragma endregion
+
 #pragma region データ: BombExplosionEffect
 //爆発本体
 const int kBombExplosionEffectNumber = 4;
@@ -1952,6 +1965,14 @@ static void DrawRecoveryEffect(void) {
 
 void CreateBreakGemEffect(Vector2 pos) {
 	CreateCircleEffect(pos, breakGemEffect.endSizeValue, breakGemEffect.easingSpeed, breakGemEffect.color);
+}
+
+#pragma endregion
+
+#pragma region 関数: SpawnGemEffect
+
+void CreateSpawnGemEffect(Vector2 pos) {
+	CreateCircleEffect(pos, spawnGemEffect.endSizeValue, spawnGemEffect.easingSpeed, spawnGemEffect.color);
 }
 
 #pragma endregion

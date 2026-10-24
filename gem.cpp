@@ -225,11 +225,6 @@ void DrawGem(void) {
 		} else {
 			DrawTextureObj(gem[i].lightTexture, gem[i].pos, gem[i].size);
 		}
-
-#ifdef _DEBUG
-		//DrawHitEllipse(gem[i].pos, gem[i].hitRadius, BLUE, false);
-#endif // _DEBUG
-
 	}
 }
 
@@ -252,6 +247,8 @@ void SpawnGem(Vector2 pos, GemType type) {
 
 		gem[i].texture = spec[ToInt(type)].texture;
 		gem[i].lightTexture = spec[ToInt(type)].lightTexture;
+
+		CreateSpawnGemEffect(gem[i].pos);
 
 		break;
 	}

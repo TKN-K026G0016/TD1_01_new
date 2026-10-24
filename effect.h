@@ -120,6 +120,12 @@ void TriggerCreateRecoveryEffect(void);
 /// <param name="pos">生成座標</param>
 void CreateBreakGemEffect(Vector2 pos);
 
+/// <summary>
+/// ジェム生成エフェクト
+/// </summary>
+/// <param name="pos">生成座標</param>
+void CreateSpawnGemEffect(Vector2 pos);
+
 void CreateBombExplosionEffect(Vector2 pos, float endSizeValue, unsigned int color);
 
 /// <summary>
