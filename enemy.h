@@ -77,6 +77,10 @@ struct EnemyShooter {
 	float decelerationSpeed = 0.12f;
 	Vector2 inputVec = { 0, 0 };
 
+	//生成演出
+	float spawnEasingT = 0.0f;
+	float scale = 1.0f;
+	int alpha = 0;
 
 	Texture texture = {};
 };
@@ -107,6 +111,11 @@ struct EnemyGuardian {
 	//<フラッシュ関係>
 	bool isFlash = false;
 	Timer flashTimer = { 7, 0 };
+
+	//生成演出
+	float spawnEasingT = 0.0f;
+	float scale = 1.0f;
+	int alpha = 0;
 
 	Texture texture = {};
 };
@@ -147,6 +156,11 @@ struct EnemyBasic {
 	bool isHitStop = false;
 	Timer hitStopTimer = { 10, 0 };
 
+	//生成演出
+	float spawnEasingT = 0.0f;
+	float scale = 1.0f;
+	int alpha = 0;
+
 	Texture texture = {};
 };
 
@@ -177,6 +191,11 @@ struct EnemyM {
 	//<フラッシュ関係>
 	bool isFlash = false;
 	Timer flashTimer = { 7, 0 };
+
+	//生成演出
+	float spawnEasingT = 0.0f;
+	float scale = 1.0f;
+	int alpha = 0;
 
 	Texture texture = {};
 };
@@ -228,6 +247,11 @@ struct EnemySmall {
 	bool isFlash = false;
 	Timer flashTimer = { 7, 0 };
 
+	//生成演出
+	float spawnEasingT = 0.0f;
+	float scale = 1.0f;
+	int alpha = 0;
+
 	Texture texture = {};
 };
 
@@ -249,8 +273,8 @@ struct EnemyBomb {
 
 	float pow = 40.0f;
 	
-	int alphaReadyBarst=255;
-	int alpha=15;
+	int alphaBurstAreaReady = 255;
+	int alphaBurstAreaNormal = 15;
 
 	//<爆発関係>
 	//爆発までの時間
@@ -283,6 +307,10 @@ struct EnemyBomb {
 	Timer createSmokeReadyBurstTimer = { 7,0 };
 	Vector2 createSmokePosOffset = { 0, 50 };
 
+	//生成演出
+	float spawnEasingT = 0.0f;
+	float scale = 1.0f;
+	int alpha = 0;
 
 	Texture texture = {};
 	Texture burstTexture = {};
@@ -320,7 +348,10 @@ struct EnemySniper {
 	bool isHitStop = false;
 	Timer hitStopTimer = { 10, 0 };
 
-
+	//生成演出
+	float spawnEasingT = 0.0f;
+	float scale = 1.0f;
+	int alpha = 0;
 
 	Texture texture = {};
 };
