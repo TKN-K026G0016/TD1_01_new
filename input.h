@@ -25,6 +25,22 @@ enum class InputAction {
 	Count,
 };
 
+enum class ModeViberation {
+	Standby,
+
+	S,
+	M,
+	L,
+
+	Count
+};
+
 void UpdateInput(void);
 bool CheckInputAction(InputAction action);
 bool GetIsConnectGamePad(void);
+
+/// <summary>
+/// ゲームパッドの振動開始処理
+/// </summary>
+/// <param name="mode"></param>
+void TriggerViberationGamePad(ModeViberation mode);

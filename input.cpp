@@ -1,7 +1,11 @@
 #include "input.h"
 #include "vector2.h"
+#include "timer.h"
+#include "tool.h"
+#include "se.h"
 
 #include <Novice.h>
+#include <algorithm>
 
 #pragma region データ: コンフィグ
 
@@ -77,6 +81,23 @@ static Vector2i cursorPos = { 0, 0 };
 
 #pragma endregion
 
+#pragma region データ: 振動関係
+
+struct ViberationManager {
+
+	ModeViberation nowMode = ModeViberation::Standby;
+
+	//振動時間
+	int vibeTime[ToInt(ModeViberation::Count) -1] = {10, 20, 30};
+	int vibeCount = 0;
+
+	//振動の強さ
+	int vibeSpeed[ToInt(ModeViberation::Count) - 1] = { 10000, 25000, 50000};
+};
+ViberationManager vibeManager;
+
+#pragma endregion
+
 /// <summary>
 /// マウスカーソルの座標を取得
 /// </summary>
@@ -94,12 +115,14 @@ static void CheckConnectGamePad(void) {
 		isConnectGamePad = true;
 
 		//接続サウンド
-		/*PlaySe(SeType::MoveCursorVoice);*/
+		PlaySe(SeType::Confirm);
 
 	}
 	//外された状態時
 	else if (Novice::GetNumberOfJoysticks() <= 0 && isConnectGamePad) {
 		isConnectGamePad = false;
+
+		Novice::StopJoystickVibration(0);
 	}
 }
 
@@ -158,6 +181,34 @@ static bool IsStickPassedDeadZone(Vector2i stickValue, StickDirection direction)
 	return false;
 }
 
+#pragma region 関数: 振動関係
+
+/// <summary>
+/// コントローラ振動処理
+/// </summary>
+/// <param name=""></param>
+static void UpdateViberation(void) {
+	if (!isConnectGamePad) return;
+	if (vibeManager.nowMode == ModeViberation::Standby) return;
+
+	int modeNum = ToInt(vibeManager.nowMode) -1;
+	modeNum = std::clamp(modeNum, 0, 2);
+
+	//振動処理
+	Novice::SetJoystickVibration(0, vibeManager.vibeSpeed[modeNum], vibeManager.vibeSpeed[modeNum]);
+
+	//停止処理
+	vibeManager.vibeCount++;
+	if (vibeManager.vibeCount >= vibeManager.vibeTime[modeNum]) {
+		vibeManager.vibeCount = 0;
+		vibeManager.nowMode = ModeViberation::Standby;
+
+		//振動の停止
+		Novice::StopJoystickVibration(0);
+	}
+}
+
+#pragma endregion
 
 /// <summary>
 /// 入力状況の更新
@@ -176,6 +227,8 @@ void UpdateInput(void) {
 		//スティックの入力状況
 		GetInputGamePadStick();
 	}
+
+	UpdateViberation();
 }
 
 /// <summary>
@@ -544,4 +597,15 @@ bool CheckInputAction(InputAction action) {
 /// <returns>isConnectGamePad</returns>
 bool GetIsConnectGamePad(void) {
 	return isConnectGamePad;
+}
+
+void TriggerViberationGamePad(ModeViberation mode) {
+	if (!isConnectGamePad) return;
+
+	//現在の振動以上の処理が来たら
+	if (ToInt(mode) >= ToInt(vibeManager.nowMode)) {
+		vibeManager.nowMode = mode;
+		vibeManager.vibeCount = 0;
+	}
+	
 }

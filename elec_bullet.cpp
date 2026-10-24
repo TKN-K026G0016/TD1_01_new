@@ -9,6 +9,7 @@
 #include "se.h"
 #include "stage.h"
 #include "bgm.h"
+#include "input.h"
 
 #include "vector2.h"
 #include "timer.h"
@@ -362,12 +363,15 @@ void SpawnElecShock(Vector2 pos, ElecBulletType type, ElecShockOriginType origin
 				PlaySe(SeType::SpawnElecShock);
 			}
 
+			TriggerViberationGamePad(ModeViberation::S);
+
 		} else if(type == ElecBulletType::Charge){
 			CreateElecShockChargedEffect(pos);
 			//Se
 			if (!CheckIsPlayingSe(SeType::SpawnElecShockCharge)) {
 				PlaySe(SeType::SpawnElecShockCharge);
 			}
+			TriggerViberationGamePad(ModeViberation::M);
 		}
 
 		//ラインエフェクトの生成
