@@ -1367,8 +1367,6 @@ void InitEnemy(void) {
 	InitEnemyBomb();
 	InitEnemySniper();
 
-
-	SpawnEnemy({ 1000,600 }, EnemyType::EnemyBasic);
 }
 
 void UpdateEnemy(void) {

@@ -22,6 +22,9 @@ static void MoveEnemyBullet(void) {
 
 		enemyBullet[i].pos.x += cosf(enemyBullet[i].moveTheta) * enemyBullet[i].moveSpeed;
 		enemyBullet[i].pos.y += sinf(enemyBullet[i].moveTheta) * enemyBullet[i].moveSpeed;
+
+		//アニメーション処理
+		UpdateAnimation(enemyBullet[i].texture);
 	}
 }
 
@@ -64,9 +67,6 @@ static void MoveEnemyLaser(void) {
 
 		enemyLaser[i].pos.x = bossPos.x + enemyLaser[i].disToBoss * cosf(enemyLaser[i].rotateTheta);
 		enemyLaser[i].pos.y = bossPos.y + enemyLaser[i].disToBoss * sinf(enemyLaser[i].rotateTheta);
-
-		//アニメーション処理
-		UpdateAnimation(enemyBullet[i].texture);
 	}
 }
 

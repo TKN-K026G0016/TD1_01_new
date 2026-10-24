@@ -62,6 +62,11 @@ struct BossEnemy {
 	bool isFlash = false;
 	Timer flashTimer = {7, 0};
 
+	//生成演出
+	float spawnEasingT = 0.0f;
+	float scale = 5.0f;
+	int alpha = 0;
+
 	//状態
 	int nowsSates=BossStates::Attack1;
 
@@ -105,3 +110,5 @@ void DrawBossEnemy(void);
 BossEnemy* GetBossEnemy(void);
 
 void DamageBossEnemy(int pow);
+
+void TriggerBossEnemySpawnEffect(void);

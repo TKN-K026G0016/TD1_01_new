@@ -12,15 +12,25 @@
 #include "tool.h"
 #include "input.h"
 #include "texture.h"
-#include "effect.h"
 
 #include <Novice.h>
 #define _USE_MATH_DEFINES
 #include <math.h>
 
-//カラー関係
+#pragma region 共通データ
 static constexpr unsigned int kNormalColor = 0xE01068FF;
 static constexpr unsigned int kFlashColor = WHITE;
+
+static constexpr float kSpawnEasingSpeed = 0.03f;
+static constexpr EasingMode kSpawnEasingMode = EasingMode::EaseOut;
+
+static constexpr float kScaleMin = 1.0f;
+static constexpr float kScaleMax = 3.0f;
+
+static constexpr int kAlphaMin = 0;
+static constexpr int kAlphaMax = 255;
+
+#pragma endregion
 
 BossEnemy bossEnemy;
 
@@ -124,7 +134,7 @@ DataShootLaser dataShootLaser;
 #pragma region データ: 撃破演出
 Timer createExploseTimer = { 30, 0 };
 int createExploseTimerMax = 30;
-int createExploseTimerMin =4;
+int createExploseTimerMin = 4;
 
 Vector2i createExploseRange = { 300, 300 };
 
@@ -260,6 +270,7 @@ void MoveAttack3(void) {
 
 				//ワープする
 				bossEnemy.pos = data.teleportTargetPos;
+				TriggerBossEnemySpawnEffect();
 				data.nowMode = ModeShootLaser::ReadyShoot;
 			}
 
@@ -420,8 +431,20 @@ void DeathBossEnemy(void) {
 
 #pragma endregion
 
-#pragma region 関数: 死亡後の演出関係
+#pragma region 関数: 演出関係
 
+static void UpdateSpawnEffect(void) {
+	if (!bossEnemy.isAlive) return;
+	if (bossEnemy.spawnEasingT >= 1.0f) return;
+
+	bossEnemy.spawnEasingT += kSpawnEasingSpeed;
+	if (bossEnemy.spawnEasingT >= 1.0f) {
+		bossEnemy.spawnEasingT = 1.0f;
+	}
+
+	bossEnemy.scale = UpdateValueByEasing(kScaleMax, kScaleMin, bossEnemy.spawnEasingT, kSpawnEasingMode);
+	bossEnemy.alpha = UpdateValueByEasing(kAlphaMin, kAlphaMax, bossEnemy.spawnEasingT, kSpawnEasingMode);
+}
 
 static void MoveAfterDead(void) {
 	if (!bossEnemy.isAlive || !bossEnemy.isDead) return;
@@ -446,7 +469,7 @@ static void MoveAfterDead(void) {
 	if (createExploseTimer.count >= createExploseTimer.time) {
 		createExploseTimer.count = 0;
 		if (createExploseTimer.time > createExploseTimerMin) {
-			createExploseTimer.time-= 5;
+			createExploseTimer.time -= 5;
 			if (createExploseTimer.time < createExploseTimerMin) {
 				createExploseTimer.time = createExploseTimerMin;
 			}
@@ -497,21 +520,26 @@ void UpdateBossEnemy(void) {
 	CountIgnoreElecShock();
 	UpdateFlashTimer();
 
-
+	UpdateSpawnEffect();
 
 	MoveAfterDead();
 };
-void DrawBossEnemy(void) {
-	if (bossEnemy.isAlive == true) {
-		Texture texture = bossEnemy.texture;
-		if (bossEnemy.isFlash) {
-			texture.color = kFlashColor;
-		} else {
-			texture.color = kNormalColor;
-		}
 
-		DrawTextureRotateObj(texture, bossEnemy.pos, bossEnemy.size, bossEnemy.rotateTheta);
+void DrawBossEnemy(void) {
+	if (!bossEnemy.isAlive) return;
+
+	Vector2 size = { bossEnemy.size.x * bossEnemy.scale, bossEnemy.size.y * bossEnemy.scale };
+
+	Texture texture = bossEnemy.texture;
+	if (bossEnemy.isFlash) {
+		texture.color = kFlashColor;
+	} else {
+		texture.color = kNormalColor;
 	}
+	texture.color = (texture.color & 0xFFFFFF00) | bossEnemy.alpha;
+
+	DrawTextureRotateObj(texture, bossEnemy.pos, size, bossEnemy.rotateTheta);
+
 }
 
 #pragma region 関数: 外部参照関係
@@ -519,6 +547,8 @@ void DrawBossEnemy(void) {
 void SpawnBoss(Vector2 pos) {
 	bossEnemy.isAlive = true;
 	bossEnemy.pos = pos;
+
+	TriggerBossEnemySpawnEffect();
 }
 
 bool GetBossEnemyIsAlive(void) {
@@ -563,6 +593,12 @@ void DamageBossEnemy(int pow) {
 
 	//ダメージエフェクト
 	CreateEnemyDamageEffect(bossEnemy.pos);
+}
+
+void TriggerBossEnemySpawnEffect(void) {
+	bossEnemy.spawnEasingT = 0.0f;
+	bossEnemy.scale = kScaleMax;
+	bossEnemy.alpha = kAlphaMin;
 }
 
 #pragma endregion
