@@ -64,6 +64,9 @@ static void MoveEnemyLaser(void) {
 
 		enemyLaser[i].pos.x = bossPos.x + enemyLaser[i].disToBoss * cosf(enemyLaser[i].rotateTheta);
 		enemyLaser[i].pos.y = bossPos.y + enemyLaser[i].disToBoss * sinf(enemyLaser[i].rotateTheta);
+
+		//アニメーション処理
+		UpdateAnimation(enemyBullet[i].texture);
 	}
 }
 
@@ -122,7 +125,6 @@ void DrawEnemyBullet(void) {
 	for (int i = 0; i < kEnemyBulletLimit; i++) {
 		if (!enemyBullet[i].isShoot) continue;
 
-		UpdateAnimation(enemyBullet[i].texture);
 		DrawTextureObj(enemyBullet[i].texture, enemyBullet[i].pos, enemyBullet[i].size);
 	}
 
