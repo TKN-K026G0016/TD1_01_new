@@ -65,7 +65,13 @@ void ChangeModeBgmFade(ModeBgmFade mode);
 void ChangeNextBgmType(BgmType type);
 
 /// <summary>
-/// Bgmぼボリューム変更
+/// Bgmの音量取得
+/// </summary>
+/// <returns>volume</returns>
+float GetBgmVolume(void);
+
+/// <summary>
+/// Bgmボリューム変更
 /// </summary>
 /// <param name="volume">音量</param>
 void ChangeBgmVolume(float volume);

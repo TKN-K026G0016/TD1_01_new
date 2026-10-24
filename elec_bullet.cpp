@@ -79,7 +79,7 @@ int kAddCombo = 1;
 //チャージ弾のコンボ増加数
 int kAddComboCharged = 5;
 //通常弾でのコンボ回復量
-constexpr int kRecoveryComboTime = 3;
+constexpr int kRecoveryComboTime = 1;
 //チャージ弾でのコンボ回復量
 constexpr int kRecoveryComboTimeCharged = 30;
 

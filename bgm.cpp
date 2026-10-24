@@ -11,7 +11,7 @@ struct BGM {
 };
 
 #pragma region 音量
-float bgmVolume = 1.0f;
+float volume = 1.0f;
 float bgmVolumeMax = 1.0f;
 
 #pragma endregion
@@ -38,11 +38,11 @@ BGMFader bgmFader;
 static void BgmFade(void) {
 	switch (bgmFader.nowMode) {
 	case ModeBgmFade::FadeOut: {
-		if (bgmVolume > 0.0f) {
-			bgmVolume -= bgmFader.fadeOutSpeed;
-			Novice::SetAudioVolume(playHandle, bgmVolume * bgms[ToInt(currentType)].volume);
+		if (volume > 0.0f) {
+			volume -= bgmFader.fadeOutSpeed;
+			Novice::SetAudioVolume(playHandle, volume * bgms[ToInt(currentType)].volume);
 		} else {
-			bgmVolume = bgmVolumeMax;
+			volume = bgmVolumeMax;
 			PlayBgm(BgmType::None);
 
 			bgmFader.nowMode = ModeBgmFade::Standby;
@@ -50,15 +50,15 @@ static void BgmFade(void) {
 		break;
 	}
 	case ModeBgmFade::FadeAndChange: {
-		if (bgmVolume > 0.0f) {
-			bgmVolume -= bgmFader.fadeSpeed;
-			Novice::SetAudioVolume(playHandle, bgmVolume * bgms[ToInt(currentType)].volume);
+		if (volume > 0.0f) {
+			volume -= bgmFader.fadeSpeed;
+			Novice::SetAudioVolume(playHandle, volume * bgms[ToInt(currentType)].volume);
 		} else {
 			//しばらく時間をおく
 			bgmFader.waitPlayTimer.count++;
 			if (bgmFader.waitPlayTimer.count >= bgmFader.waitPlayTimer.time) {
 				//音声を切替
-				bgmVolume = bgmVolumeMax;
+				volume = bgmVolumeMax;
 				PlayBgm(nextType);
 
 				bgmFader.waitPlayTimer.count = 0;
@@ -111,7 +111,7 @@ void PlayBgm(BgmType type) {
 	if (playHandle != -1) {
 		Novice::StopAudio(playHandle);
 	}
-	playHandle = Novice::PlayAudio(bgms[ToInt(type)].aHandle, true, bgms[ToInt(type)].volume * bgmVolume);
+	playHandle = Novice::PlayAudio(bgms[ToInt(type)].aHandle, true, bgms[ToInt(type)].volume * volume);
 	currentType = type;
 }
 
@@ -131,15 +131,19 @@ void ChangeNextBgmType(BgmType type) {
 	nextType = type;
 }
 
-void ChangeBgmVolume(float volume) {
-	volume = std::clamp(volume, 0.0f, 1.0f);
+float GetBgmVolume(void) {
+	return volume;
+}
 
-	bgmVolume = volume;
+void ChangeBgmVolume(float nextVolume) {
+	nextVolume = std::clamp(nextVolume, 0.0f, 1.0f);
 
-	Novice::SetAudioVolume(playHandle, bgmVolume * bgms[ToInt(currentType)].volume);
+	volume = nextVolume;
+
+	Novice::SetAudioVolume(playHandle, volume * bgms[ToInt(currentType)].volume);
 }
 
 void ResetBgmVolume(void) {
-	bgmVolume = 1.0f;
-	Novice::SetAudioVolume(playHandle, bgmVolume * bgms[ToInt(currentType)].volume);
+	volume = 1.0f;
+	Novice::SetAudioVolume(playHandle, volume * bgms[ToInt(currentType)].volume);
 }

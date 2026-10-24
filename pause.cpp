@@ -11,6 +11,9 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 
+static constexpr float kPauseBgmVolume = 0.4f;
+static float preBgmVolume = 0.0f;
+
 #pragma region データ: 選択関係
 
 enum class ModePauseSelect {
@@ -103,6 +106,7 @@ struct CoverPanel {
 CoverPanel pauseCoverPanel = {};
 
 #pragma endregion
+
 
 
 #pragma region 関数: カバーパネル
@@ -241,7 +245,7 @@ static void ChangeScene(void) {
 		switch (nowSelect) {
 		case ModePauseSelect::Resume: {
 			ChangeSceneImmediate(Scene::Play);
-			ResumeBgm();
+			ChangeBgmVolume(preBgmVolume);
 
 			break;
 		}
@@ -249,11 +253,17 @@ static void ChangeScene(void) {
 			ChangeModeFade(ModeFade::FadeOut);
 			ChangeFadeTarget(FadeTarget::Play);
 
+			PlayBgm(BgmType::None);
+			ResetBgmVolume();
+
 			break;
 		}
 		case ModePauseSelect::Exit: {
 			ChangeModeFade(ModeFade::FadeOut);
 			ChangeFadeTarget(FadeTarget::Title);
+
+			PlayBgm(BgmType::None);
+			ResetBgmVolume();
 
 			break;
 		}
@@ -370,7 +380,11 @@ static void DrawCursor(void) {
 
 void InitPause(void) {
 	PlaySe(SeType::Pause);
-	PauseBgm();
+
+	//前までの音量を取得
+	preBgmVolume = GetBgmVolume();
+	//音量を小さくする
+	ChangeBgmVolume(kPauseBgmVolume);
 
 	InitSelect();
 	InitIcon();
