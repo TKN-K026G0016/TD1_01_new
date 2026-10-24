@@ -219,7 +219,7 @@ ModeStartEffect nowModeStart = ModeStartEffect::WaitPlayerSpawn;
 //開始演出
 Timer waitPlayerTimer = { 60, 0 };
 //Readyの表示される時間
-Timer readyTelopTimer = { 90, 0 };
+Timer readyTelopTimer = { 80, 0 };
 //Goの表示される時間
 Timer goTelopTimer = { 30, 0 };
 

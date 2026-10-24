@@ -422,6 +422,8 @@ static void CheckBreakScore(void) {
 
 		PlaySe(SeType::BreakScoreJingle);
 
+		TriggerViberationGamePad(ModeViberation::L);
+
 		scoreManager.breakScore = true;
 		newRecordIcon.isBreakScore = true;
 	}

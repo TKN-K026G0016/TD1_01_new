@@ -88,7 +88,7 @@ struct ViberationManager {
 	ModeViberation nowMode = ModeViberation::Standby;
 
 	//振動時間
-	int vibeTime[ToInt(ModeViberation::Count) -1] = {10, 20, 30};
+	int vibeTime[ToInt(ModeViberation::Count) -1] = {5, 10, 40};
 	int vibeCount = 0;
 
 	//振動の強さ

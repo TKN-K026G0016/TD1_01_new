@@ -200,7 +200,7 @@ static void ChangeMode(void) {
 		PlaySe(SeType::DeadEnemy);
 
 		ResetBgmVolume();
-		TriggerViberationGamePad(ModeViberation::M);
+		TriggerViberationGamePad(ModeViberation::L);
 
 	}
 	//シーン切り替え
@@ -452,7 +452,7 @@ static void ChangeModeByCredits(void) {
 		PlaySe(SeType::DeadEnemy);
 
 		ResetBgmVolume();
-		TriggerViberationGamePad(ModeViberation::M);
+		TriggerViberationGamePad(ModeViberation::L);
 	}
 	//シーン切り替え
 	else {
@@ -475,7 +475,7 @@ static void ChangeModeByReset(void) {
 		PlaySe(SeType::DeadEnemy);
 
 		ResetBgmVolume();
-		TriggerViberationGamePad(ModeViberation::M);
+		TriggerViberationGamePad(ModeViberation::L);
 	}
 	//シーン切り替え
 	else {

@@ -363,7 +363,7 @@ void SpawnElecShock(Vector2 pos, ElecBulletType type, ElecShockOriginType origin
 				PlaySe(SeType::SpawnElecShock);
 			}
 
-			TriggerViberationGamePad(ModeViberation::S);
+			//TriggerViberationGamePad(ModeViberation::S);
 
 		} else if(type == ElecBulletType::Charge){
 			CreateElecShockChargedEffect(pos);
@@ -371,7 +371,7 @@ void SpawnElecShock(Vector2 pos, ElecBulletType type, ElecShockOriginType origin
 			if (!CheckIsPlayingSe(SeType::SpawnElecShockCharge)) {
 				PlaySe(SeType::SpawnElecShockCharge);
 			}
-			TriggerViberationGamePad(ModeViberation::M);
+			//TriggerViberationGamePad(ModeViberation::M);
 		}
 
 		//ラインエフェクトの生成

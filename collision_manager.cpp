@@ -6,10 +6,18 @@
 #include "player.h"
 #include "enemy_bullet.h"
 #include "gem.h"
+#include "input.h"
 
 #include "tool.h"
 #include "vector2.h"
 
+static  void TriggerHitViberation(ElecBulletType type) {
+	if (type == ElecBulletType::Normal) {
+		TriggerViberationGamePad(ModeViberation::S);
+	} else {
+		TriggerViberationGamePad(ModeViberation::M);
+	}
+}
 
 #pragma region 関数: playerLaserVS敵の判定
 /// <summary>
@@ -351,6 +359,8 @@ static void CheckCollisionElecShockVSEnemy(void) {
 
 					//コンボ
 					AddShockCombo(elecShock[j].type);
+
+					TriggerHitViberation(elecShock[j].type);
 				}
 			}
 
@@ -380,9 +390,9 @@ static void CheckCollisionElecShockVSEnemy(void) {
 				if (elecShock[j].breakTimer.count == elecShock[j].triggerDamageFrame) {
 					DamageEnemyGuardian(enemy2[i], elecShock[j].pow);
 
-
 					//コンボ
 					AddShockCombo(elecShock[j].type);
+					TriggerHitViberation(elecShock[j].type);
 				}
 			}
 		}
@@ -414,6 +424,7 @@ static void CheckCollisionElecShockVSEnemy(void) {
 					DamageEnemyBasic(enemyBasic[i], elecShock[j].pow, hitStopSwitch);
 					//コンボ
 					AddShockCombo(elecShock[j].type);
+					TriggerHitViberation(elecShock[j].type);
 				}
 			}
 		}
@@ -442,6 +453,8 @@ static void CheckCollisionElecShockVSEnemy(void) {
 
 					//コンボ
 					AddShockCombo(elecShock[j].type);
+
+					TriggerHitViberation(elecShock[j].type);
 				}
 			}
 
@@ -472,6 +485,8 @@ static void CheckCollisionElecShockVSEnemy(void) {
 
 					//コンボ
 					AddShockCombo(elecShock[j].type);
+
+					TriggerHitViberation(elecShock[j].type);
 				}
 			}
 
@@ -502,6 +517,8 @@ static void CheckCollisionElecShockVSEnemy(void) {
 
 					//コンボ
 					AddShockCombo(elecShock[j].type);
+
+					TriggerHitViberation(elecShock[j].type);
 				}
 			}
 
@@ -534,6 +551,8 @@ static void CheckCollisionElecShockVSEnemy(void) {
 
 					//コンボ
 					AddShockCombo(elecShock[j].type);
+
+					TriggerHitViberation(elecShock[j].type);
 				}
 			}
 
@@ -570,6 +589,8 @@ void CheckCollisionElecShockVSBossEnemy(void) {
 
 				//コンボ
 				AddShockCombo(elecShock[i].type);
+
+				TriggerHitViberation(elecShock[i].type);
 			}
 		}
 	}
@@ -634,6 +655,8 @@ static void CheckCollisionElecShockVSGem(void) {
 				if (gem[j].hp <= 0) {
 					BreakGem(j);
 				}
+
+				TriggerHitViberation(elecShock[i].type);
 			}
 		}
 

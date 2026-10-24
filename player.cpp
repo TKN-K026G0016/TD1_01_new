@@ -989,6 +989,7 @@ static void CreateChargeOrbEffect(void) {
 
 		//チャージSE
 		PlaySeContinuous(SeType::Charge);
+		TriggerViberationGamePad(ModeViberation::S);
 
 	} else {
 		StopPlayingSe(SeType::Charge);

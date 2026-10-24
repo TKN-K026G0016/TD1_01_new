@@ -164,6 +164,7 @@ static void CreateChargeOrbEffect(void) {
 
 		if (!player.isGameStart) {
 			PlaySeContinuous(SeType::Charge);
+			TriggerViberationGamePad(ModeViberation::S);
 		}
 	}
 	else {

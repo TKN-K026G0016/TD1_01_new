@@ -984,6 +984,7 @@ static void UpdateDangerDisplayEffect(void) {
 			} else {
 				//ボス警告演出
 				PlaySe(SeType::WarningBossAlarm);
+				TriggerViberationGamePad(ModeViberation::L);
 			}
 		}
 	} else {
