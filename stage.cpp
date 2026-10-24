@@ -28,12 +28,20 @@ constexpr float cameraMovablePosOffset = 64;
 #pragma endregion
 
 #pragma region データ: カメラ関係
+
 struct Camera {
 	Vector2 pos = { 0, 0 };
 
-	float zoom = 1.0f;
+	ModeCameraZoom nowModeZoom = ModeCameraZoom::Standby;
+
+	float zoom = 0.5f;
 	float zoomMax = 1.0f;
-	float zoomMin = 0.5f;
+	float zoomMin = 0.6f;
+
+	float zoomEasingT = 0.0f;
+	float zoomOutEasingSpeed = 0.01f;
+	float zoomInEasingSpeed = 0.02f;
+	EasingMode zoomEasingMode = EasingMode::EaseOutBack;
 
 	//<移動処理関係>
 	float moveSpeed = 6.5f;
@@ -269,32 +277,45 @@ static void MoveCameraPos(void) {
 
 static void ClampCameraPos(void) {
 
-	Vector2 minPos = {
-		 cameraMovablePos[0].x - cameraMovablePosOffset,
-		 cameraMovablePos[0].y - cameraMovablePosOffset
-	};
+	float halfWidth = kWindowCenter.x / camera.zoom;
+	float halfHeight = kWindowCenter.y / camera.zoom;
 
-	Vector2 maxPos = {
-		cameraMovablePos[1].x + cameraMovablePosOffset,
-		cameraMovablePos[1].y + cameraMovablePosOffset
-	};
+	float minX = movablePos[0].x - cameraMovablePosOffset + halfWidth;
+	float maxX = movablePos[1].x + cameraMovablePosOffset - halfWidth;
 
-	camera.pos.x = std::clamp(camera.pos.x, minPos.x, maxPos.x);
-	camera.pos.y = std::clamp(camera.pos.y, minPos.y, maxPos.y);
+	float minY = movablePos[0].y - cameraMovablePosOffset + halfHeight;
+	float maxY = movablePos[1].y + cameraMovablePosOffset - halfHeight;
 
-	//if (camera.pos.x < minPos.x) {
-	//	camera.pos.x = minPos.x;
-	//} else if (camera.pos.x > maxPos.x) {
-	//	camera.pos.x = maxPos.x;
-	//}
-	//if (camera.pos.y < minPos.y) {
-	//	camera.pos.y = minPos.y;
-	//} else if (camera.pos.y > maxPos.y) {
-	//	camera.pos.y = maxPos.y;
-	//}
+	camera.pos.x = std::clamp(camera.pos.x, minX, maxX);
+	camera.pos.y = std::clamp(camera.pos.y, minY, maxY);
 
+}
 
+static void MoveCameraZoom(void) {
+	switch (camera.nowModeZoom) {
+	case ModeCameraZoom::ZoomOut: {
+		camera.zoomEasingT += camera.zoomOutEasingSpeed;
+		if (camera.zoomEasingT >= 1.0f) {
+			camera.zoomEasingT = 1.0f;
+			camera.nowModeZoom = ModeCameraZoom::Standby;
+		}
 
+		break;
+	}
+
+	case ModeCameraZoom::ZoomIn: {
+		camera.zoomEasingT -= camera.zoomInEasingSpeed;
+		if (camera.zoomEasingT <= 0.0f) {
+			camera.zoomEasingT = 0.0f;
+			camera.nowModeZoom = ModeCameraZoom::Standby;
+		}
+
+		break;
+	}
+
+	}
+
+	camera.zoom = UpdateValueByEasing(camera.zoomMax, camera.zoomMin, camera.zoomEasingT, camera.zoomEasingMode);
 }
 
 #pragma endregion
@@ -689,6 +710,7 @@ void UpdateStage(void) {
 	//カメラ関係
 	MoveCameraPos();
 	ClampCameraPos();
+	MoveCameraZoom();
 
 	//背景関係
 	UpdateBackGround();
@@ -733,6 +755,24 @@ Vector2 GetCameraPos(void) {
 
 float GetCameraZoom(void) {
 	return camera.zoom;
+}
+
+void ChangeModeCameraZoom(ModeCameraZoom nextMode) {
+	camera.nowModeZoom = nextMode;
+
+	switch (nextMode) {
+	case ModeCameraZoom::ZoomIn:
+		camera.zoom = camera.zoomMax;
+		camera.zoomEasingT = 1.0f;
+
+		break;
+
+	case ModeCameraZoom::ZoomOut:
+		camera.zoom = camera.zoomMin;
+		camera.zoomEasingT = 0.0f;
+
+		break;
+	}
 }
 
 TimeData GetGameTimeData(void) {

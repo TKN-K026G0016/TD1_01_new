@@ -264,6 +264,11 @@ void MoveAttack3(void) {
 
 		switch (data.nowMode) {
 		case ModeShootLaser::Teleport: {
+
+			if (data.readyTeleportTimer.count == 0) {
+				ChangeModeCameraZoom(ModeCameraZoom::ZoomOut);
+			}
+
 			data.readyTeleportTimer.count++;
 			if (data.readyTeleportTimer.count >= data.readyTeleportTimer.time) {
 				data.readyTeleportTimer.count = 0;
@@ -334,23 +339,6 @@ void MoveAttack3(void) {
 			if (data.nowMode == ModeShootLaser::ShootAndRotate) {
 				playerPos = GetPlayerPos();
 
-				/*if(data.shootLaserTimer.count==data.startRotateTime){
-					プレイヤーを追跡するように回転
-					float disX = playerPos.x - bossEnemy.pos.x;
-					float disY = playerPos.y - bossEnemy.pos.y;
-					float targetTheta = atan2f(disY, disX);
-
-					現在の方向との差を求める
-					data.rotateDiff = targetTheta - bossEnemy.rotateTheta;
-
-					差を-π~πに正規化
-					while (data.rotateDiff > ToFloat(M_PI)) {
-						data.rotateDiff -= ToFloat(M_PI) * 2;
-					}
-					while (data.rotateDiff < -ToFloat(M_PI)) {
-						data.rotateDiff += ToFloat(M_PI) * 2;
-					}
-				}*/
 				if (data.nowRotateTheta < data.rotateThetaMax && data.nowRotateTheta>-1 * data.rotateThetaMax) {
 					bossEnemy.rotateTheta += data.rotateDiff * data.nowRotateSpeed;
 					data.nowRotateTheta += data.rotateDiff * data.nowRotateSpeed;
@@ -377,6 +365,9 @@ void MoveAttack3(void) {
 				data.shootTimer.count = 0;
 				data.nowMode = ModeShootLaser::Teleport;
 				bossEnemy.nowsSates = BossStates::Normal;
+
+				//カメラのズームイン
+				ChangeModeCameraZoom(ModeCameraZoom::ZoomIn);
 			}
 
 			break;
@@ -503,7 +494,7 @@ void InitBossEnemy(void) {
 		bossBomb[i].burstTexture = GetTexture(TextureType::BossBomBurstRange);
 	}
 
-	//SpawnBoss({ 500, 500 });
+	SpawnBoss({ 500, 500 });
 
 }
 

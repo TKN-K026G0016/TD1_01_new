@@ -2,6 +2,12 @@
 #include "vector2.h"
 #include "timer.h"
 
+enum class ModeCameraZoom {
+	Standby,
+	ZoomIn,
+	ZoomOut,
+};
+
 enum class ModeStartEffect {
 	//プレイヤーの生成を待つ処理
 	WaitPlayerSpawn,
@@ -43,6 +49,12 @@ Vector2 GetCameraPos(void);
 /// <param name=""></param>
 /// <returns></returns>
 float GetCameraZoom(void);
+
+/// <summary>
+/// カメラのズーム状態変更
+/// </summary>
+/// <param name="nextMode">次の状態</param>
+void ChangeModeCameraZoom(ModeCameraZoom nextMode);
 
 /// <summary>
 /// 現在の時間を取得
