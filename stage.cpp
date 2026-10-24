@@ -97,7 +97,7 @@ struct SpawnerData {
 SpawnerData spawners[ToInt(Round::Count)][kMaxSpawner] = {
 	//Round1
 	{
-		{EnemyType::EnemyBomb,{300,300}},
+		/*{EnemyType::EnemyBomb,{300,300}},*/
 		{EnemyType::EnemyBasic, {230, 120}},
 	},
 	//Round2
