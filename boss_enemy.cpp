@@ -493,6 +493,8 @@ void InitBossEnemy(void) {
 		bossBomb[i].texture = GetTexture(TextureType::BossBomb);
 		bossBomb[i].burstTexture = GetTexture(TextureType::BossBomBurstRange);
 	}
+
+	SpawnBoss({ 500, 500 });
 }
 
 void UpdateBossEnemy(void) {

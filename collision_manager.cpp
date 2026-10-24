@@ -574,8 +574,6 @@ void CheckCollisionElecShockVSBossEnemy(void) {
 	for (int i = 0; i < elecShockLimit; i++) {
 		if (!elecShock[i].isShoot) continue;
 
-		if (boss->isIgnoreElecShock) continue;
-
 		if (CheckCollisionCircleVSCircle(boss->pos, boss->hitRadius, elecShock[i].pos, elecShock[i].hitRadius)) {
 			//ホウデンの生成
 			if (!boss->isIgnoreElecShock) {
