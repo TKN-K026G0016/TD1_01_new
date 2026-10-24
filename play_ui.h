@@ -40,3 +40,8 @@ void TriggerStartIconFrameIn(void);
 /// 開始アイコンのフレームイン終了
 /// </summary>
 void TriggerStartIconFrameOut(void);
+
+/// <summary>
+/// PauseGuideの出現処理
+/// </summary>
+void TriggerPauseGuideFrameIn(void);

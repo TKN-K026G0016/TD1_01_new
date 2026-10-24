@@ -138,6 +138,8 @@ void InitTexture(void) {
 
 		{ Novice::LoadTexture("./resources/texture/ui/play/warn_boss.png"), { 512, 128 }, {0, 0}, 0, 0, WHITE },
 
+		{ Novice::LoadTexture("./resources/texture/ui/play/pause_guide.png"), { 256, 64 }, {0, 0}, 1, 0, WHITE },
+
 		//effect
 		{ Novice::LoadTexture("./resources/texture/effect/effect.square.png"), {128 , 128 }, {0, 0}, 0, 0, WHITE },
 		{ Novice::LoadTexture("./resources/texture/effect/effect.square.mini.png"), {32 , 32 }, {0, 0}, 0, 0, WHITE },
@@ -151,6 +153,7 @@ void InitTexture(void) {
 		//Pause
 		//===============
 		{ Novice::LoadTexture("./resources/texture/ui/pause/pause_icon.png"), { 600, 150 }, {0, 0}, 0, 0, WHITE },
+		{ Novice::LoadTexture("./resources/texture/ui/pause/pause_guide.png"), { 600, 150 }, {0, 0}, 0, 0, WHITE },
 
 		//===============
 		//Clear

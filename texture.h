@@ -143,8 +143,10 @@ enum class TextureType {
 
 	ReadyTelop,
 	GoTelop,
-	
+
 	WarnBossTelop,
+
+	PauseGuide,
 
 	//effect
 	EffectSquare,
@@ -161,6 +163,7 @@ enum class TextureType {
 	//Pause
 	//===============
 	PauseIcon,
+	PauseControllGuide,
 
 	//===============
 	//Clear

@@ -602,6 +602,9 @@ static void UpdateStartEffect(void) {
 			//Bgm再生
 			PlayBgm(BgmType::Stage);
 			TriggerStartIconFrameOut();
+
+			//PauseGuideの出現
+			TriggerPauseGuideFrameIn();
 		}
 
 		break;

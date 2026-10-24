@@ -93,6 +93,21 @@ MenuCursor menuCursor;
 
 #pragma endregion
 
+#pragma region データ: ガイド
+
+struct PauseGuide {
+	Vector2 pos = {};
+	Vector2 size = { 600, 150 };
+
+	Vector2 standbyPos = { -330, 110 };
+	Vector2 endPos = { 330, 110 };
+
+	Texture texture = {};
+};
+static PauseGuide pauseGuide;
+
+#pragma endregion
+
 #pragma region データ: カバーパネル
 
 struct CoverPanel {
@@ -378,6 +393,31 @@ static void DrawCursor(void) {
 
 #pragma endregion
 
+#pragma region 関数: ガイド
+
+static void InitPauseGuide(void) {
+	pauseGuide = {};
+	pauseGuide.texture = GetTexture(TextureType::PauseControllGuide);
+}
+
+static void UpdatePauseGuide(void) {
+	pauseGuide.pos = MoveByEasing(pauseGuide.standbyPos, pauseGuide.endPos, menuBackground.easingT, menuBackground.easingModeFrameIn);
+
+	//見た目変更
+	if (GetIsConnectGamePad()) {
+		pauseGuide.texture.animNum = 0;
+	} else {
+		pauseGuide.texture.animNum = 1;
+	}
+
+}
+
+static void DrawPauseGuide(void) {
+	DrawTextureUI(pauseGuide.texture, pauseGuide.pos, pauseGuide.size);
+}
+
+#pragma endregion
+
 void InitPause(void) {
 	PlaySe(SeType::Pause);
 
@@ -390,6 +430,7 @@ void InitPause(void) {
 	InitIcon();
 	InitCoverPanel();
 	InitMenuBackground();
+	InitPauseGuide();
 }
 
 void UpdatePause(void) {
@@ -401,6 +442,7 @@ void UpdatePause(void) {
 	UpdateMenuBackground();
 	UpdateIcon();
 	UpdateCursor();
+	UpdatePauseGuide();
 
 	ChangeScene();
 }
@@ -408,6 +450,8 @@ void UpdatePause(void) {
 void DrawPause(void) {
 	DrawCoverPanel();
 	DrawMenuBackground();
+
+	DrawPauseGuide();
 
 	DrawIcon();
 	DrawCursor();

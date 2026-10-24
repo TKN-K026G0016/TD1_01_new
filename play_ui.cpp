@@ -6,6 +6,7 @@
 #include "effect.h"
 #include "score_data.h"
 #include "se.h"
+#include "input.h"
 
 #include "vector2.h"
 #include "timer.h"
@@ -376,6 +377,41 @@ struct WarningBossTelop {
 	Texture texture = {};
 };
 WarningBossTelop bossTelop;
+
+#pragma endregion
+
+#pragma region データ: ポーズガイド
+
+enum class ModePauseGuide {
+	Standby,
+	FrameIn,
+	Show,
+	FrameOut,
+};
+
+struct PauseGuide {
+	Vector2 pos = {};
+	Vector2 size = { 256, 64 };
+
+	Vector2 offset = { 0, 128 };
+
+	ModePauseGuide nowMode = ModePauseGuide::Standby;
+
+	Timer showTimer = { 150, 0 };
+
+	//<イージング関係>
+	float easingT = 0.0f;
+	float easingSpeedFrameIn = 0.03f;
+	float easingSpeedFrameOut = 0.08f;
+	EasingMode easingMode = EasingMode::EaseIn;
+
+	int alpha = 0;
+	int alphaMin = 0;
+	int alphaMax = 255;
+
+	Texture texture = {};
+};
+static PauseGuide pauseGuide;
 
 #pragma endregion
 
@@ -839,16 +875,15 @@ static void UpdateScore(void) {
 
 		scoreIcon.showScore = UpdateValueByEasing(scoreIcon.startScore, scoreIcon.endScore, scoreIcon.easingT, EasingMode::Linear);
 
-		if (scoreIcon.easingT >= 1.0f) { 
-			scoreIcon.easingT = 0.0f; 
+		if (scoreIcon.easingT >= 1.0f) {
+			scoreIcon.easingT = 0.0f;
 			scoreIcon.showScore = scoreIcon.endScore;
 		}
 
 
 		PlaySe(SeType::CountUpScore);
 
-	} 
-	else {
+	} else {
 		scoreIcon.showScore = nowScore;
 		scoreIcon.easingT = 0.0f;
 
@@ -1096,6 +1131,71 @@ static void DrawBossTelop(void) {
 
 #pragma endregion
 
+#pragma region 関数: ポーズガイド
+
+static void InitPauseGuide(void) {
+	pauseGuide = {};
+	pauseGuide.texture = GetTexture(TextureType::PauseGuide);
+}
+
+static void UpdatePauseGuide(void) {
+	if (pauseGuide.nowMode == ModePauseGuide::Standby) return;
+
+	//移動処理
+	Vector2 playerPos = GetPlayerPos();
+	pauseGuide.pos = { playerPos.x + pauseGuide.offset.x, playerPos.y + pauseGuide.offset.y };
+
+	switch (pauseGuide.nowMode) {
+	case ModePauseGuide::FrameIn: {
+		pauseGuide.easingT += pauseGuide.easingSpeedFrameIn;
+		if (pauseGuide.easingT >= 1.0f) {
+			pauseGuide.easingT = 1.0f;
+			pauseGuide.nowMode = ModePauseGuide::Show;
+		}
+
+		break;
+	}
+	case ModePauseGuide::Show: {
+		pauseGuide.showTimer.count++;
+		if (pauseGuide.showTimer.count >= pauseGuide.showTimer.time) {
+			pauseGuide.showTimer.count = 0;
+			pauseGuide.nowMode = ModePauseGuide::FrameOut;
+		}
+
+		break;
+	}
+	case ModePauseGuide::FrameOut: {
+		pauseGuide.easingT -= pauseGuide.easingSpeedFrameOut;
+		if (pauseGuide.easingT <= 0.0f) {
+			pauseGuide.easingT = 0.0f;
+			pauseGuide.nowMode = ModePauseGuide::Standby;
+		}
+
+		break;
+	}
+	}
+
+	pauseGuide.alpha = UpdateValueByEasing(pauseGuide.alphaMin, pauseGuide.alphaMax, pauseGuide.easingT, pauseGuide.easingMode);
+
+	//見た目変更
+	if (GetIsConnectGamePad()) {
+		pauseGuide.texture.animNum = 0;
+	} else {
+		pauseGuide.texture.animNum = 1;
+	}
+}
+
+
+static void DrawPauseGuide(void) {
+	if (pauseGuide.nowMode == ModePauseGuide::Standby) return;
+
+	Texture texture = pauseGuide.texture;
+	texture.color = (texture.color & 0xFFFFFF00) | pauseGuide.alpha;
+	DrawTextureObj(texture, pauseGuide.pos, pauseGuide.size);
+}
+
+#pragma endregion
+
 void InitPlayUI(void) {
 	InitLifeIcon();
 	InitEnergyGauge();
@@ -1107,6 +1207,7 @@ void InitPlayUI(void) {
 	InitDangerDisplayEffect();
 	InitStartTelop();
 	InitBossTelop();
+	InitPauseGuide();
 }
 
 void UpdatePlayUI(void) {
@@ -1120,9 +1221,12 @@ void UpdatePlayUI(void) {
 	UpdateDangerDisplayEffect();
 	UpdateStartTelop();
 	UpdateBossTelop();
+	UpdatePauseGuide();
 }
 
 void DrawPlayUI(void) {
+	DrawPauseGuide();
+
 	DrawDisplayEffect();
 	DrawDangerDisplayEffect();
 
@@ -1161,6 +1265,12 @@ void TriggerEndCombo(void) {
 
 void TriggerGaugeShakeByDamage(void) {
 	gaugeShakeDamageTimer.count = 0;
+}
+
+void TriggerPauseGuideFrameIn(void) {
+	pauseGuide.nowMode = ModePauseGuide::FrameIn;
+	pauseGuide.easingT = 0.0f;
+	pauseGuide.showTimer.count = 0;
 }
 
 #pragma endregion
