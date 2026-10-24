@@ -22,7 +22,7 @@ static constexpr unsigned int kFlashColor = WHITE;
 
 #pragma region データ: 生成演出
 
-static constexpr float kSpawnEasingSpeed = 0.05f;
+static constexpr float kSpawnEasingSpeed = 0.03f;
 static constexpr EasingMode kSpawnEasingMode = EasingMode::EaseOut;
 
 static constexpr float kScaleMin = 1.0f;
@@ -1368,7 +1368,7 @@ void InitEnemy(void) {
 	InitEnemySniper();
 
 
-	//SpawnEnemy({ 1000,600 }, EnemyType::EnemyShooter);
+	SpawnEnemy({ 1000,600 }, EnemyType::EnemyBasic);
 }
 
 void UpdateEnemy(void) {
