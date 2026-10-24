@@ -6,6 +6,7 @@
 #include "enemy.h"
 #include "effect.h"
 #include "se.h"
+#include "bgm.h"
 
 #include "vector2.h"
 #include "tool.h"
@@ -412,6 +413,7 @@ void DeathBossEnemy(void) {
 		bossEnemy.isDead = true;
 		CreateFlashPanel();
 		DeadAllEnemy();
+		ChangeModeBgmFade(ModeBgmFade::FadeOut);
 	}
 
 }
@@ -462,6 +464,8 @@ static void MoveAfterDead(void) {
 
 void InitBossEnemy(void) {
 	bossEnemy = {};
+	statesTimer = {};
+	dataShootLaser = {};
 	createExploseTimer.time = createExploseTimerMax;
 
 	//ステージの中心座標を取得(shootLaser時のため)

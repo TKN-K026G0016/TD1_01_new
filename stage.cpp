@@ -646,7 +646,7 @@ static void UpdateWarningBoss(void) {
 		CancelDangerDisplayEffect();
 		CreateFlashPanel();
 
-		PlayBgm(BgmType::Boss);
+ 		PlayBgm(BgmType::Boss);
 	}
 
 }
@@ -659,8 +659,6 @@ static void GoClearScene(void) {
 
 	//フェードアウトし始めたらスキップ
 	if (GetNowModeFade() != ModeFade::Standby) return;
-
-	ChangeModeBgmFade(ModeBgmFade::FadeOut);
 
 	goToClearTimer.count++;
 	if (goToClearTimer.count >= goToClearTimer.time) {

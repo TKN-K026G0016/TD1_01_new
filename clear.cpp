@@ -342,6 +342,7 @@ static void UpdateScore(void) {
 
 	//スコアのカウントアップ演出
 	scoreManager.showScore = UpdateValueByEasing(0, scoreManager.nowScore, scoreManager.easingTScore, scoreManager.easingMode);
+	PlaySe(SeType::CountUpScore);
 }
 
 static void UpdateCombo(void) {
@@ -357,6 +358,7 @@ static void UpdateCombo(void) {
 
 	//コンボのカウント処理
 	scoreManager.showMaxCombo = UpdateValueByEasing(0, scoreManager.maxCombo, scoreManager.easingTCombo, scoreManager.easingMode);
+	PlaySe(SeType::CountUpScore);
 }
 
 static void DrawScore(void) {
@@ -627,6 +629,8 @@ static void Confirm(void) {
 		}
 
 		PlaySe(SeType::Confirm);
+		StopPlayingSe(SeType::StageClearJingle);
+		StopPlayingSe(SeType::BreakScoreJingle);
 		onceSelect = true;
 	}
 }

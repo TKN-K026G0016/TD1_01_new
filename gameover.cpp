@@ -453,6 +453,8 @@ static void ChangeScene(void) {
 			break;
 		}
 		}
+
+		StopPlayingSe(SeType::GameoverJingle);
 	}
 }
 

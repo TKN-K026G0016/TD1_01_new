@@ -122,6 +122,11 @@ void CreateBreakGemEffect(Vector2 pos);
 
 void CreateBombExplosionEffect(Vector2 pos, float endSizeValue, unsigned int color);
 
+/// <summary>
+/// シールド破壊エフェクトの生成処理
+/// </summary>
+/// <param name="pos">生成座標</param>
+/// <param name="color">色</param>
 void CreateBarrierBreakEffect(Vector2 pos, unsigned int color);
 
 void CreateFlashPanel(void);

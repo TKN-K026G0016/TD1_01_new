@@ -831,6 +831,7 @@ static void UpdateElecShield(void) {
 		if (player.isEquipShield) {
 			reEquipShieldTimer.count = 0;
 			ChangeModeElecShield(ModeElecShield::Break);
+			CreateBarrierBreakEffect(player.pos, elecShield.colorMinDanger);
 		}
 		player.isEquipShield = false;
 	}

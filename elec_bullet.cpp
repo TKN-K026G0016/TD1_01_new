@@ -256,6 +256,7 @@ static void UpdateShockCombo(void) {
 		}
 	}
 
+	if (GetNowScene() != Scene::Play || GetIsWarningBoss()) return;
 	if (CheckIsPlayingSe(SeType::ComboJingle1000) || CheckIsPlayingSe(SeType::ComboJingle500) || CheckIsPlayingSe(SeType::ComboJingle100)) {
 		ChangeBgmVolume(bgmVolumePlayingJingle);
 	} else {

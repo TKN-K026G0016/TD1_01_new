@@ -606,22 +606,25 @@ static FlashPanel flashPanel;
 
 #pragma region データ: barrierbreak
 
-const int kbarrierBreakNumber = 4;
+const int kBarrierBreakNumber = 6;
 struct  BarrierBreakEffect {
 	Vector2 pos = {};
-	Vector2 size = { 60,60 };
+	Vector2 size = { 30,30 };
 
 	//表示フラグ
 	bool appear = false;
 
 	//加速度
 	Vector2 acceleration = {};
+
+	float gravityVelocity = 0.01f;
+
 	//回転量
 	float rotateTheta = 0.0f;
 	float rotateSpeed = ToFloat(M_PI) / 20.0f;
 
 	float easingT = 0.0f;
-	float easingSpeed = 0.4f;
+	float easingSpeed = 0.02f;
 	//透明化が始まるタイミング
 	float startFadeEasingT = 0.0f;
 
@@ -634,7 +637,7 @@ struct  BarrierBreakEffect {
 	Texture texture = {};
 
 };
-BarrierBreakEffect barrierBreakEffect[kbarrierBreakNumber];
+BarrierBreakEffect barrierBreakEffect[kBarrierBreakNumber];
 
 
 #pragma endregion
@@ -2112,7 +2115,7 @@ void CreateFlashPanel(void) {
 
 #pragma region 関数: BarrierBreak
 void CreateBarrierBreakEffect(Vector2 pos, unsigned int color) {
-	for (int i = 0; i < kbarrierBreakNumber; i++) {
+	for (int i = 0; i < kBarrierBreakNumber; i++) {
 		if (barrierBreakEffect[i].appear) continue;
 
 		barrierBreakEffect[i].appear = true;
@@ -2128,30 +2131,28 @@ void CreateBarrierBreakEffect(Vector2 pos, unsigned int color) {
 
 		barrierBreakEffect[i].easingT = 0.0f;
 		barrierBreakEffect[i].alpha = kAlphaMax;
-
-		break;
-
 	}
 }
 
 static void InitBarrierBreakEffect(void) {
-	for (int i = 0; i < kbarrierBreakNumber; i++) {
-		barrierBreakEffect[i].texture = GetTexture(TextureType::barruerBreakEffect);
+	for (int i = 0; i < kBarrierBreakNumber; i++) {
+		barrierBreakEffect[i].texture = GetTexture(TextureType::BarrierBreakEffect);
 	}
 }
 
 void UpdateBarrierBreakEffect() {
-	for (int i = 0; i < kbarrierBreakNumber; i++) {
+	for (int i = 0; i < kBarrierBreakNumber; i++) {
 		if (!barrierBreakEffect[i].appear) continue;
 
 		//移動処理
 		barrierBreakEffect[i].pos.x += barrierBreakEffect[i].acceleration.x;
 		barrierBreakEffect[i].pos.y += barrierBreakEffect[i].acceleration.y;
 
-		barrierBreakEffect[i].acceleration.y -= 1;
+		//重力による落下処理
+		barrierBreakEffect[i].acceleration.y -= barrierBreakEffect[i].gravityVelocity;
 
 		//回転処理
-		//barrierBreakEffect[i].rotateTheta += barrierBreakEffect[i].rotateSpeed;
+		barrierBreakEffect[i].rotateTheta += barrierBreakEffect[i].rotateSpeed;
 
 		//イージングを増価させる処理
 		barrierBreakEffect[i].easingT += barrierBreakEffect[i].easingSpeed;
@@ -2176,10 +2177,10 @@ void UpdateBarrierBreakEffect() {
 }
 
 void DrawBarrierBreakEffect() {
-	for (int i = 0; i < kbarrierBreakNumber; i++) {
+	for (int i = 0; i < kBarrierBreakNumber; i++) {
 		if (!barrierBreakEffect[i].appear) continue;
 
-		Texture texture = triangleTexture;
+		Texture texture = barrierBreakEffect[i].texture;
 		texture.color = (barrierBreakEffect[i].color & 0xFFFFFF00) | barrierBreakEffect[i].alpha;
 
 		if (nowScene == Scene::Play) {

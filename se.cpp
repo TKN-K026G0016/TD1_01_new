@@ -77,9 +77,9 @@ void InitSe(void) {
 		{Novice::LoadAudio("./resources/sound/se/ui/combo_9.wav"), 1.0f},
 		{Novice::LoadAudio("./resources/sound/se/ui/combo_10.wav"), 1.0f},
 
-		{Novice::LoadAudio("./resources/sound/se/ui/combo_jingle_10.wav"), 1.0f},
-		{Novice::LoadAudio("./resources/sound/se/ui/combo_jingle_100.wav"), 1.0f},
-		{Novice::LoadAudio("./resources/sound/se/ui/combo_jingle_1000.wav"), 1.0f},
+		{Novice::LoadAudio("./resources/sound/se/ui/combo_jingle_1.wav"), 1.0f},
+		{Novice::LoadAudio("./resources/sound/se/ui/combo_jingle_2.wav"), 1.0f},
+		{Novice::LoadAudio("./resources/sound/se/ui/combo_jingle_3.wav"), 1.0f},
 
 		{Novice::LoadAudio("./resources/sound/se/ui/countup_score.wav"), 1.0f},
 
