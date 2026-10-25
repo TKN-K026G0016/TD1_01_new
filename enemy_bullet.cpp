@@ -14,7 +14,7 @@ static EnemyBullet enemyBullet[kEnemyBulletLimit];
 static constexpr int kEnemyLaserLimit = 100;
 static EnemyLaser enemyLaser[kEnemyLaserLimit];
 //模擬弾レーザー不透明度
-static constexpr int kDummyLaserAlpha = 80;
+static constexpr int kDummyLaserAlpha = 15;
 
 #pragma region 関数: enemyBullet
 

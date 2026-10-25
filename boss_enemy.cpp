@@ -100,7 +100,7 @@ struct DataShootLaser {
 	Vector2 teleportTargetPos = {};
 
 	//テレポート終了から射撃開始までの時間
-	Timer readyShootTimer = { 100, 0 };
+	Timer readyShootTimer = { 120, 0 };
 	//射撃準備中の回転速度
 	float rotatateSpeedReadyShoot = 0.05f;
 	//射撃準備中の狙いのずれ
@@ -284,6 +284,14 @@ void MoveAttack3(void) {
 		case ModeShootLaser::ReadyShoot: {
 			data.readyShootTimer.count++;
 
+			//模擬弾発射処理
+			data.shootLaserTimer.count++;
+			if (data.shootLaserTimer.count >= data.shootLaserTimer.time && data.shootTimer.count < data.shootTimer.time - 60) {
+				data.shootLaserTimer.count = 0;
+				ShootEnemyLaser(bossEnemy.pos, bossEnemy.rotateTheta, 0.0f, TypeEnemyLaser::Dummy);
+			}
+
+			//待機処理
 			if (data.readyShootTimer.count >= data.readyShootTimer.time) {
 				data.readyShootTimer.count = 0;
 
@@ -325,12 +333,11 @@ void MoveAttack3(void) {
 		case ModeShootLaser::Shoot:
 		case ModeShootLaser::ShootAndRotate: {
 
-
 			//射撃処理
 			data.shootLaserTimer.count++;
 			if (data.shootLaserTimer.count >= data.shootLaserTimer.time && data.shootTimer.count < data.shootTimer.time - 60) {
 				data.shootLaserTimer.count = 0;
-				ShootEnemyLaser(bossEnemy.pos, bossEnemy.rotateTheta, 0.0f);
+				ShootEnemyLaser(bossEnemy.pos, bossEnemy.rotateTheta, 0.0f, TypeEnemyLaser::Normal);
 				PlaySe(SeType::ShootEnemyLaser);
 
 				CreateShootLaserEffect(bossEnemy.pos, bossEnemy.rotateTheta);

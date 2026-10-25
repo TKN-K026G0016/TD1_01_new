@@ -92,7 +92,7 @@ static constexpr float kShootLaserEffectGravity = 0.03f;
 
 struct ShootLaserEffect {
 	Vector2 pos = { };
-	Vector2 size = { 12,12 };
+	//Vector2 size = { 12,12 };
 
 	bool isShoot = false;
 
@@ -110,6 +110,11 @@ struct ShootLaserEffect {
 	float easingT = 0.0f;
 	float easingSpeed = 0.08f;
 	EasingMode easingMode = EasingMode::EaseIn;
+
+	//<サイズ関係>
+	float sizeValue = 0.0f;
+	float sizeValueMin = 8.0f;
+	float sizeValueMax = 20.0f;
 
 	//<不透明度>
 	int alpha = kAlphaMax;
@@ -858,13 +863,16 @@ static void UpdateShootLaserEffect(void) {
 		//回転処理
 		shootLaserEffect[i].rotateTheta += shootLaserEffect[i].rotateSpeed;
 
-		//透明化処理
+		//イージング
 		shootLaserEffect[i].easingT += shootLaserEffect[i].easingSpeed;
 		if (shootLaserEffect[i].easingT >= 1.0f) {
 			shootLaserEffect[i].easingT = 1.0f;
 			shootLaserEffect[i].isShoot = false;
 		}
 
+		//サイズ変更
+		shootLaserEffect[i].sizeValue = UpdateValueByEasing(shootLaserEffect[i].sizeValueMax, shootLaserEffect[i].sizeValueMin, shootLaserEffect[i].easingT, shootLaserEffect[i].easingMode);
+		//透明度変更
 		shootLaserEffect[i].alpha = UpdateValueByEasing(kAlphaMax, kAlphaMin, shootLaserEffect[i].easingT, shootLaserEffect[i].easingMode);
 	}
 }
@@ -874,9 +882,11 @@ static void DrawShootLaserEffect(void) {
 	for (int i = 0; i < kShootLaserEffectLimit; i++) {
 		if (!shootLaserEffect[i].isShoot) continue;
 
+		Vector2 size = { shootLaserEffect[i].sizeValue, shootLaserEffect[i].sizeValue };
+
 		Texture texture = whiteBoxTexture;
 		texture.color = (shootLaserEffect[i].color & 0xFFFFFF00) | shootLaserEffect[i].alpha;
-		DrawTextureRotateObj(texture, shootLaserEffect[i].pos, shootLaserEffect[i].size, shootLaserEffect[i].rotateTheta);
+		DrawTextureRotateObj(texture, shootLaserEffect[i].pos, size, shootLaserEffect[i].rotateTheta);
 	}
 }
 
