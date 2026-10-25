@@ -48,6 +48,8 @@ enum class TextureType {
 	ResetScoreButton,
 	ResetScoreButtonNew,
 
+	RecommendIcon,
+
 	CreditsIcon,
 	CreditsExitIcon,
 	CreditsContent,

@@ -199,7 +199,7 @@ struct RecommendIcon {
 
 	//最初の座標
 	Vector2 standbyPos = { 640, 1000 };
-	Vector2 showPos = { 640, 450 };
+	Vector2 showPos = { 640, 400 };
 
 	//透明度
 	int alpha = 0;
@@ -211,6 +211,7 @@ struct RecommendIcon {
 RecommendIcon recommendIcon;
 
 #pragma endregion
+
 
 #pragma region 関数: 項目決定
 
@@ -767,7 +768,7 @@ static void DrawFlashPanel(void) {
 
 static void InitRecommend(void) {
 	recommendIcon = {};
-	recommendIcon.texture = GetTexture(TextureType::White1x1);
+	recommendIcon.texture = GetTexture(TextureType::RecommendIcon);
 }
 
 static void UpdateRecommend(void) {

@@ -40,6 +40,8 @@ void InitTexture(void) {
 		{ Novice::LoadTexture("./resources/texture/ui/title/reset_score_button.png"), { 80, 80 }, {0, 0}, 0, 0, WHITE },
 		{ Novice::LoadTexture("./resources/texture/ui/title/reset_score_button_new.png"), { 256, 128 }, {0, 0}, 0, 0, WHITE },
 
+		{ Novice::LoadTexture("./resources/texture/ui/title/recommend_icon.png"), { 1024, 512 }, {0, 0}, 0, 0, WHITE },
+
 		{ Novice::LoadTexture("./resources/texture/ui/title/credits_icon.png"), { 600, 150 }, {0, 0}, 0, 0, WHITE },
 		{ Novice::LoadTexture("./resources/texture/ui/title/credits_exit_button.png"), { 256, 64 }, {0, 0}, 0, 0, WHITE },
 		{ Novice::LoadTexture("./resources/texture/ui/title/credits_content.png"), { 600, 400 }, {0, 0}, 0, 0, WHITE },
