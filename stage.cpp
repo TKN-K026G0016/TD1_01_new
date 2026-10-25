@@ -68,7 +68,8 @@ enum class Round {
 	Round4,
 	Round5,
 
-	RoundBoss,
+	RoundBoss1,
+	RoundBoss2,
 
 	Count
 };
@@ -87,6 +88,7 @@ TimeData changeRoundTime[ToInt(Round::Count)] = {
 
 	//ボス
 	{ 2,30,0 },
+	{ 3, 0,0 },
 };
 
 #pragma endregion
@@ -147,6 +149,14 @@ SpawnerData spawners[ToInt(Round::Count)][kMaxSpawner] = {
 		{ EnemyType::EnemyFormation, {250, 0} },
 		{ EnemyType::EnemyShooter, {250, 0} },
 		//{EnemyType::EnemyBomb, {500, 0}},
+	},
+	//BossRound2
+	{
+		{ EnemyType::EnemyBasic, {100, 0} },
+		{ EnemyType::EnemySmallGroup, {200, 50} },
+		{ EnemyType::EnemyFormation, {250, 0} },
+		{ EnemyType::EnemyShooter, {100, 0} },
+		{EnemyType::EnemySniper,{360,350}},
 	},
 };
 
@@ -343,9 +353,11 @@ static void UpdateBackGround(void) {
 	float easingSpeed;
 	if (backGround.nowMode == ModeBackground::Combo100) {
 		easingSpeed = backGround.easingSpeed100;
-	} else if (backGround.nowMode == ModeBackground::Combo500) {
+	}
+	else if (backGround.nowMode == ModeBackground::Combo500) {
 		easingSpeed = backGround.easingSpeed500;
-	} else {
+	}
+	else {
 		easingSpeed = backGround.easingSpeed1000;
 	}
 
@@ -356,7 +368,8 @@ static void UpdateBackGround(void) {
 			backGround.easingT = 1.0f;
 			backGround.isFadeIn = false;
 		}
-	} else {
+	}
+	else {
 		backGround.easingT -= easingSpeed;
 		if (backGround.easingT <= 0.0f) {
 			backGround.easingT = 0.0f;
@@ -467,7 +480,7 @@ static void ChangeRound(void) {
 		nowRound = static_cast<Round>(nextRound);
 
 		//ボスラウンドに入ったら
-		if (nowRound == Round::RoundBoss) {
+		if (nowRound == Round::RoundBoss1) {
 			//ボスの警告演出
 			isWarningBoss = true;
 			TriggerDangerDisplayEffect();
@@ -570,7 +583,7 @@ static void SpawnEnemyByRound(void) {
 				//右下
 				else if (getrand == 3) {
 					spawnPos = { ToFloat(GetRand(2410,2510)),ToFloat(GetRand(1290,1390)) };
-				SpawnEnemy(spawnPos, data.type);
+					SpawnEnemy(spawnPos, data.type);
 				}
 			}
 			else {
@@ -672,7 +685,7 @@ static void UpdateWarningBoss(void) {
 		CancelDangerDisplayEffect();
 		CreateFlashPanel();
 
- 		PlayBgm(BgmType::Boss);
+		PlayBgm(BgmType::Boss);
 	}
 
 }
