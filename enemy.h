@@ -41,8 +41,8 @@ struct EnemyShooter {
 	//生存フラグ
 	bool isAlive = false;
 
-	int hp = 30;
-	int hpMax = 30;
+	int hp = 45;
+	int hpMax = 45;
 
 	float hitRadius = 20.0f;
 
@@ -327,8 +327,8 @@ struct EnemySniper {
 	//生存フラグ
 	bool isAlive = false;
 
-	int hp = 30;
-	int hpMax = 30;
+	int hp = 75;
+	int hpMax = 75;
 
 	float hitRadius = 20.0f;
 
