@@ -34,6 +34,7 @@ struct Camera {
 
 	ModeCameraZoom nowModeZoom = ModeCameraZoom::Standby;
 
+	//<ズーム関係>
 	float zoom = 0.5f;
 	float zoomMax = 1.0f;
 	float zoomMin = 0.6f;
@@ -42,6 +43,13 @@ struct Camera {
 	float zoomOutEasingSpeed = 0.01f;
 	float zoomInEasingSpeed = 0.02f;
 	EasingMode zoomEasingMode = EasingMode::EaseOutBack;
+
+	//<振動関係>
+	Vector2 shakeOffset = {};
+	ModeCameraShake nowModeShake = ModeCameraShake::Standby;
+	int shakeAmp[ToInt(ModeCameraShake::Count) - 1] = { 1, 2, 3 };
+	int shakeTime[ToInt(ModeCameraShake::Count) - 1] = { 5, 10, 20 };
+	int shakeCount = 0;
 
 	//<移動処理関係>
 	float moveSpeed = 6.5f;
@@ -292,6 +300,10 @@ static void ClampCameraPos(void) {
 
 }
 
+/// <summary>
+/// カメラのズーム処理
+/// </summary>
+/// <param name=""></param>
 static void MoveCameraZoom(void) {
 	switch (camera.nowModeZoom) {
 	case ModeCameraZoom::ZoomOut: {
@@ -317,6 +329,33 @@ static void MoveCameraZoom(void) {
 	}
 
 	camera.zoom = UpdateValueByEasing(camera.zoomMax, camera.zoomMin, camera.zoomEasingT, camera.zoomEasingMode);
+}
+
+/// <summary>
+/// カメラの振動処理
+/// </summary>
+/// <param name=""></param>
+static void MoveCameraShake(void) {
+	if (camera.nowModeShake == ModeCameraShake::Standby) {
+		camera.shakeOffset = { 0,0 };
+		return;
+	}
+
+	int modeNum = ToInt(camera.nowModeShake) - 1;
+	
+#pragma region 移動処理
+
+	camera.shakeOffset.x = ToFloat(GetRand(-camera.shakeAmp[modeNum], camera.shakeAmp[modeNum]));
+	camera.shakeOffset.y = ToFloat(GetRand(-camera.shakeAmp[modeNum], camera.shakeAmp[modeNum]));
+
+#pragma endregion
+
+	camera.shakeCount++;
+	if (camera.shakeCount >= camera.shakeTime[modeNum]) {
+		camera.shakeOffset = { 0,0 };
+		camera.shakeCount = 0;
+		camera.nowModeShake = ModeCameraShake::Standby;
+	}
 }
 
 #pragma endregion
@@ -712,6 +751,7 @@ void UpdateStage(void) {
 	MoveCameraPos();
 	ClampCameraPos();
 	MoveCameraZoom();
+	MoveCameraShake();
 
 	//背景関係
 	UpdateBackGround();
@@ -751,7 +791,7 @@ void GetMovablePos(Vector2 pos[2]) {
 }
 
 Vector2 GetCameraPos(void) {
-	return camera.pos;
+	return {camera.pos.x + camera.shakeOffset.x, camera.pos.y + camera.shakeOffset.y };
 }
 
 float GetCameraZoom(void) {
@@ -773,6 +813,13 @@ void ChangeModeCameraZoom(ModeCameraZoom nextMode) {
 		camera.zoomEasingT = 0.0f;
 
 		break;
+	}
+}
+
+void ChangeModeCameraShake(ModeCameraShake nextMode) {
+	if (ToInt(nextMode) >= ToInt(camera.nowModeShake)) {
+		camera.nowModeShake = nextMode;
+		camera.shakeCount = 0;
 	}
 }
 

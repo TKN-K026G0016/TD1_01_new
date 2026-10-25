@@ -8,6 +8,16 @@ enum class ModeCameraZoom {
 	ZoomOut,
 };
 
+enum class ModeCameraShake {
+	Standby,
+
+	S,
+	M,
+	L,
+
+	Count
+};
+
 enum class ModeStartEffect {
 	//プレイヤーの生成を待つ処理
 	WaitPlayerSpawn,
@@ -55,6 +65,12 @@ float GetCameraZoom(void);
 /// </summary>
 /// <param name="nextMode">次の状態</param>
 void ChangeModeCameraZoom(ModeCameraZoom nextMode);
+
+/// <summary>
+/// カメラの振動状態変更
+/// </summary>
+/// <param name="nextMode">次の状態</param>
+void ChangeModeCameraShake(ModeCameraShake nextMode);
 
 /// <summary>
 /// 現在の時間を取得

@@ -30,10 +30,10 @@ struct Logo {
 	Vector2 hitVertex[4] = {};
 
 	//振動関係
-	int shakeDuration = 1;
+	int shakeAmp = 1;
 	Timer shakeTimer = { 10, 0 };
 	//<ヒット演出>
-	int shakeDurationHit = 8;
+	int shakeAmpHit = 14;
 	Timer hitTimer = { 20, 0 };
 
 	unsigned int lightOutColor = 0x222222FF;
@@ -356,16 +356,16 @@ static void DrawLogo(void) {
 	Vector2 showPos = logo.pos;
 
 	if (logo.hitTimer.count > 0) {
-		showPos.x += GetRand(-logo.shakeDurationHit, logo.shakeDurationHit);
-		showPos.y += GetRand(-logo.shakeDurationHit, logo.shakeDurationHit);
+		showPos.x += GetRand(-logo.shakeAmpHit, logo.shakeAmpHit);
+		showPos.y += GetRand(-logo.shakeAmpHit, logo.shakeAmpHit);
 	}
 	else if (nowMode == ModeTitle::Recommend || nowMode == ModeTitle::MovePlayer) {
 		logo.shakeTimer.count++;
 		if (logo.shakeTimer.count >= logo.shakeTimer.time) {
 			logo.shakeTimer.count = 0;
 
-			showPos.x += GetRand(-logo.shakeDuration, logo.shakeDuration);
-			showPos.y += GetRand(-logo.shakeDuration, logo.shakeDuration);
+			showPos.x += GetRand(-logo.shakeAmp, logo.shakeAmp);
+			showPos.y += GetRand(-logo.shakeAmp, logo.shakeAmp);
 		}
 	}
 
