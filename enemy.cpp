@@ -1623,6 +1623,7 @@ void SpawnEnemy(Vector2 pos, EnemyType type) {
 		break;
 	}
 	case EnemyType::EnemySniper: {
+		if (pos.x < 0 || pos.x>2560 || pos.y < 0 || pos.y>1440)break;
 		for (int i = 0; i < kEnemySniperLimit; i++) {
 			if (enemySniper[i].isAlive) continue;
 			enemySniper[i].isAlive = true;
