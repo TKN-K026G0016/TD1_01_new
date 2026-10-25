@@ -76,6 +76,50 @@ GageEffect gageEffect[KGageEffectNumber];
 
 #pragma endregion
 
+#pragma region データ: ShootLaserEffect
+
+static constexpr int kShootLaserEffectLimit = 30;
+
+//生成時のブレ度合い
+static constexpr int kShootLaserEffectSpreadTheta = 15;
+//初速度の範囲
+static constexpr int kShootLaserEffectFirstSpeedRange[2] = { 25, 40 };
+
+//初速度
+static constexpr float kShootLaserEffectFistSpped = 20.0f;
+//shootLaserEffectの重力の強さ
+static constexpr float kShootLaserEffectGravity = 0.03f;
+
+struct ShootLaserEffect {
+	Vector2 pos = { };
+	Vector2 size = { 12,12 };
+
+	bool isShoot = false;
+
+	//移動関係
+	//Vector2 velocity = {};
+	float moveSpeed = 0.0f;
+	float moveTheta = 0.0f;
+
+	//<回転関係>
+	float rotateTheta = 0.0f;
+	float rotateSpeed = ToFloat(M_PI) / 14.0f;
+
+
+	//<イージング関係>
+	float easingT = 0.0f;
+	float easingSpeed = 0.08f;
+	EasingMode easingMode = EasingMode::EaseIn;
+
+	//<不透明度>
+	int alpha = kAlphaMax;
+
+	unsigned int color = kEnemyColor;
+};
+ShootLaserEffect shootLaserEffect[kShootLaserEffectLimit];
+
+#pragma endregion
+
 #pragma region データ: 煙エフェクト
 //煙エフェクトの数
 static constexpr int kSmokeEffectLimit = 10;
@@ -789,6 +833,75 @@ void DrawGageEffect() {
 
 	}
 }
+#pragma endregion
+
+#pragma region 関数: ShootLaserEffect
+
+static void InitShootLaserEffect(void) {
+	for (int i = 0; i < kShootLaserEffectLimit; i++) {
+		shootLaserEffect[i] = {};
+	}
+}
+
+static void UpdateShootLaserEffect(void) {
+	for (int i = 0; i < kShootLaserEffectLimit; i++) {
+		if (!shootLaserEffect[i].isShoot) continue;
+		//移動処理
+		shootLaserEffect[i].moveSpeed -= kShootLaserEffectGravity;
+		if (shootLaserEffect[i].moveSpeed < 0.0f) {
+			shootLaserEffect[i].moveSpeed = 0.0f;
+		}
+
+		shootLaserEffect[i].pos.x += cosf(shootLaserEffect[i].moveTheta) * shootLaserEffect[i].moveSpeed;
+		shootLaserEffect[i].pos.y += sinf(shootLaserEffect[i].moveTheta) * shootLaserEffect[i].moveSpeed;
+
+		//回転処理
+		shootLaserEffect[i].rotateTheta += shootLaserEffect[i].rotateSpeed;
+
+		//透明化処理
+		shootLaserEffect[i].easingT += shootLaserEffect[i].easingSpeed;
+		if (shootLaserEffect[i].easingT >= 1.0f) {
+			shootLaserEffect[i].easingT = 1.0f;
+			shootLaserEffect[i].isShoot = false;
+		}
+
+		shootLaserEffect[i].alpha = UpdateValueByEasing(kAlphaMax, kAlphaMin, shootLaserEffect[i].easingT, shootLaserEffect[i].easingMode);
+	}
+}
+
+
+static void DrawShootLaserEffect(void) {
+	for (int i = 0; i < kShootLaserEffectLimit; i++) {
+		if (!shootLaserEffect[i].isShoot) continue;
+
+		Texture texture = whiteBoxTexture;
+		texture.color = (shootLaserEffect[i].color & 0xFFFFFF00) | shootLaserEffect[i].alpha;
+		DrawTextureRotateObj(texture, shootLaserEffect[i].pos, shootLaserEffect[i].size, shootLaserEffect[i].rotateTheta);
+	}
+}
+
+void CreateShootLaserEffect(Vector2 pos, float shootTheta) {
+	for (int i = 0; i < kShootLaserEffectLimit; i++) {
+		if (shootLaserEffect[i].isShoot) continue;
+
+		shootLaserEffect[i].isShoot = true;
+		shootLaserEffect[i].pos = pos;
+
+		//角度設定
+		float spreadTheta = ToFloat(GetRand(-kShootLaserEffectSpreadTheta, kShootLaserEffectSpreadTheta)) * ToFloat(M_PI) / 180.0f;
+		shootLaserEffect[i].moveTheta = shootTheta + spreadTheta;
+
+		//初速度設定
+		float speed = ToFloat(GetRand(kShootLaserEffectFirstSpeedRange[0], kShootLaserEffectFirstSpeedRange[1]));
+		shootLaserEffect[i].moveSpeed = speed;
+
+		//初期化
+		shootLaserEffect[i].easingT = 0.0f;
+
+		break;
+	}
+}
+
 #pragma endregion
 
 #pragma region 関数: smokeEffect
@@ -2224,11 +2337,9 @@ void InitEffect() {
 	InitGemEffect();
 
 	InitGageEffect();
+	InitShootLaserEffect();
 
 	InitSmokeEffect();
-
-	//InitElecShockEffect();
-	//InitElecShockChargedEffect();
 
 	InitChargeOrbEffect();
 	InitChargeChipEffect();
@@ -2264,9 +2375,8 @@ void UpdateEffect() {
 
 	UpdateGemEffect();
 	UodateGageEffect();
+	UpdateShootLaserEffect();
 	UpdateSmokeEffect();
-	//UpdateElecShockEffect();
-	//UpdateElecShockChargedEffect();
 	UpdateChargeOrbEffect();
 	UpdateChargeChipEffect();
 	UpdateExplodeEffect();
@@ -2286,8 +2396,8 @@ void DrawEffect() {
 	DrawGetEffect();
 
 	DrawSmokeEffect();
-	//DrawElecShockEffect();
-	//DrawElecShockChargedEffect();
+	DrawShootLaserEffect();
+
 	DrawChargeOrbEffect();
 	DrawChargeChipEffect();
 	DrawExplodeEffect();

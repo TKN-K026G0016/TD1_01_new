@@ -27,6 +27,13 @@ void CreateJemEffect();
 void CreateGageEffect(Vector2 pos, unsigned int color);
 
 /// <summary>
+/// レーザー射撃エフェクトの生成処理
+/// </summary>
+/// <param name="pos">生成位置</param>
+/// <param name="shootTheta">射撃方向</param>
+void CreateShootLaserEffect(Vector2 pos, float shootTheta);
+
+/// <summary>
 /// 煙エフェクトの生成処理
 /// </summary>
 /// <param name="pos">生成座標</param>
