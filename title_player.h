@@ -9,4 +9,6 @@ Vector2 GetTitlePlayerPos();
 
 Vector2 GetTitlePlayerShootPos();
 
+float GetTitlePlayerEasingT(void);
+
 void NoticeTitlePlayerGameStart(void);

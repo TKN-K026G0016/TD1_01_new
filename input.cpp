@@ -3,6 +3,7 @@
 #include "timer.h"
 #include "tool.h"
 #include "se.h"
+#include "title.h"
 
 #include <Novice.h>
 #include <algorithm>
@@ -210,9 +211,16 @@ static void UpdateViberation(void) {
 
 #pragma endregion
 
-/// <summary>
-/// 入力状況の更新
-/// </summary>
+
+void InitInput(void) {
+
+	//ゲーム開始時にゲームパッドが接続されていなければ、Recommend起動
+	CheckConnectGamePad();
+	if (!isConnectGamePad) {
+		TriggerTitleRecommend();
+	}
+}
+
 void UpdateInput(void) {
 	//キーボード
 	memcpy(preKeys, keys, 256);

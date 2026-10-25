@@ -1,4 +1,5 @@
 #include "title_player.h"
+#include "title.h"
 #include "elec_bullet.h"
 #include "effect.h"
 #include "se.h"
@@ -27,7 +28,7 @@ struct TitlePlayer {
 	float rotateTheta = ToFloat(M_PI) / 2.0f;
 
 	//最初の移動を開始するまでの時間
-	Timer waitMoveStartTimer = { 10, 0 };
+	Timer waitMoveStartTimer = { 20, 0 };
 
 	//最初の移動演出
 	float easingT = 0.0f;
@@ -115,6 +116,8 @@ static void ClampPlayerPos(void) {
 
 static void ShootElecBullet(void) {
 
+	if (GetNowModeTitle() == ModeTitle::Recommend) return;
+
 #pragma region 射撃位置設定
 	shootPos.x = player.pos.x + kShootDisLength * cosf(player.rotateTheta);
 	shootPos.y = player.pos.y + kShootDisLength * sinf(player.rotateTheta);
@@ -182,6 +185,7 @@ static void CreateChargeOrbEffect(void) {
 }
 
 static void MovePlayerFirst(void) {
+	if (GetNowModeTitle() == ModeTitle::Recommend) return;
 	if (player.easingT >= 1.0f) return;
 
 	player.waitMoveStartTimer.count++;
@@ -222,6 +226,10 @@ Vector2 GetTitlePlayerPos() {
 
 Vector2 GetTitlePlayerShootPos() {
 	return shootPos;
+}
+
+float GetTitlePlayerEasingT(void) {
+	return player.easingT;
 }
 
 void NoticeTitlePlayerGameStart(void) {

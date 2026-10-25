@@ -17,12 +17,7 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 
-enum class ModeTitle {
-	MovePlayer,
-	TriggerLightUp,
-	WaitInput,
-};
-ModeTitle nowMode = ModeTitle::MovePlayer;
+static ModeTitle nowMode = ModeTitle::MovePlayer;
 
 #pragma region データ: ロゴ
 
@@ -90,8 +85,6 @@ struct TitleInst {
 	float easingSpeedStart = 0.03f;
 	EasingMode easingMode = EasingMode::EaseInOut;
 	float isFadeIn = true;
-
-	Timer waitEasingTimer = { 100, 0 };
 
 	//透明度
 	int alpha = 0;
@@ -190,6 +183,35 @@ static constexpr float lightOutVolume = 0.2f;
 
 #pragma endregion
 
+#pragma region データ: Recommend
+
+struct RecommendIcon {
+	Vector2 pos = {};
+	Vector2 size = { 1024, 512 };
+
+	bool oncePushed = false;
+
+	//<イージング関係>
+	float easingT = 0.0f;
+	float easingSpeed = 0.02f;
+	float easingSpeedFrameOut = 0.05f;
+	EasingMode easingMode = EasingMode::EaseOut;
+
+	//最初の座標
+	Vector2 standbyPos = { 640, 1000 };
+	Vector2 showPos = { 640, 450 };
+
+	//透明度
+	int alpha = 0;
+	int alphaMin = 0;
+	int alphaMax = 255;
+
+	Texture texture = {};
+};
+RecommendIcon recommendIcon;
+
+#pragma endregion
+
 #pragma region 関数: 項目決定
 
 static void ChangeMode(void) {
@@ -221,7 +243,7 @@ static void ChangeMode(void) {
 
 #pragma endregion
 
-#pragma region ロゴ・インスト関係
+#pragma region 関数: ロゴ・インスト関係
 
 static void InitLogo(void) {
 	logo = {};
@@ -318,7 +340,7 @@ static void DrawLogo(void) {
 		showPos.x += GetRand(-logo.shakeDurationHit, logo.shakeDurationHit);
 		showPos.y += GetRand(-logo.shakeDurationHit, logo.shakeDurationHit);
 	}
-	else if (nowMode != ModeTitle::MovePlayer) {
+	else if (nowMode == ModeTitle::Recommend || nowMode == ModeTitle::MovePlayer) {
 		logo.shakeTimer.count++;
 		if (logo.shakeTimer.count >= logo.shakeTimer.time) {
 			logo.shakeTimer.count = 0;
@@ -330,7 +352,7 @@ static void DrawLogo(void) {
 
 	//colorの変更
 	Texture texture = logo.texture;
-	if (nowMode == ModeTitle::MovePlayer) {
+	if (nowMode == ModeTitle::Recommend || nowMode == ModeTitle::MovePlayer) {
 		texture.color = logo.lightOutColor;
 	}
 
@@ -349,11 +371,8 @@ static void InitInst(void) {
 
 static void UpdateInst(void) {
 
-	if (instShot.waitEasingTimer.count < instShot.waitEasingTimer.time) {
-		instShot.waitEasingTimer.count++;
-
-		return;
-	}
+	//TitlePlayerが到着していなければスキップ
+	if (GetTitlePlayerEasingT() < 1.0f) return;
 
 #pragma region instShotの処理
 	if (nowMode == ModeTitle::MovePlayer) {
@@ -589,7 +608,7 @@ static void UpdateButton(void) {
 #pragma endregion
 
 #pragma region 残像の処理
-	if (nowMode == ModeTitle::MovePlayer) return;
+	if (nowMode == ModeTitle::Recommend || nowMode == ModeTitle::MovePlayer) return;
 
 #pragma region CreditsButton
 	if (creditsButton.isScaleUp) {
@@ -650,7 +669,7 @@ static void DrawButton(void) {
 
 	//colorの変更
 	texture = creditsButton.texture;
-	if (nowMode == ModeTitle::MovePlayer) {
+	if (nowMode == ModeTitle::Recommend || nowMode == ModeTitle::MovePlayer) {
 		texture.color = creditsButton.lightOutColor;
 	}
 
@@ -670,7 +689,7 @@ static void DrawButton(void) {
 
 	//colorの変更
 	texture = resetButton.texture;
-	if (nowMode == ModeTitle::MovePlayer) {
+	if (nowMode == ModeTitle::Recommend || nowMode == ModeTitle::MovePlayer) {
 		texture.color = resetButton.lightOutColor;
 	}
 
@@ -682,7 +701,7 @@ static void DrawButton(void) {
 
 #pragma endregion
 
-#pragma region 暗転パネル
+#pragma region 関数: 暗転パネル
 
 static void InitBlackPanel(void) {
 	blackPanel = {};
@@ -744,6 +763,60 @@ static void DrawFlashPanel(void) {
 
 #pragma endregion
 
+#pragma region 関数: Recommend関係
+
+static void InitRecommend(void) {
+	recommendIcon = {};
+	recommendIcon.texture = GetTexture(TextureType::White1x1);
+}
+
+static void UpdateRecommend(void) {
+	if (nowMode != ModeTitle::Recommend) return;
+
+#pragma region ボタン入力
+
+	if (!recommendIcon.oncePushed) {
+		if (CheckInputAction(InputAction::Confirm)) {
+			recommendIcon.oncePushed = true;
+			PlaySe(SeType::Confirm);
+		}
+	}
+
+#pragma endregion
+
+#pragma region アイコンの移動処理
+	if (!recommendIcon.oncePushed) {
+		if (recommendIcon.easingT >= 1.0f) return;
+
+		recommendIcon.easingT += recommendIcon.easingSpeed;
+		if (recommendIcon.easingT >= 1.0f) {
+			recommendIcon.easingT = 1.0f;
+		}
+	} 
+	else {
+		recommendIcon.easingT -= recommendIcon.easingSpeedFrameOut;
+		if (recommendIcon.easingT <= 0.0f) {
+			recommendIcon.easingT = 0.0f;
+			nowMode = ModeTitle::MovePlayer;
+		}
+	}
+
+	recommendIcon.pos = MoveByEasing(recommendIcon.standbyPos, recommendIcon.showPos, recommendIcon.easingT, recommendIcon.easingMode);
+	recommendIcon.alpha = UpdateValueByEasing(recommendIcon.alphaMin, recommendIcon.alphaMax, recommendIcon.easingT, recommendIcon.easingMode);
+
+#pragma endregion
+}
+
+static void DrawRecommend(void) {
+	if (nowMode != ModeTitle::Recommend) return;
+
+	Texture texture = recommendIcon.texture;
+	texture.color = (texture.color & 0xFFFFFF00) | recommendIcon.alpha;
+	DrawTextureUI(texture, recommendIcon.pos, recommendIcon.size);
+}
+
+#pragma endregion
+
 #pragma region 関数: Bgm関係
 
 static void InitTitleBgm(void) {
@@ -754,10 +827,14 @@ static void InitTitleBgm(void) {
 #pragma endregion
 
 void InitTitle(void) {
-	nowMode = ModeTitle::MovePlayer;
+	if (nowMode != ModeTitle::Recommend) {
+		nowMode = ModeTitle::MovePlayer;
+	}
 	InitTitleBgm();
 
 	InitTitleBackground();
+
+	InitRecommend();
 
 	InitTitlePlayer();
 	InitElecBullet();
@@ -775,6 +852,8 @@ void UpdateTitle(void) {
 	UpdateTitlePlayer();
 	UpdateElecBullet();
 	UpdateEffect();
+
+	UpdateRecommend();
 
 	UpdateLogo();
 	UpdateInst();
@@ -796,7 +875,20 @@ void DrawTitle(void) {
 	DrawInst();
 	DrawButton();
 
+	DrawRecommend();
+
 	DrawFlashPanel();
 	DrawEffect();
 }
 
+#pragma region 関数: 外部参照
+
+void TriggerTitleRecommend(void) {
+	nowMode = ModeTitle::Recommend;
+}
+
+ModeTitle GetNowModeTitle(void) {
+	return nowMode;
+}
+
+#pragma endregion

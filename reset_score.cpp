@@ -20,7 +20,7 @@ enum class ModeResetScore {
 	Select,
 	AfterReset,
 };
-ModeResetScore nowMode = ModeResetScore::Select;
+static ModeResetScore nowMode = ModeResetScore::Select;
 
 //現在の選択状態
 enum class ModeResetScoreSelect {

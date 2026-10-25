@@ -21,7 +21,7 @@ enum class ModeClear {
 	CheckBreakScore,
 	Select,
 };
-ModeClear nowMode = ModeClear::IconFrameIn;
+static ModeClear nowMode = ModeClear::IconFrameIn;
 
 #pragma region データ: ステージクリアアイコン
 

@@ -35,6 +35,7 @@ enum class ModeViberation {
 	Count
 };
 
+void InitInput(void);
 void UpdateInput(void);
 bool CheckInputAction(InputAction action);
 bool GetIsConnectGamePad(void);

@@ -23,7 +23,7 @@ enum class ModeGameover {
 	//項目選択状態
 	Select
 };
-ModeGameover nowMode = ModeGameover::PanelFadeIn;
+static ModeGameover nowMode = ModeGameover::PanelFadeIn;
 
 #pragma region データ: カバーパネル
 
