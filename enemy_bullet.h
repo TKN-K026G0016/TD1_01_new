@@ -22,9 +22,18 @@ struct EnemyBullet {
 	Texture texture = {};
 };
 
-struct EnemyLaser {
+enum class TypeEnemyLaser {
+	//通常タイプ
+	Normal,
+	//模擬弾
+	Dummy,
+};
+
+struct EnemyLaser{
 	Vector2 pos = { 0, 0 };
 	Vector2 size = { 60, 90 };
+
+	TypeEnemyLaser type = TypeEnemyLaser::Normal;
 
 	//<移動関係>
 	float moveSpeed = 20.0f;
@@ -62,7 +71,14 @@ EnemyBullet* GetEnemyBulletArray(void);
 
 int GetEnemyBulletLimit(void);
 
-void ShootEnemyLaser(Vector2 pos, float moveTheta, float firstDisLength);
+/// <summary>
+/// Laserの射撃処理
+/// </summary>
+/// <param name="pos"生成座標></param>
+/// <param name="moveTheta">射撃方向</param>
+/// <param name="firstDisLength">発射元との距離</param>
+/// <param name="type">種類(実弾/模擬弾)</param>
+void ShootEnemyLaser(Vector2 pos, float moveTheta, float firstDisLength, TypeEnemyLaser type);
 
 EnemyLaser* GetEnemyLaserArray(void);
 

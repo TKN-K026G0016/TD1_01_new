@@ -13,6 +13,8 @@ static EnemyBullet enemyBullet[kEnemyBulletLimit];
 
 static constexpr int kEnemyLaserLimit = 100;
 static EnemyLaser enemyLaser[kEnemyLaserLimit];
+//模擬弾レーザー不透明度
+static constexpr int kDummyLaserAlpha = 80;
 
 #pragma region 関数: enemyBullet
 
@@ -31,7 +33,6 @@ static void MoveEnemyBullet(void) {
 /// <summary>
 /// 自壊タイマーのカウント処理
 /// </summary>
-/// <param name=""></param>
 static void BreakEnemyBulletItSelf(void) {
 	for (int i = 0; i < kEnemyBulletLimit; i++) {
 		if (!enemyBullet[i].isShoot) {
@@ -45,12 +46,23 @@ static void BreakEnemyBulletItSelf(void) {
 	}
 }
 
+/// <summary>
+/// enemyBulletの描画処理
+/// </summary>
+static void DrawBullet(void) {
+	for (int i = 0; i < kEnemyBulletLimit; i++) {
+		if (!enemyBullet[i].isShoot) continue;
+
+		DrawTextureObj(enemyBullet[i].texture, enemyBullet[i].pos, enemyBullet[i].size);
+	}
+}
+
 #pragma endregion
 
 #pragma region 関数: enemyLaser
 
 /// <summary>
-/// 移動処理
+/// Laserの移動処理
 /// </summary>
 static void MoveEnemyLaser(void) {
 	Vector2 bossPos = GetBossEnemyPos();
@@ -70,12 +82,17 @@ static void MoveEnemyLaser(void) {
 	}
 }
 
+/// <summary>
+/// Laserの当たり判定更新処理
+/// </summary>
+/// <param name=""></param>
 static void UpdateEnemyLaserHitVertex(void) {
 	for (int i = 0; i < kEnemyLaserLimit; i++) {
 		if (!enemyLaser[i].isShoot) continue;
+		//模擬弾の場合はスキップ
+		if (enemyLaser[i].type == TypeEnemyLaser::Dummy) continue;
 
 		SetVertexRotate(enemyLaser[i].pos, enemyLaser[i].size, enemyLaser[i].hitBoxVertex, enemyLaser[i].rotateTheta);
-
 	}
 }
 
@@ -93,6 +110,23 @@ static void BreakLaserItSelf(void) {
 		if (enemyLaser[i].breakTimer.count >= enemyLaser[i].breakTimer.time) {
 			BreakEnemyLaser(i);
 		}
+	}
+}
+
+/// <summary>
+/// enemyLaserの描画処理
+/// </summary>
+static void DrawLaser(void) {
+	for (int i = 0; i < kEnemyLaserLimit; i++) {
+		if (!enemyLaser[i].isShoot) continue;
+
+		Texture texture = enemyLaser[i].texture;
+		if (enemyLaser[i].type == TypeEnemyLaser::Dummy) {
+			texture.color = (texture.color & 0xFFFFFF00) | kDummyLaserAlpha;
+		}
+
+		DrawTextureRotateObj(texture, enemyLaser[i].pos, enemyLaser[i].size, enemyLaser[i].rotateTheta);
+
 	}
 }
 
@@ -122,18 +156,8 @@ void UpdateEnemyBullet(void) {
 }
 
 void DrawEnemyBullet(void) {
-	for (int i = 0; i < kEnemyBulletLimit; i++) {
-		if (!enemyBullet[i].isShoot) continue;
-
-		DrawTextureObj(enemyBullet[i].texture, enemyBullet[i].pos, enemyBullet[i].size);
-	}
-
-	for (int i = 0; i < kEnemyLaserLimit; i++) {
-		if (!enemyLaser[i].isShoot) continue;
-
-		DrawTextureRotateObj(enemyLaser[i].texture, enemyLaser[i].pos, enemyLaser[i].size, enemyLaser[i].rotateTheta);
-		
-	}
+	DrawBullet();
+	DrawLaser();
 }
 
 #pragma region 関数: 外部参照関係
@@ -163,11 +187,12 @@ void BreakEnemyBullet(int index) {
 	enemyBullet[index].breakTimer.count = 0;
 }
 
-void ShootEnemyLaser(Vector2 pos, float moveTheta, float firstDisLength) {;
+void ShootEnemyLaser(Vector2 pos, float moveTheta, float firstDisLength, TypeEnemyLaser type) {;
 	for (int i = 0; i < kEnemyLaserLimit; i++) {
 		if (enemyLaser[i].isShoot) continue;
 
 		enemyLaser[i].isShoot = true;
+		enemyLaser[i].type = type;
 
 		enemyLaser[i].pos = pos;
 		enemyLaser[i].rotateTheta = moveTheta;
