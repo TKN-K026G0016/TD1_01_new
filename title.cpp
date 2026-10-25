@@ -208,7 +208,24 @@ struct RecommendIcon {
 
 	Texture texture = {};
 };
-RecommendIcon recommendIcon;
+static RecommendIcon recommendIcon;
+
+struct ButtonGuide {
+	Vector2 pos = {1180, 100};
+	Vector2 size = { 128, 128 };
+
+	//座標
+	Vector2 standbyPos = { 1400, 100 };
+	Vector2 showPos = { 1180, 100 };
+
+	//透明度
+	int alpha = 0;
+	int alphaMin = 0;
+	int alphaMax = 255;
+
+	Texture texture = {};
+};
+static ButtonGuide buttonGuide;
 
 #pragma endregion
 
@@ -816,6 +833,25 @@ static void DrawRecommend(void) {
 	DrawTextureUI(texture, recommendIcon.pos, recommendIcon.size);
 }
 
+static void InitButtonIcon(void) {
+	buttonGuide = {};
+	buttonGuide.texture = GetTexture(TextureType::White1x1);
+}
+
+static void UpdateButtonIcon(void) {
+	buttonGuide.pos = MoveByEasing(buttonGuide.standbyPos, buttonGuide.showPos, recommendIcon.easingT, recommendIcon.easingMode);
+	buttonGuide.alpha = UpdateValueByEasing(buttonGuide.alphaMin, buttonGuide.alphaMax, recommendIcon.easingT, recommendIcon.easingMode);
+}
+
+static void DrawButtonIcon(void) {
+	if (nowMode != ModeTitle::Recommend) return;
+
+	Texture texture = buttonGuide.texture;
+	texture.color = (texture.color & 0xFFFFFF00) | buttonGuide.alpha;
+
+	DrawTextureUI(texture, buttonGuide.pos, buttonGuide.size);
+}
+
 #pragma endregion
 
 #pragma region 関数: Bgm関係
@@ -836,6 +872,7 @@ void InitTitle(void) {
 	InitTitleBackground();
 
 	InitRecommend();
+	InitButtonIcon();
 
 	InitTitlePlayer();
 	InitElecBullet();
@@ -855,6 +892,7 @@ void UpdateTitle(void) {
 	UpdateEffect();
 
 	UpdateRecommend();
+	UpdateButtonIcon();
 
 	UpdateLogo();
 	UpdateInst();
@@ -877,6 +915,7 @@ void DrawTitle(void) {
 	DrawButton();
 
 	DrawRecommend();
+	DrawButtonIcon();
 
 	DrawFlashPanel();
 	DrawEffect();
