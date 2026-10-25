@@ -215,15 +215,16 @@ struct ButtonGuide {
 	Vector2 size = { 128, 128 };
 
 	//座標
-	Vector2 standbyPos = { 1400, 100 };
-	Vector2 showPos = { 1180, 100 };
+	Vector2 standbyPos = { 1400, 70 };
+	Vector2 showPos = { 1180, 70 };
 
 	//透明度
 	int alpha = 0;
 	int alphaMin = 0;
 	int alphaMax = 255;
 
-	Texture texture = {};
+	Texture textureKeyboard = {};
+	Texture textureGamepad = {};
 };
 static ButtonGuide buttonGuide;
 
@@ -833,20 +834,28 @@ static void DrawRecommend(void) {
 	DrawTextureUI(texture, recommendIcon.pos, recommendIcon.size);
 }
 
+
 static void InitButtonIcon(void) {
 	buttonGuide = {};
-	buttonGuide.texture = GetTexture(TextureType::White1x1);
+	buttonGuide.textureKeyboard = GetTexture(TextureType::ButtonGuideKeyboard);
+	buttonGuide.textureGamepad = GetTexture(TextureType::ButtonGuideGamepad);
 }
 
 static void UpdateButtonIcon(void) {
 	buttonGuide.pos = MoveByEasing(buttonGuide.standbyPos, buttonGuide.showPos, recommendIcon.easingT, recommendIcon.easingMode);
 	buttonGuide.alpha = UpdateValueByEasing(buttonGuide.alphaMin, buttonGuide.alphaMax, recommendIcon.easingT, recommendIcon.easingMode);
+
+	//アニメーション処理
+	if (recommendIcon.oncePushed) {
+		UpdateAnimation(buttonGuide.textureKeyboard);
+		UpdateAnimation(buttonGuide.textureGamepad);
+	}
 }
 
 static void DrawButtonIcon(void) {
 	if (nowMode != ModeTitle::Recommend) return;
 
-	Texture texture = buttonGuide.texture;
+	Texture texture = (GetIsConnectGamePad()) ? buttonGuide.textureGamepad : buttonGuide.textureKeyboard;
 	texture.color = (texture.color & 0xFFFFFF00) | buttonGuide.alpha;
 
 	DrawTextureUI(texture, buttonGuide.pos, buttonGuide.size);

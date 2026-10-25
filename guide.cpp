@@ -14,6 +14,8 @@ float easingT = 0.0f;
 float easingSpeed = 0.01f;
 EasingMode easingMode = EasingMode::EaseInOut;
 
+static bool oncePushed = false;
+
 //透明度関係
 constexpr int alphaMin = 0;
 constexpr int alphaMax = 255;
@@ -63,6 +65,28 @@ struct EnergyGauge {
 	Texture meterTexture = {};
 };
 EnergyGauge energyGauge;
+
+#pragma endregion
+
+#pragma region データ: ボタンガイド
+struct ButtonGuide {
+	Vector2 pos = { 1180, 100 };
+	Vector2 size = { 128, 128 };
+
+	//座標
+	Vector2 standbyPos = { 1400, 70 };
+	Vector2 showPos = { 1180, 70 };
+
+	//透明度
+	int alpha = 0;
+	int alphaMin = 0;
+	int alphaMax = 255;
+
+	Texture textureKeyboard = {};
+	Texture textureGamepad = {};
+};
+static ButtonGuide buttonGuide;
+
 
 #pragma endregion
 
@@ -166,6 +190,34 @@ static void DrawControllerGuide(void) {
 
 #pragma endregion
 
+#pragma region 関数: ボタンガイド
+
+static void InitButtonIcon(void) {
+	buttonGuide = {};
+	buttonGuide.textureKeyboard = GetTexture(TextureType::ButtonGuideKeyboard);
+	buttonGuide.textureGamepad = GetTexture(TextureType::ButtonGuideGamepad);
+}
+
+static void UpdateButtonIcon(void) {
+	buttonGuide.pos = MoveByEasing(buttonGuide.standbyPos, buttonGuide.showPos, easingT, easingMode);
+	buttonGuide.alpha = UpdateValueByEasing(buttonGuide.alphaMin, buttonGuide.alphaMax, easingT, easingMode);
+
+	//アニメーション処理
+	if (oncePushed) {
+		UpdateAnimation(buttonGuide.textureKeyboard);
+		UpdateAnimation(buttonGuide.textureGamepad);
+	}
+}
+
+static void DrawButtonIcon(void) {
+	Texture texture = (GetIsConnectGamePad()) ? buttonGuide.textureGamepad : buttonGuide.textureKeyboard;
+	texture.color = (texture.color & 0xFFFFFF00) | buttonGuide.alpha;
+
+	DrawTextureUI(texture, buttonGuide.pos, buttonGuide.size);
+}
+
+#pragma endregion
+
 #pragma region 関数: 決定処理
 
 static void Confirm(void) {
@@ -183,14 +235,18 @@ static void Confirm(void) {
 		ChangeFadeTarget(FadeTarget::Play);
 
 		PlaySe(SeType::Confirm);
+		oncePushed = true;
 	}
 }
 
 #pragma endregion
 
 void InitGuide(void) {
+	oncePushed = false;
+
 	InitTitleBackground();
 	InitControllerGuide();
+	InitButtonIcon();
 }
 
 void UpdateGuide(void) {
@@ -198,9 +254,11 @@ void UpdateGuide(void) {
 
 	UpdateTitleBackground();
 	UpdateControllerGuide();
+	UpdateButtonIcon();
 }
 
 void DrawGuide(void) {
 	DrawTitleBackground();
 	DrawControllerGuide();
+	DrawButtonIcon();
 }

@@ -23,10 +23,14 @@ void InitTexture(void) {
 		//Menu
 		//===============
 		{ Novice::LoadTexture("./resources/texture/ui/menu/menu_background.png"), { 1280, 720 }, {0, 0}, 0, 0, WHITE },
+
 		{ Novice::LoadTexture("./resources/texture/ui/menu/resume_button2.png"), { 256, 64 }, {0, 0}, 0, 0, WHITE },
 		{ Novice::LoadTexture("./resources/texture/ui/menu/retry_button2.png"), { 256, 64 }, {0, 0}, 0, 0, WHITE },
 		{ Novice::LoadTexture("./resources/texture/ui/menu/exit_button2.png"), { 256, 64 }, {0, 0}, 0, 0, WHITE },
 		{ Novice::LoadTexture("./resources/texture/ui/menu/menu_cursor.png"), { 64, 64 }, {0, 0}, 0, 0, WHITE },
+
+		{ Novice::LoadTexture("./resources/texture/ui/menu/button_guide_keyboard.png"), { 128, 128 }, {2, 0}, 3, 0, WHITE },
+		{ Novice::LoadTexture("./resources/texture/ui/menu/button_guide_gamepad.png"), { 128, 128 }, {12, 0}, 3, 0, WHITE },
 
 		//===============
 		//Title

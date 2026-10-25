@@ -31,10 +31,14 @@ enum class TextureType {
 	//Menu
 	//===============
 	MenuBackground,
+
 	ResumeIcon,
 	RetryIcon,
 	ExitIcon,
 	MenuCursor,
+
+	ButtonGuideKeyboard,
+	ButtonGuideGamepad,
 
 	//===============
 	//Title
