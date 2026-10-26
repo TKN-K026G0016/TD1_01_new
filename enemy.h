@@ -40,10 +40,10 @@ struct EnemyShooter {
 	//生存フラグ
 	bool isAlive = false;
 
-	int hp = 45;
+	int hp = 0;
 
 	//<射撃処理関係>
-	Timer shootTimer = { 300, 0 };
+	Timer shootTimer = {};
 
 	//ショックの生成無視状態
 	bool isIgnoreShock = false;
@@ -85,10 +85,10 @@ struct EnemyGuardian {
 	//生存フラグ
 	bool isAlive = false;
 
-	int hp = 60;
+	int hp = 0;
 
 	//<射撃処理関係>
-	Timer shootTimer = { 75, 0 };
+	Timer shootTimer = {};
 
 	//ショックの生成無視状態
 	bool isIgnoreShock = false;
@@ -117,7 +117,7 @@ struct EnemyBasic {
 	//生存フラグ
 	bool isAlive = false;
 
-	int hp = 20;
+	int hp = 0;
 
 	//移動関係
 	float moveTheta = 0;
@@ -154,10 +154,10 @@ struct EnemyM {
 	//生存フラグ
 	bool isAlive = false;
 
-	int hp = 60;
+	int hp = 0;
 
 	//<射撃処理関係>
-	Timer shootTimer = { 30, 0 };
+	Timer shootTimer = {};
 
 	//ショックの生成無視状態
 	bool isIgnoreShock = false;
@@ -186,7 +186,7 @@ struct EnemySmall {
 	//生存フラグ
 	bool isAlive = false;
 
-	int hp = 5;
+	int hp = 0;
 
 	//<移動関係>
 	//速度
@@ -228,7 +228,7 @@ struct EnemyBomb {
 	//<生存関係>
 	bool isAlive = false;
 
-	int hp = 60;
+	int hp = 0;
 	
 	//<爆発関係>
 	//爆発までの時間
@@ -252,7 +252,6 @@ struct EnemyBomb {
 
 	Timer createSmokeTimer = { 20, 0 };
 	Timer createSmokeReadyBurstTimer = { 7,0 };
-	Vector2 createSmokePosOffset = { 0, 50 };
 
 	//生成演出
 	float spawnEasingT = 0.0f;
@@ -273,11 +272,11 @@ struct EnemySniper {
 	//生存フラグ
 	bool isAlive = false;
 
-	int hp = 75;
+	int hp = 0;
 
 	//<射撃処理関係>
-	Timer shootLazerTimer = { 300, 0 };
-	Timer shootingLazerTimer = { 60, 0 };
+	Timer shootLaserTimer = {};
+	Timer shootingLaserTimer = {};
 
 	//ショックの生成無視状態
 	bool isIgnoreShock = false;

@@ -39,12 +39,15 @@ constexpr int kEnemyShooterLimit = 10;
 static EnemyShooter enemyShooter[kEnemyShooterLimit];
 
 struct EnemyShooterData {
+	//ザイス
 	Vector2 size = { 64, 64 };
 
 	//体力上限
 	int hpMax = 45;
-
 	float hitRadius = 20.0f;
+
+	//射撃関係
+	int shootTime = 300;
 
 	// 視界
 	float viewRange = 700.0f;
@@ -75,8 +78,9 @@ struct EnemyGuardianData {
 	Vector2 size = { 64, 64 };
 
 	int hpMax = 60;
-
 	float hitRadius = 20.0f;
+
+	int shootTime = 75;
 
 	//ジェムの生成量
 	int createGemLimit = 1;
@@ -128,8 +132,9 @@ struct EnemyMData {
 	Vector2 size = { 64, 64 };
 
 	int hpMax = 60;
-
 	float hitRadius = 20.0f;
+
+	int shootTime = 30;
 
 	//ジェムの生成量
 	int enemyMGemLimit = 4;
@@ -193,7 +198,6 @@ struct EnemyBombData {
 	Vector2 size = { 128, 128 };
 
 	int hpMax = 60;
-
 	//当たり判定の大きさ
 	float hitRadius = 64.0f;
 
@@ -213,14 +217,14 @@ struct EnemyBombData {
 	//減速度
 	float decelerationSpeed = 0.1f;
 
+	Vector2 createSmokePosOffset = { 0, 50 };
+
 	//ジェムの生成量
 	int createGemLimit = 3;
 	//撃破時のスコア
 	int defeatScore = 500;
 };
 EnemyBombData enemyBombData;
-
-
 
 #pragma endregion
 
@@ -232,8 +236,10 @@ struct EnemySniperData {
 	Vector2 size = { 64, 64 };
 
 	int hpMax = 75;
-
 	float hitRadius = 20.0f;
+
+	int shootLaserTime = 300;
+	int shootingLaserTime = 60;
 
 	//ジェムの生成量
 	int createGemLimit = 4;
@@ -256,7 +262,7 @@ EnemySniperData enemySniperData;
 static void InitEnemyShooter(void) {
 	for (int i = 0; i < kEnemyShooterLimit; i++) {
 		enemyShooter[i] = {};
-
+		enemyShooter[i].shootTimer.time = enemyShooterData.shootTime;
 		enemyShooter[i].texture = GetTexture(TextureType::EnemySniper);
 	}
 }
@@ -444,7 +450,7 @@ static void DrawEnemyShooter(void) {
 static void InitEnemyGuardian(void) {
 	for (int i = 0;i < kEnemyGuardianLimit;i++) {
 		enemyGuardian[i] = {};
-
+		enemyGuardian[i].shootTimer.time = enemyGuardianData.shootTime;
 		enemyGuardian[i].texture = GetTexture(TextureType::EnemyGuardian);
 	}
 }
@@ -771,7 +777,7 @@ static void DrawEnemyBasic(void) {
 static void InitEnemyM(void) {
 	for (int i = 0;i < kEnemyMLimit;i++) {
 		enemyM[i] = {};
-
+		enemyM[i].shootTimer.time = enemyMData.shootTime;
 		enemyM[i].texture = GetTexture(TextureType::EnemyGuardian);
 	}
 }
@@ -1104,14 +1110,14 @@ static void MoveEnemyBomb(void) {
 				enemyBomb[i].createSmokeTimer.count++;
 				if (enemyBomb[i].createSmokeTimer.count >= enemyBomb[i].createSmokeTimer.time) {
 					enemyBomb[i].createSmokeTimer.count = 0;
-					Vector2 createPos = { enemyBomb[i].pos.x + enemyBomb[i].createSmokePosOffset.x, enemyBomb[i].pos.y + enemyBomb[i].createSmokePosOffset.y };
+					Vector2 createPos = { enemyBomb[i].pos.x + enemyBombData.createSmokePosOffset.x, enemyBomb[i].pos.y + enemyBombData.createSmokePosOffset.y };
 					CreateSmokeEffect(createPos, TypeDrawEffect::Obj, TypeSmoke::EnemyBomb);
 				}
 			} else {
 				enemyBomb[i].createSmokeReadyBurstTimer.count++;
 				if (enemyBomb[i].createSmokeReadyBurstTimer.count >= enemyBomb[i].createSmokeReadyBurstTimer.time) {
 					enemyBomb[i].createSmokeReadyBurstTimer.count = 0;
-					Vector2 createPos = { enemyBomb[i].pos.x + enemyBomb[i].createSmokePosOffset.x, enemyBomb[i].pos.y + enemyBomb[i].createSmokePosOffset.y };
+					Vector2 createPos = { enemyBomb[i].pos.x + enemyBombData.createSmokePosOffset.x, enemyBomb[i].pos.y + enemyBombData.createSmokePosOffset.y };
 					CreateSmokeEffect(createPos, TypeDrawEffect::Obj, TypeSmoke::EnemyBomb);
 				}
 			}
@@ -1272,7 +1278,8 @@ static void DrawEnemyBomb(void) {
 static void InitEnemySniper(void) {
 	for (int i = 0; i < kEnemySniperLimit; i++) {
 		enemySniper[i] = {};
-
+		enemySniper[i].shootLaserTimer.time = enemySniperData.shootLaserTime;
+		enemySniper[i].shootingLaserTimer.time = enemySniperData.shootingLaserTime;
 		enemySniper[i].texture = GetTexture(TextureType::EnemySniper);
 	}
 }
@@ -1281,12 +1288,12 @@ static void ShootEnemyLazerSniper(void) {
 	for (int i = 0; i < kEnemySniperLimit; i++) {
 		if (!enemySniper[i].isAlive) continue;
 
-		enemySniper[i].shootLazerTimer.count++;
-		if (enemySniper[i].shootLazerTimer.count >= enemySniper[i].shootLazerTimer.time) {
-			enemySniper[i].shootingLazerTimer.count++;
-			if (enemySniper[i].shootingLazerTimer.count == enemySniper[i].shootingLazerTimer.time) {
-				enemySniper[i].shootLazerTimer.count = 0;
-				enemySniper[i].shootingLazerTimer.count = 0;
+		enemySniper[i].shootLaserTimer.count++;
+		if (enemySniper[i].shootLaserTimer.count >= enemySniper[i].shootLaserTimer.time) {
+			enemySniper[i].shootingLaserTimer.count++;
+			if (enemySniper[i].shootingLaserTimer.count == enemySniper[i].shootingLaserTimer.time) {
+				enemySniper[i].shootLaserTimer.count = 0;
+				enemySniper[i].shootingLaserTimer.count = 0;
 			}
 			Vector2 playerPos = GetPlayerPos();
 
