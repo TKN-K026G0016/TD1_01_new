@@ -70,7 +70,7 @@ GameoverIcon gameoverIcon;
 
 #pragma region データ: スコア表示
 
-static constexpr int kScoreNumberLimit = 9;
+static constexpr int kScoreNumberLimit = 10;
 struct ScoreNumber {
 	Vector2 size = { 32, 64 };
 
