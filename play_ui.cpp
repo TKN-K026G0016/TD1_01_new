@@ -788,7 +788,18 @@ static void InitScore(void) {
 
 static void UpdateScore(void) {
 
+
+
 	int nowScore = GetNowScore();
+
+	if (nowScore >= kCountStopScoreInPlay) {
+		scoreIcon.showScore = kCountStopScoreInPlay;
+
+		for (int i = 0; i < kScoreNumbersLimit; i++) {
+			scoreNumbers[i].animNum = GetValueAtDigit(scoreIcon.showScore, i);
+		}
+	}
+
 	int diff = nowScore - scoreIcon.showScore;
 
 	//一定値以上得点を得ていたら、
