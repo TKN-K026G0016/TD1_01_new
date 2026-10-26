@@ -90,12 +90,12 @@ constexpr int kRecoveryComboTime = 2;
 //チャージ弾でのコンボ回復量
 constexpr int kRecoveryComboTimeCharged = 30;
 
-
-int totalComboInCombo = 0;
+//コンボ中の累計撃破スコア
+int totalDefeatScoreInCombo = 0;
 //コンボ中に得たスコアの合計
 int scoreInCombo = 0;
 //スコア数による獲得スコアの倍率
-constexpr float kScoreMugByCombo = 0.01f;
+constexpr float kScoreMugByCombo = 0.006f;
 
 //コンボサウンドの間隔
 static constexpr int comboSoundSpan = 100;
@@ -285,12 +285,13 @@ static void UpdateShockCombo(void) {
 				TriggerBackgroundFlash(ModeBackground::Combo100);
 			}
 			
-			totalComboInCombo = 0;
+			totalDefeatScoreInCombo = 0;
 			nowCombo = 0;
 		}
 	}
 
-	if (GetNowScene() != Scene::Play || GetIsWarningBoss()) return;
+	//BGMの音量調整
+	if (GetNowScene() != Scene::Play || GetIsWarningBoss() || GetBossEnemyIsDead()) return;
 	if (CheckIsPlayingSe(SeType::ComboJingle1000) || CheckIsPlayingSe(SeType::ComboJingle500) || CheckIsPlayingSe(SeType::ComboJingle100)) {
 		ChangeBgmVolume(bgmVolumePlayingJingle);
 	} else {
@@ -560,10 +561,10 @@ Timer GetComboTimer(void) {
 }
 
 void AddScoreByDefeatEnemy(int defeatPoint) {
-	int point = (defeatPoint + totalComboInCombo) * ToInt((1.0f + ToFloat(nowCombo) * kScoreMugByCombo));
+	int point = (defeatPoint + totalDefeatScoreInCombo) * ToInt((1.0f + ToFloat(nowCombo) * kScoreMugByCombo));
 	scoreInCombo += point;
 
-	totalComboInCombo += defeatPoint;
+	totalDefeatScoreInCombo += defeatPoint;
 }
 
 

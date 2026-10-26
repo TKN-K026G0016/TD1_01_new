@@ -397,7 +397,6 @@ static void CheckCollisionElecShockVSEnemy(void) {
 				if (elecShock[j].breakTimer.count == elecShock[j].triggerDamageFrame) {
 					DamageEnemyM(enemyM[i], elecShock[j].pow);
 
-
 					//コンボ
 					AddShockCombo(elecShock[j].type);
 
