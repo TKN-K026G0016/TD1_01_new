@@ -109,7 +109,7 @@ static MenuCursor menuCursor;
 
 #pragma region データ: スコア
 
-static constexpr int kScoreNumberLimit = 9;
+static constexpr int kScoreNumberLimit = 10;
 struct ScoreNumber {
 	Vector2 size = { 40, 80 };
 
@@ -403,9 +403,9 @@ static void UpdateScoreCount(void) {
 #pragma endregion
 
 	scoreManager.showScore = GetHighScore();
-	if (scoreManager.showScore > kCountStopScore) {
-		scoreManager.showScore = kCountStopScore;
-	}
+	//if (scoreManager.showScore > kCountStopScoreInPlay) {
+	//	scoreManager.showScore = kCountStopScoreInPlay;
+	//}
 
 	for (int i = 0; i < kScoreNumberLimit; i++) {
 		scoreNumbers[i].animNum = GetValueAtDigit(scoreManager.showScore, i);

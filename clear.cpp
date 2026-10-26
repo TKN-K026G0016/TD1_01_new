@@ -45,7 +45,7 @@ ClearIcon clearIcon;
 
 #pragma region データ: スコアなど
 
-static constexpr int kScoreNumberLimit = 9;
+static constexpr int kScoreNumberLimit = 10;
 static constexpr int kComboNumberLimit = 5;
 struct ScoreNumber {
 	Vector2 size = { 32, 64 };
@@ -297,8 +297,8 @@ static void InitScore(void) {
 
 	//必要なデータ取得
 	scoreManager.nowScore = GetNowScore();
-	if (scoreManager.nowScore > kCountStopScore) {
-		scoreManager.nowScore = kCountStopScore;
+	if (scoreManager.nowScore > kCountStopScoreInPlay) {
+		scoreManager.nowScore = kCountStopScoreInPlay;
 	}
 	scoreManager.maxCombo = GetMaxCombo();
 	if (scoreManager.maxCombo > 99999) {
@@ -306,8 +306,8 @@ static void InitScore(void) {
 	}
 
 	scoreManager.bestScore = GetHighScore();
-	if (scoreManager.bestScore > kCountStopScore) {
-		scoreManager.bestScore = kCountStopScore;
+	if (scoreManager.bestScore > kCountStopScoreInPlay) {
+		scoreManager.bestScore = kCountStopScoreInPlay;
 	}
 
 }
@@ -437,8 +437,8 @@ static void CheckBreakScore(void) {
 			nowMode = ModeClear::Select;
 
 			scoreManager.bestScore = GetHighScore();
-			if (scoreManager.bestScore > kCountStopScore) {
-				scoreManager.bestScore = kCountStopScore;
+			if (scoreManager.bestScore > kCountStopScoreInPlay) {
+				scoreManager.bestScore = kCountStopScoreInPlay;
 			}
 		}
 

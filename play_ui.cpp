@@ -820,8 +820,8 @@ static void UpdateScore(void) {
 
 	}
 
-	if (scoreIcon.showScore > kCountStopScore) {
-		scoreIcon.showScore = kCountStopScore;
+	if (scoreIcon.showScore > kCountStopScoreInPlay) {
+		scoreIcon.showScore = kCountStopScoreInPlay;
 	}
 
 	for (int i = 0; i < kScoreNumbersLimit; i++) {
