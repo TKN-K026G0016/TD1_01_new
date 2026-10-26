@@ -36,15 +36,11 @@ enum class EnemyType {
 
 struct EnemyShooter {
 	Vector2 pos = { 0, 0 };
-	Vector2 size = { 64, 64 };
 
 	//生存フラグ
 	bool isAlive = false;
 
 	int hp = 45;
-	int hpMax = 45;
-
-	float hitRadius = 20.0f;
 
 	//<射撃処理関係>
 	Timer shootTimer = { 300, 0 };
@@ -63,18 +59,13 @@ struct EnemyShooter {
 
 
 	//<移動関係>
-	// 視界
-	float viewRange = 700.0f;
+
 	//速度
 	Vector2 velocity = { 0.0f, 0.0f };
 	//スピード
 	float nowSpeed = 0.0f;
-	//加速度
-	float accleretionSpeed = 0.05f;
-	//スピード上限
-	float moveSpeedLimit = 2.0f;
-	//減速度
-	float decelerationSpeed = 0.12f;
+	
+	
 	Vector2 inputVec = { 0, 0 };
 
 	//生成演出
@@ -90,15 +81,11 @@ struct EnemyShooter {
 
 struct EnemyGuardian {
 	Vector2 pos = { 0, 0 };
-	Vector2 size = { 64, 64 };
 
 	//生存フラグ
 	bool isAlive = false;
 
 	int hp = 60;
-	int hpMax = 60;
-
-	float hitRadius = 20.0f;
 
 	//<射撃処理関係>
 	Timer shootTimer = { 75, 0 };
@@ -126,21 +113,13 @@ struct EnemyGuardian {
 
 struct EnemyBasic {
 	Vector2 pos = { 0, 0 };
-	Vector2 size = { 64, 64 };
-
+	
 	//生存フラグ
 	bool isAlive = false;
 
 	int hp = 20;
-	int hpMax = 20;
 
-	float hitRadius = 30.0f;
-
-	//攻撃力
-	float pow = 25.0f;
-
-	//移動速度
-	float moveSpeed = 1.5f;
+	//移動関係
 	float moveTheta = 0;
 	bool thetaUpDate = false;
 
@@ -448,3 +427,8 @@ int GetEnemySniperLimit(void);
 void DamageEnemySniper(EnemySniper& enemy, int pow, bool hitStopSwitch);
 
 void DeadAllEnemy(void);
+
+//指定Enemyの当たり判定取得
+float GetEnemyHitRadius(EnemyType type);
+
+int GetEnemyPow(EnemyType type);

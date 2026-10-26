@@ -37,35 +37,86 @@ static constexpr int kAlphaMax = 255;
 
 constexpr int kEnemyShooterLimit = 10;
 static EnemyShooter enemyShooter[kEnemyShooterLimit];
-int nowEnemyShooterIsAliveCount = 0;
-//ジェムの生成量
-constexpr int enemyShooterGemLimit = 4;
-//撃破時のスコア
-constexpr int kEnemyShooterDefeatScore = 150;
+
+struct EnemyShooterData {
+	Vector2 size = { 64, 64 };
+
+	//体力上限
+	int hpMax = 45;
+
+	float hitRadius = 20.0f;
+
+	// 視界
+	float viewRange = 700.0f;
+
+	//加速度
+	float accleretionSpeed = 0.05f;
+	//スピード上限
+	float moveSpeedLimit = 2.0f;
+	//減速度
+	float decelerationSpeed = 0.12f;
+
+	//ジェムの生成量
+	int createGemLimit = 4;
+	//撃破時のスコア
+	int defeatScore = 150;
+};
+EnemyShooterData enemyShooterData;
+
+
 
 #pragma endregion
 
 #pragma region データ: EnemyGuardian
 constexpr int kEnemyGuardianLimit = 10;
 static EnemyGuardian enemyGuardian[kEnemyGuardianLimit];
-//ジェムの生成量
-constexpr int enemyGuardianGemLimit = 1;
-//撃破時のスコア
-constexpr int kEnemyGuardianDefeatScore = 150;
+
+struct EnemyGuardianData {
+	Vector2 size = { 64, 64 };
+
+	int hpMax = 60;
+
+	float hitRadius = 20.0f;
+
+	//ジェムの生成量
+	int createGemLimit = 1;
+	//撃破時のスコア
+	int defeatScore = 150;
+};
+EnemyGuardianData enemyGuardianData;
 
 #pragma endregion
 
 #pragma region データ: EnemyBasic
 constexpr int kEnemyBasicLimit = 20;
 static EnemyBasic enemyBasic[kEnemyBasicLimit];
-//ジェムの生成量
-constexpr int enemyBasicGemLimit = 2;
-//ジェムの生成量（隊列）
-constexpr int enemyFormationGemLimit = 1;
-//Formationの生成間隔
-constexpr int formationRange = 75;
-//撃破時のスコア
-constexpr int kEnemyBasicDefeatScore = 100;
+
+struct EnemyBasicData {
+	Vector2 size = { 64, 64 };
+
+	int hpMax = 20;
+
+	float hitRadius = 30.0f;
+
+	//攻撃力
+	float pow = 25.0f;
+
+	float moveSpeed = 1.5f;
+
+	//Formationの生成間隔
+	int formationRange = 75;
+
+	//ジェムの生成量
+	int createGemLimitNormal = 2;
+	//ジェムの生成量（隊列）
+	int createGemLimitFormation = 1;
+
+	//撃破時のスコア
+	int defeatScore = 100;
+};
+EnemyBasicData enemyBasicData;
+
+
 
 #pragma endregion
 
@@ -169,17 +220,17 @@ static void MoveEnemyShooter(void) {
 		float diffX = playerPos.x - enemyShooter[i].pos.x;
 		float diffY = playerPos.y - enemyShooter[i].pos.y;
 		float distance = sqrtf(diffX * diffX + diffY * diffY);
-		if (distance > enemyShooter[i].viewRange) {
+		if (distance > enemyShooterData.viewRange) {
 			enemyShooter[i].velocity = { diffX / distance,diffY / distance };
-			enemyShooter[i].nowSpeed += enemyShooter[i].accleretionSpeed;
-			if (enemyShooter[i].nowSpeed > enemyShooter[i].moveSpeedLimit) {
-				enemyShooter[i].nowSpeed = enemyShooter[i].moveSpeedLimit;
+			enemyShooter[i].nowSpeed += enemyShooterData.accleretionSpeed;
+			if (enemyShooter[i].nowSpeed > enemyShooterData.moveSpeedLimit) {
+				enemyShooter[i].nowSpeed = enemyShooterData.moveSpeedLimit;
 			}
 			enemyShooter[i].pos.x += enemyShooter[i].velocity.x * enemyShooter[i].nowSpeed;
 			enemyShooter[i].pos.y += enemyShooter[i].velocity.y * enemyShooter[i].nowSpeed;
 		}
 		else {
-			enemyShooter[i].nowSpeed -= enemyShooter[i].decelerationSpeed;
+			enemyShooter[i].nowSpeed -= enemyShooterData.decelerationSpeed;
 			if (enemyShooter[i].nowSpeed < 0) {
 				enemyShooter[i].nowSpeed = 0;
 			}
@@ -263,13 +314,9 @@ static void UpdateSpawnEffectEnemyShooter(void) {
 /// </summary>
 static void DeadEnemyShooter(int index) {
 	enemyShooter[index].isAlive = false;
-	enemyShooter[index].hp = enemyShooter[index].hpMax;
+	enemyShooter[index].hp = enemyShooterData.hpMax;
 
 	CreateExplodeEffect(enemyShooter[index].pos,WHITE);
-
-	nowEnemyShooterIsAliveCount--;
-
-	//spawner.spawnTimer.time = spawner.kSpawnTime * nowEnemyShooterIsAliveCount;
 }
 
 /// <summary>
@@ -283,11 +330,11 @@ static void CheckDeadEnemyShooter(void) {
 			DeadEnemyShooter(i);
 
 			//ジェムの生成処理
-			for (int j = 0; j < enemyShooterGemLimit;j++) {
+			for (int j = 0; j < enemyShooterData.createGemLimit;j++) {
 				SpawnGem(enemyShooter[i].pos, GemType::S);
 			}
 
-			AddScoreByDefeatEnemy(kEnemyShooterDefeatScore);
+			AddScoreByDefeatEnemy(enemyShooterData.defeatScore);
 		}
 	}
 }
@@ -299,7 +346,7 @@ static void DrawEnemyShooter(void) {
 	for (int i = 0; i < kEnemyShooterLimit; i++) {
 		if (!enemyShooter[i].isAlive) continue;
 
-		Vector2 size = { enemyShooter[i].size.x * enemyShooter[i].scale, enemyShooter[i].size.y * enemyShooter[i].scale };
+		Vector2 size = { enemyShooterData.size.x * enemyShooter[i].scale, enemyShooterData.size.y * enemyShooter[i].scale };
 
 		Texture texture = enemyShooter[i].texture;
 		if (enemyShooter[i].isFlash) {
@@ -395,11 +442,11 @@ static void UpdateFlashTimerEnemyGuardian(void) {
 
 static void DeadEnemyGuardian(int index) {
 	enemyGuardian[index].isAlive = false;
-	enemyGuardian[index].hp = enemyGuardian[index].hpMax;
+	enemyGuardian[index].hp = enemyGuardianData.hpMax;
 
 	CreateExplodeEffect(enemyGuardian[index].pos, WHITE);
 
-	AddScoreByDefeatEnemy(kEnemyGuardianDefeatScore);
+	AddScoreByDefeatEnemy(enemyGuardianData.defeatScore);
 }
 
 static void CheckDeadEnemyGuardian(void) {
@@ -410,7 +457,7 @@ static void CheckDeadEnemyGuardian(void) {
 			DeadEnemyGuardian(i);
 
 			//ジェムの生成処理
-			for (int j = 0; j < enemyGuardianGemLimit; j++) {
+			for (int j = 0; j < enemyGuardianData.createGemLimit; j++) {
 				SpawnGem(enemyGuardian[i].pos, GemType::S);
 			}
 		}
@@ -421,7 +468,7 @@ static void DrawEnemyGuardian(void) {
 	for (int i = 0; i < kEnemyGuardianLimit; i++) {
 		if (!enemyGuardian[i].isAlive) continue;
 
-		Vector2 size = { enemyGuardian[i].size.x * enemyGuardian[i].scale, enemyGuardian[i].size.y * enemyGuardian[i].scale };
+		Vector2 size = { enemyGuardianData.size.x * enemyGuardian[i].scale, enemyGuardianData.size.y * enemyGuardian[i].scale };
 
 		Texture texture = enemyGuardian[i].texture;
 		if (enemyGuardian[i].isFlash) {
@@ -469,7 +516,7 @@ static void Attack2EnemyGuardianMove(void) {
 	else if (bossEnemyNouStates != Attack2) {
 		for (int i = 0;i < kEnemyGuardianLimit;i++) {
 			enemyGuardian[i].isAlive = false;
-			enemyGuardian[i].hp = enemyGuardian[i].hpMax;
+			enemyGuardian[i].hp = enemyGuardianData.hpMax;
 		}
 	}
 }
@@ -511,8 +558,8 @@ static void MoveEnemyBasic(void) {
 			enemyBasic[i].pos.y += moveVec.y * enemyBasic[i].moveSpeed;*/
 			enemyBasic[i].moveTheta = atan2f(disY, disX);
 		}
-		enemyBasic[i].pos.x += cosf(enemyBasic[i].moveTheta) * enemyBasic[i].moveSpeed;
-		enemyBasic[i].pos.y += sinf(enemyBasic[i].moveTheta) * enemyBasic[i].moveSpeed;
+		enemyBasic[i].pos.x += cosf(enemyBasic[i].moveTheta) * enemyBasicData.moveSpeed;
+		enemyBasic[i].pos.y += sinf(enemyBasic[i].moveTheta) * enemyBasicData.moveSpeed;
 		if ((enemyBasic[i].pos.x < -640 || enemyBasic[i].pos.x>3200 || enemyBasic[i].pos.y < -360 || enemyBasic[i].pos.y>1800)&&!enemyBasic[i].thetaUpDate) {
 			Vector2 targetPos = GetPlayerPos();
 			float disX = targetPos.x - enemyBasic[i].pos.x;
@@ -590,13 +637,11 @@ static void UpdateSpawnEffectEnemyBasic(void) {
 
 static void DeadEnemyBasic(int index) {
 	enemyBasic[index].isAlive = false;
-	enemyBasic[index].hp = enemyBasic[index].hpMax;
+	enemyBasic[index].hp = enemyBasicData.hpMax;
 
 	CreateExplodeEffect(enemyBasic[index].pos, WHITE);
 
-	AddScoreByDefeatEnemy(kEnemyBasicDefeatScore);
-
-	/*spawner.spawnTimer.time = spawner.kSpawnTime * nowenemyBasicIsAliveCount;*/
+	AddScoreByDefeatEnemy(enemyBasicData.defeatScore);
 }
 
 static void CheckDeadEnemyBasic(void) {
@@ -608,12 +653,12 @@ static void CheckDeadEnemyBasic(void) {
 
 			//ジェムの生成処理
 			if (enemyBasic[i].thetaUpDate) {
-				for (int j = 0;j < enemyBasicGemLimit;j++) {
+				for (int j = 0;j < enemyBasicData.createGemLimitNormal;j++) {
 					SpawnGem(enemyBasic[i].pos, GemType::S);
 				}
 			}
 			else {
-				for (int j = 0;j < enemyFormationGemLimit;j++) {
+				for (int j = 0;j < enemyBasicData.createGemLimitFormation;j++) {
 					SpawnGem(enemyBasic[i].pos, GemType::S);
 				}
 
@@ -626,7 +671,7 @@ static void DrawEnemyBasic(void) {
 	for (int i = 0; i < kEnemyBasicLimit; i++) {
 		if (!enemyBasic[i].isAlive) continue;
 
-		Vector2 size = { enemyBasic[i].size.x * enemyBasic[i].scale, enemyBasic[i].size.y * enemyBasic[i].scale };
+		Vector2 size = { enemyBasicData.size.x * enemyBasic[i].scale, enemyBasicData.size.y * enemyBasic[i].scale };
 
 		Texture texture = enemyBasic[i].texture;
 		if (enemyBasic[i].isFlash) {
@@ -1437,13 +1482,11 @@ void SpawnEnemy(Vector2 pos, EnemyType type) {
 			if (enemyShooter[i].isAlive) continue;
 			enemyShooter[i].isAlive = true;
 			enemyShooter[i].pos = pos;
+			enemyShooter[i].hp = enemyShooterData.hpMax;
 
 			enemyShooter[i].spawnEasingT = 0.0f;
 			enemyShooter[i].scale = kScaleMax;
 			enemyShooter[i].alpha = kAlphaMin;
-
-			nowEnemyShooterIsAliveCount++;
-			//spawner.spawnTimer.time = spawner.kSpawnTime * nowEnemyShooterIsAliveCount;
 
 			break;
 		}
@@ -1456,6 +1499,7 @@ void SpawnEnemy(Vector2 pos, EnemyType type) {
 			enemyBasic[i].isAlive = true;
 			enemyBasic[i].thetaUpDate = true;
 			enemyBasic[i].pos = pos;
+			enemyBasic[i].hp = enemyBasicData.hpMax;
 
 			enemyBasic[i].spawnEasingT = 0.0f;
 			enemyBasic[i].scale = kScaleMax;
@@ -1594,6 +1638,7 @@ void SpawnEnemy(Vector2 pos, EnemyType type) {
 
 			enemyBasic[i].isAlive = true;
 			enemyBasic[i].thetaUpDate = false;
+			enemyGuardian[i].hp = enemyGuardianData.hpMax;
 
 			enemyBasic[i].spawnEasingT = 0.0f;
 			enemyBasic[i].scale = kScaleMax;
@@ -1601,8 +1646,8 @@ void SpawnEnemy(Vector2 pos, EnemyType type) {
 
 
 			enemyBasic[i].moveTheta = formationTheta;
-			enemyBasic[i].pos.x = pos.x + (formationRange * enemyFomationCount - (formationRange * 2)) * cosf(formationTheta);
-			enemyBasic[i].pos.y = pos.y + (formationRange * enemyFomationCount - (formationRange * 2)) * sinf(formationTheta);
+			enemyBasic[i].pos.x = pos.x + (enemyBasicData.formationRange * enemyFomationCount - (enemyBasicData.formationRange * 2)) * cosf(formationTheta);
+			enemyBasic[i].pos.y = pos.y + (enemyBasicData.formationRange * enemyFomationCount - (enemyBasicData.formationRange * 2)) * sinf(formationTheta);
 			enemyFomationCount++;
 
 			//5回生成したら終了
@@ -1797,4 +1842,35 @@ void DamageEnemySniper(EnemySniper& enemy, int pow, bool hitStopSwitch) {
 
 	PlaySe(SeType::DamageEnemy);
 }
+
+float GetEnemyHitRadius(EnemyType type) {
+	float hitRadius = {};
+
+	switch (type) {
+	case EnemyType::EnemyShooter:
+		hitRadius = enemyShooterData.hitRadius;
+		break;
+	case EnemyType::EnemyGuardian:
+		hitRadius = enemyGuardianData.hitRadius;
+		break;
+	case EnemyType::EnemyBasic:
+		hitRadius = enemyBasicData.hitRadius;
+		break;
+	}
+
+	return hitRadius;
+}
+
+int GetEnemyPow(EnemyType type) {
+	int pow = 0;
+
+	switch (type) {
+	case EnemyType::EnemyBasic:
+		pow = enemyBasicData.pow;
+		break;
+	}
+
+	return pow;
+}
+
 #pragma endregion
