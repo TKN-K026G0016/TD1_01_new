@@ -391,7 +391,16 @@ void DamageEnemySniper(EnemySniper& enemy, int pow, bool hitStopSwitch);
 
 void DeadAllEnemy(void);
 
-//指定Enemyの当たり判定取得
+/// <summary>
+/// 指定Enemyの当たり判定取得
+/// </summary>
+/// <param name="type"></param>
+/// <returns></returns>
 float GetEnemyHitRadius(EnemyType type);
 
-int GetEnemyPow(EnemyType type);
+/// <summary>
+/// 指定Enemyの攻撃力取得
+/// </summary>
+/// <param name="type"></param>
+/// <returns></returns>
+float GetEnemyPow(EnemyType type);

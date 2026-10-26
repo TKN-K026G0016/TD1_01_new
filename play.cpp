@@ -3,7 +3,6 @@
 #include "scene_manager.h"
 
 #include "player.h"
-#include "player_laser.h"
 #include "elec_bullet.h"
 #include "gem.h"
 #include "enemy.h"
@@ -25,7 +24,6 @@ static void Pause(void) {
 
 void InitPlay(void) {
 	InitPlayer();
-	InitPlayerLaser();
 	InitElecBullet();
 	InitGem();
 
@@ -45,7 +43,6 @@ void InitPlay(void) {
 
 void UpdatePlay(void) {
 	UpdatePlayer();
-	UpdatePlayerLaser();
 	UpdateElecBullet();
 	UpdateGem();
 
@@ -68,8 +65,6 @@ void UpdatePlay(void) {
 void DrawPlay(void) {
 	DrawStage();
 
-
-	DrawPlayerLaser();
 	DrawGem();
 
 	DrawEnemy();
@@ -85,9 +80,4 @@ void DrawPlay(void) {
 	DrawPlayUI();
 	DrawEffectAsUI();
 
-#ifdef _DEBUG
-
-	//Novice::ScreenPrintf(20, 20, "PlayScene");
-
-#endif // _DEBUG
 }

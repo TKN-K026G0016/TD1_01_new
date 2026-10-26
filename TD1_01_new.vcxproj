@@ -204,7 +204,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="pause.cpp" />
     <ClCompile Include="play.cpp" />
     <ClCompile Include="player.cpp" />
-    <ClCompile Include="player_laser.cpp" />
     <ClCompile Include="play_ui.cpp" />
     <ClCompile Include="reset_score.cpp" />
     <ClCompile Include="scene_manager.cpp" />
@@ -264,7 +263,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="pause.h" />
     <ClInclude Include="play.h" />
     <ClInclude Include="player.h" />
-    <ClInclude Include="player_laser.h" />
     <ClInclude Include="play_ui.h" />
     <ClInclude Include="reset_score.h" />
     <ClInclude Include="scene_manager.h" />

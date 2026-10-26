@@ -1959,8 +1959,8 @@ float GetEnemyHitRadius(EnemyType type) {
 	return hitRadius;
 }
 
-int GetEnemyPow(EnemyType type) {
-	int pow = 0;
+float GetEnemyPow(EnemyType type) {
+	float pow = 0;
 
 	switch (type) {
 	case EnemyType::EnemyBasic:

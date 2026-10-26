@@ -1,6 +1,5 @@
 #include "boss_enemy.h"
 #include "player.h"
-#include "player_laser.h"
 #include "stage.h"
 #include "enemy_bullet.h"
 #include "enemy.h"

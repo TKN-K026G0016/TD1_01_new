@@ -86,9 +86,6 @@
     <Filter Include="player">
       <UniqueIdentifier>{24832969-17e4-4bce-9d22-b71b2a2d7113}</UniqueIdentifier>
     </Filter>
-    <Filter Include="player\player_laser">
-      <UniqueIdentifier>{4fcbca65-2fa8-4731-b900-6d43793c0070}</UniqueIdentifier>
-    </Filter>
     <Filter Include="player\elec_bullet">
       <UniqueIdentifier>{70bd84a6-3fa0-46a1-a20a-093c6a668027}</UniqueIdentifier>
     </Filter>
@@ -178,9 +175,6 @@
     </ClCompile>
     <ClCompile Include="player.cpp">
       <Filter>player</Filter>
-    </ClCompile>
-    <ClCompile Include="player_laser.cpp">
-      <Filter>player\player_laser</Filter>
     </ClCompile>
     <ClCompile Include="elec_bullet.cpp">
       <Filter>player\elec_bullet</Filter>
@@ -351,9 +345,6 @@
     </ClInclude>
     <ClInclude Include="player.h">
       <Filter>player</Filter>
-    </ClInclude>
-    <ClInclude Include="player_laser.h">
-      <Filter>player\player_laser</Filter>
     </ClInclude>
     <ClInclude Include="elec_bullet.h">
       <Filter>player\elec_bullet</Filter>
