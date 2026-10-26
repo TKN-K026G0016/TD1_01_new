@@ -820,7 +820,8 @@ static void UpdateScore(void) {
 
 	}
 
-	if (scoreIcon.showScore > kCountStopScoreInPlay) {
+	//カンスト表示
+	if (scoreIcon.showScore >= kCountStopScoreInPlay) {
 		scoreIcon.showScore = kCountStopScoreInPlay;
 	}
 
@@ -841,8 +842,6 @@ static void DrawScore(void) {
 		//scoreIconの表示
 		//DrawTextureUI(scoreIcon.texture, scoreIcon.pos, scoreIcon.size);
 	}
-
-	//Novice::ScreenPrintf(30, 30, "Score: %07d", GetNowScore());
 }
 
 #pragma endregion
