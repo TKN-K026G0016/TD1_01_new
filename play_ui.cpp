@@ -16,19 +16,6 @@
 
 #include <Novice.h>
 
-#pragma region データ: HPアイコン
-//struct LifeIcon {
-//	Vector2 startPos = { 30, 690 };
-//	Vector2 size = { 40, 40 };
-//
-//	float intervalX = 10;
-//
-//	Texture texture = {};
-//};
-//LifeIcon lifeIcon;
-//
-#pragma endregion
-
 #pragma region データ: エネルギーゲージ
 
 static constexpr bool kGaugeShakeSwitch = true;
@@ -133,19 +120,6 @@ struct BossHpGaugeDelayMeter {
 	Texture texture = {};
 };
 BossHpGaugeDelayMeter bossHpGaugeDelayMeter;
-
-#pragma endregion
-
-#pragma region データ: 持続ボーナス
-
-struct LaserPowRate {
-	Vector2i startPos = { 1000, 700 };
-
-	float powRate = 1.0f;
-};
-LaserPowRate laserPowRate;
-
-
 
 #pragma endregion
 
@@ -416,26 +390,6 @@ static PauseGuide pauseGuide;
 #pragma endregion
 
 
-#pragma region 関数: ライフアイコン
-
-static void InitLifeIcon(void) {
-	//lifeIcon.texture = GetTexture(TextureType::LifeIcon);
-}
-
-static void DrawLifeIcon(void) {
-	//if (GetLifeGaugeSwitch()) return;
-
-	//int remainLife = GetPlayerHp();
-
-	//for (int i = 0; i < remainLife; i++) {
-	//	Vector2 posS = { lifeIcon.startPos.x + (lifeIcon.size.x + lifeIcon.intervalX) * i, lifeIcon.startPos.y };
-
-	//	DrawTextureUI(lifeIcon.texture, posS, lifeIcon.size);
-	//}
-}
-
-#pragma endregion
-
 #pragma region 関数: エネルギーゲージ
 
 static void InitEnergyGauge(void) {
@@ -678,28 +632,6 @@ static void DrawBossHpGauge(void) {
 #endif // _DEBUG
 
 
-}
-
-#pragma endregion
-
-#pragma region 関数: 持続ボーナス
-
-static void UpdatePowRate(void) {
-	if (GetPlayerNowLaserLevel() == PlayerLaserLevel::Level2) {
-		laserPowRate.powRate = GetPlayerLaserPowRate();
-	}
-}
-
-static void DrawPowRate(void) {
-	if (GetPlayerNowLaserLevel() != PlayerLaserLevel::Level2) return;
-
-	if (!GetPlayerIsAlive()) return;
-
-	/*Vector2i posS = laserPowRate.startPos;*/
-	Vector2 playerPos = GetPlayerPos();
-	Vector2i posS = ConvertPosWToS({ playerPos.x, playerPos.y + 40 });
-
-	Novice::ScreenPrintf(posS.x, posS.y, "DAMAGE RATE: %.3f!!!", laserPowRate.powRate);
 }
 
 #pragma endregion
@@ -1198,7 +1130,6 @@ static void DrawPauseGuide(void) {
 #pragma endregion
 
 void InitPlayUI(void) {
-	InitLifeIcon();
 	InitEnergyGauge();
 	InitBossHpGauge();
 	InitProgressGauge();
@@ -1214,7 +1145,6 @@ void InitPlayUI(void) {
 void UpdatePlayUI(void) {
 	UpdateEnergyGauge();
 	UpdateBossHpGauge();
-	UpdatePowRate();
 	UpdateProgressGauge();
 	UpdateShockCombo();
 	UpdateScore();
@@ -1231,10 +1161,8 @@ void DrawPlayUI(void) {
 	DrawDisplayEffect();
 	DrawDangerDisplayEffect();
 
-	DrawLifeIcon();
 	DrawEnergyGauge();
 	DrawBossHpGauge();
-	DrawPowRate();
 	DrawProgressGauge();
 	DrawShockCombo();
 	DrawStartTelop();

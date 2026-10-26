@@ -56,7 +56,7 @@ int GetPlayerHp(void);
 bool GetPlayerIsAlive(void);
 
 /// <summary>
-/// 
+/// デンリョク残量取得
 /// </summary>
 /// <param name=""></param>
 /// <returns></returns>
@@ -68,13 +68,6 @@ float GetPlayerRemainEnergy(void);
 /// <param name=""></param>
 /// <returns></returns>
 float GetPlayerEnergyLimit(void);
-
-/// <summary>
-/// 現在のレーザーの火力倍率取得
-/// </summary>
-/// <param name=""></param>
-/// <returns></returns>
-float GetPlayerLaserPowRate(void);
 
 /// <summary>
 /// エネルギー回復処理
@@ -95,12 +88,6 @@ Vector2 GetPlayerShootPos(void);
 float GetPlayerRotateTheta(void);
 
 /// <summary>
-/// playerのレベル取得
-/// </summary>
-/// <returns>player.laserLevel</returns>
-PlayerLaserLevel GetPlayerNowLaserLevel(void);
-
-/// <summary>
 /// playerの被弾処理
 /// </summary>
 /// <param name="hitPos">接触した相手の座標</param>
@@ -113,19 +100,6 @@ void PlayerDamage(Vector2 hitPos, float damage);
 /// <param name="hitPos">接触した相手の座標</param>
 void PlayerKnockBack(Vector2 hitPos);
 
-bool GetDodgeCloseSwitch(void);
-
-/// <summary>
-/// ギリ避け判定の大きさ取得
-/// </summary>
-/// <returns>player.dodgeCloseRadius</returns>
-float GetPlayerDodgeCloseRadius(void);
-
-/// <summary>
-/// ギリ避け成功時の処理
-/// </summary>
-/// <param name="eBulletPos">敵弾の座標</param>
-void TriggerDodgeClose(Vector2 eBulletPos);
 
 /// <summary>
 /// playerの現在状態を取得

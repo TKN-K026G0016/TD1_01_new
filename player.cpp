@@ -20,15 +20,6 @@
 #include <algorithm>
 
 
-//ギリ避けスイッチ
-constexpr bool kDodgeCloseSwitch = false;
-//ジェムをロックオンの対象にするフラグ
-constexpr bool kGemLockOnSwitch = true;
-//一定範囲内に敵がいなければ、ジェムをロックオンするスイッチ
-constexpr bool KCancelLockOnEnemySwitch = true;
-//シールド制スイッチ
-constexpr bool kElecShieldSwitch = true;
-
 #pragma region データ: player本体
 struct Player {
 	Vector2 pos = { 1280, 720 };
@@ -41,10 +32,6 @@ struct Player {
 	//当たり判定の大きさ
 	float hitRadius = 10.0f;
 	int hp = 1;
-	int hpMax = 1;
-
-	//<ギリ避け関係>
-	float dodgeCloseRadius = 50.0f;
 
 	//<無敵関係>
 	//無敵フラグ
@@ -55,24 +42,13 @@ struct Player {
 	bool isKnockBack = false;
 
 	//<移動関係>
-	Vector2 velocity = { 0.0f, 0.0f };
-	//加速度
-	float accleretionSpeed = 0.14f;
-	//スピード上限
-	float moveSpeedLimit = 9.0f;
-	//減速度
-	float decelerationSpeed = 0.15f;
-
 	//移動速度(等速)
-	float moveSpeed[2] = { 6.0f, 6.0f };
+	float moveSpeed = 6.0f;
 	Vector2 inputVec = { 0, 0 };
 
 
 	//<回転関係>
 	float rotateTheta = 0.0f;
-	//回転速度
-	float rotateSpeed = 0.05f;
-
 
 	//<ロックオン関係>
 	//ロック状態フラグ
@@ -82,16 +58,8 @@ struct Player {
 
 
 	//<射撃関係>
-	//射撃スパン
-	Timer shootTimer = { 2, 0 };
 	//エネルギー残量
 	float remainEnergy = 0.0f;
-
-	//<レベル関係>
-	//レーザーのレベル
-	PlayerLaserLevel laserLevel = PlayerLaserLevel::Level0;
-	//レベルアップのライン
-	float levelUpLine[ToInt(PlayerLaserLevel::Count)] = { 0.0f, 1.0f, 80.0f };
 
 	Texture texture = {};
 };
@@ -114,8 +82,8 @@ Vector2 movablePos[2] = { {0, 0}, {0, 0} };
 enum class LockTargetType {
 	None = -1,
 	Boss = -2,
-	Enemy1 = 0,
-	Enemy2 = 1,
+	EnemyShooter = 0,
+	EnemyGuardian = 1,
 	EnemyBasic = 2,
 	EnemySmall = 3,
 	EnemyM = 4,
@@ -153,8 +121,6 @@ float consumptionShootNormal = 0.3f;
 float consumptionShootCharge = 10.0f;
 static bool isCharge = false;
 
-float laserPowRate;
-
 #pragma endregion
 
 #pragma region データ: エネルギー関係
@@ -163,8 +129,6 @@ float laserPowRate;
 constexpr float kEnergyMax = 100.0f;
 //エネルギー下限
 constexpr float kEnergyMin = 0.0f;
-//エネルギーゲージの中間
-constexpr float kEnergyCenter = (kEnergyMax - kEnergyMin) / 2;
 constexpr float kFirstEnergy = kEnergyMax;
 
 //エネルギー消費量(常時)
@@ -243,9 +207,6 @@ static ElecShield elecShield;
 
 #pragma region データ: ギリ避け・ノックバック関係
 
-//ギリ避け時のボーナススパン
-static Timer dodgeCloseBonusTimer = { 8, 0 };
-
 //ノックバックの初速度
 static constexpr float kFirstKnockBackPow = 20.0f;
 //ノックバックの減速度
@@ -259,32 +220,10 @@ static Timer knockBackTimer = { 20, 0 };
 
 #pragma region データ: 演出関係
 
-//プレイヤーの色管理データ
-struct ColorManager {
-	static constexpr int colorValueMin = 32;
-	static constexpr int colorValueMax = 255;
-	//現在のプレイヤーの色
-	int colorValue = 255;
-
-	//イージング用
-	float easingT = 0.0f;
-	float changeSpeed = 0.05f;
-	bool isGoToBlack = true;
-};
-ColorManager colorManager;
-
 //チャージの破片表示を開始する時間
 constexpr int kStartCreateChargeChipTime = 7;
 Timer createChargeOrbTimer = { 10, 0 };
 Timer createChargeChipTimer = { 10, 0 };
-
-
-//オーバーヒート時の生成範囲(player中心で)
-constexpr int kCreateSmokeRange = 45;
-//オーバーヒート時に出す煙の数
-constexpr int kCreateSmokeNum = 4;
-//オーバーヒート時のケムリ生成スパン
-Timer createSmokeTimer = { 15, 0 };
 
 //警告演出が出てくるエネルギーの量
 static constexpr float kWarnEnergyLine = 30.0f;
@@ -315,11 +254,8 @@ struct StartEffectManager {
 };
 StartEffectManager startEffectManager;
 
-struct DeadEffectManager {
-	int exploseCount = 6;
-	int createExploseRange = 100;
-};
-DeadEffectManager deadEffectManager;
+constexpr int exploseCount = 6;
+constexpr int createExploseRange = 100;
 
 #pragma endregion
 
@@ -364,11 +300,8 @@ static void MovePlayer(void) {
 		moveVec.y /= moveVecLength;
 	}
 
-	//energy量で移動速度を変更
-	float moveSpeed = (player.isEquipShield) ? player.moveSpeed[0] : player.moveSpeed[1];
-
-	player.pos.x += moveSpeed * moveVec.x;
-	player.pos.y += moveSpeed * moveVec.y;
+	player.pos.x += player.moveSpeed * moveVec.x;
+	player.pos.y += player.moveSpeed * moveVec.y;
 
 	//playerの移動エフェクト
 	CreatePlayerMoveEffect(player.pos, moveVec);
@@ -440,7 +373,7 @@ static void RotatePlayer(void) {
 		if (dis < closestDis) {
 			closestDis = dis;
 			targetIndex = i;
-			nowTargetType = LockTargetType::Enemy1;
+			nowTargetType = LockTargetType::EnemyShooter;
 		}
 	}
 
@@ -454,7 +387,7 @@ static void RotatePlayer(void) {
 		if (dis < closestDis) {
 			closestDis = dis;
 			targetIndex = i;
-			nowTargetType = LockTargetType::Enemy2;
+			nowTargetType = LockTargetType::EnemyGuardian;
 		}
 	}
 
@@ -543,7 +476,7 @@ static void RotatePlayer(void) {
 	}
 
 	//ジェム
-	if (kGemLockOnSwitch && KCancelLockOnEnemySwitch && closestDis > kCancelLockOnEnemyRange) {
+	if (closestDis > kCancelLockOnEnemyRange) {
 		for (int i = 0; i < gemLimit; i++) {
 			if (!gem[i].isAlive) continue;
 
@@ -571,13 +504,13 @@ static void RotatePlayer(void) {
 			return;
 		}
 		targetPos = boss->pos;
-	} else if (nowTargetType == LockTargetType::Enemy1) {
+	} else if (nowTargetType == LockTargetType::EnemyShooter) {
 		if (!enemyShooter[targetIndex].isAlive) {
 			nowTargetType = LockTargetType::None;
 			return;
 		}
 		targetPos = enemyShooter[targetIndex].pos;
-	} else if (nowTargetType == LockTargetType::Enemy2) {
+	} else if (nowTargetType == LockTargetType::EnemyGuardian) {
 		if (!enemyGuardian[targetIndex].isAlive) {
 			nowTargetType = LockTargetType::None;
 			return;
@@ -668,12 +601,12 @@ static void UpdateLockOnSign(void) {
 		lockOnSign.pos = boss->pos;
 	}
 	//enemy1
-	else if (nowTargetType == LockTargetType::Enemy1) {
+	else if (nowTargetType == LockTargetType::EnemyShooter) {
 		EnemyShooter* enemy1 = GetEnemyShooterArray();
 		lockOnSign.pos = enemy1[targetIndex].pos;
 	}
 	//enemy2
-	else if (nowTargetType == LockTargetType::Enemy2) {
+	else if (nowTargetType == LockTargetType::EnemyGuardian) {
 		EnemyGuardian* enemy2 = GetEnemyGuardianArray();
 		lockOnSign.pos = enemy2[targetIndex].pos;
 	}
@@ -1106,10 +1039,10 @@ static void CheckDeadPlayer(void) {
 		chargeElecBulletTimer.count = 0;
 
 		//爆発エフェクト生成
-		for (int i = 0; i < deadEffectManager.exploseCount; i++) {
+		for (int i = 0; i < exploseCount; i++) {
 			Vector2 createPos;
-			createPos.x = player.pos.x + ToFloat(GetRand(-deadEffectManager.createExploseRange / 2, deadEffectManager.createExploseRange / 2));
-			createPos.y = player.pos.y + ToFloat(GetRand(-deadEffectManager.createExploseRange / 2, deadEffectManager.createExploseRange / 2));
+			createPos.x = player.pos.x + ToFloat(GetRand(-createExploseRange / 2, createExploseRange / 2));
+			createPos.y = player.pos.y + ToFloat(GetRand(-createExploseRange / 2, createExploseRange / 2));
 
 			CreateExplodeEffect(createPos, GetPlayerColor());
 		}
@@ -1219,10 +1152,6 @@ float GetPlayerEnergyLimit(void) {
 	return kEnergyMax;
 }
 
-float GetPlayerLaserPowRate(void) {
-	return laserPowRate;
-}
-
 void RecoveryEnergy(float recoveryValue) {
 	player.remainEnergy += recoveryValue;
 	if (player.remainEnergy > kEnergyMax) {
@@ -1236,10 +1165,6 @@ Vector2 GetPlayerShootPos(void) {
 
 float GetPlayerRotateTheta(void) {
 	return player.rotateTheta;
-}
-
-PlayerLaserLevel GetPlayerNowLaserLevel(void) {
-	return player.laserLevel;
 }
 
 void PlayerDamage(Vector2 hitPos, float damage) {
@@ -1295,25 +1220,6 @@ void PlayerKnockBack(Vector2 hitPos) {
 	player.isKnockBack = true;
 
 
-}
-
-bool GetDodgeCloseSwitch(void) {
-	return kDodgeCloseSwitch;
-}
-
-float GetPlayerDodgeCloseRadius(void) {
-	return player.dodgeCloseRadius;
-}
-
-void TriggerDodgeClose(Vector2 eBulletPos) {
-	if (!player.isAlive || player.isInvincible) return;
-
-	dodgeCloseBonusTimer.count++;
-	if (dodgeCloseBonusTimer.count >= dodgeCloseBonusTimer.time) {
-		dodgeCloseBonusTimer.count = 0;
-
-		SpawnGem(eBulletPos, GemType::S);
-	}
 }
 
 bool GetPlayerIsInvincible(void) {
