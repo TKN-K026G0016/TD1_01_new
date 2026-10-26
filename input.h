@@ -16,10 +16,6 @@ enum class InputAction {
 	MoveUp,
 	MoveDown,
 
-	Lock,
-	TriggerLock,
-
-	Shoot,
 	Charge,
 
 	Count,
