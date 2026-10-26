@@ -46,7 +46,7 @@ ClearIcon clearIcon;
 #pragma region データ: スコアなど
 
 static constexpr int kScoreNumberLimit = 9;
-static constexpr int kComboNumberLimit = 4;
+static constexpr int kComboNumberLimit = 5;
 struct ScoreNumber {
 	Vector2 size = { 32, 64 };
 
@@ -301,8 +301,8 @@ static void InitScore(void) {
 		scoreManager.nowScore = kCountStopScore;
 	}
 	scoreManager.maxCombo = GetMaxCombo();
-	if (scoreManager.maxCombo > 9999) {
-		scoreManager.maxCombo = 9999;
+	if (scoreManager.maxCombo > 99999) {
+		scoreManager.maxCombo = 99999;
 	}
 
 	scoreManager.bestScore = GetHighScore();

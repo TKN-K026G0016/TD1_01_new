@@ -200,7 +200,7 @@ static void Confirm(void) {
 
 				CreateExplodeEffect(createPos, WHITE);
 			}
-
+			TriggerViberationGamePad(ModeViberation::L);
 
 		} else {
 			onceSelect = true;

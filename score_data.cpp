@@ -10,7 +10,7 @@ int nowScore = 0;
 //ハイスコア
 int highScore = 0;
 
-static constexpr int kFirstHighScore = 1000000;
+static constexpr int kFirstHighScore = 100000;
 #pragma endregion
 
 ///

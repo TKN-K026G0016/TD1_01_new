@@ -120,16 +120,6 @@ constexpr int enemySniperGemLimit = 4;
 #pragma endregion
 
 
-//struct Spawner {
-//	Timer spawnTimer = { 0, 0 };
-//
-//	Vector2 spawnRange[2] = {};
-//
-//	int kSpawnTime = 20;
-//};
-//Spawner spawner;
-
-
 
 #pragma region 関数: enemyShooter
 
@@ -1045,6 +1035,7 @@ static void BurstEnemyBomb(void) {
 				}
 				DeadEnemyBomb(i);
 				PlaySe(SeType::ExploseEnemyBomb);
+				ChangeModeCameraShake(ModeCameraShake::L);
 			}
 		}
 	}

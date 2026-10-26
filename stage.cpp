@@ -47,7 +47,7 @@ struct Camera {
 	//<振動関係>
 	Vector2 shakeOffset = {};
 	ModeCameraShake nowModeShake = ModeCameraShake::Standby;
-	int shakeAmp[ToInt(ModeCameraShake::Count) - 1] = { 1, 2, 3 };
+	int shakeAmp[ToInt(ModeCameraShake::Count) - 1] = { 1, 2, 5 };
 	int shakeTime[ToInt(ModeCameraShake::Count) - 1] = { 5, 10, 20 };
 	int shakeCount = 0;
 

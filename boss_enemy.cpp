@@ -5,6 +5,7 @@
 #include "enemy_bullet.h"
 #include "enemy.h"
 #include "effect.h"
+#include "stage.h"
 #include "se.h"
 #include "bgm.h"
 
@@ -480,6 +481,8 @@ static void MoveAfterDead(void) {
 		createPos.y = bossEnemy.pos.y + ToFloat(GetRand(-createExploseRange.y / 2, createExploseRange.y / 2));
 		CreateExplodeEffect(createPos, WHITE);
 	}
+
+	ChangeModeCameraShake(ModeCameraShake::L);
 
 }
 
