@@ -297,18 +297,18 @@ static void InitScore(void) {
 
 	//必要なデータ取得
 	scoreManager.nowScore = GetNowScore();
-	if (scoreManager.nowScore > kCountStopScoreInPlay) {
-		scoreManager.nowScore = kCountStopScoreInPlay;
-	}
+	//if (scoreManager.nowScore > kCountStopScoreInPlay) {
+	//	scoreManager.nowScore = kCountStopScoreInPlay;
+	//}
 	scoreManager.maxCombo = GetMaxCombo();
 	if (scoreManager.maxCombo > 99999) {
 		scoreManager.maxCombo = 99999;
 	}
 
 	scoreManager.bestScore = GetHighScore();
-	if (scoreManager.bestScore > kCountStopScoreInPlay) {
-		scoreManager.bestScore = kCountStopScoreInPlay;
-	}
+	//if (scoreManager.bestScore > kCountStopScoreInPlay) {
+	//	scoreManager.bestScore = kCountStopScoreInPlay;
+	//}
 
 }
 
@@ -426,6 +426,8 @@ static void CheckBreakScore(void) {
 
 		scoreManager.breakScore = true;
 		newRecordIcon.isBreakScore = true;
+
+		scoreManager.bestScore = GetHighScore();
 	}
 
 	//スコア更新時
@@ -435,11 +437,6 @@ static void CheckBreakScore(void) {
 			scoreManager.waitBreakScoreTimer.count = 0;
 
 			nowMode = ModeClear::Select;
-
-			scoreManager.bestScore = GetHighScore();
-			if (scoreManager.bestScore > kCountStopScoreInPlay) {
-				scoreManager.bestScore = kCountStopScoreInPlay;
-			}
 		}
 
 	}

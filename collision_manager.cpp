@@ -586,7 +586,6 @@ static void CheckCollisionPlayerVSEnemyBullet(void) {
 	if (!GetPlayerIsAlive()) return;
 	Vector2 playerPos = GetPlayerPos();
 	float playerHitRadius = GetPlayerHitRadius();
-	//float playerDodgeCloseRadius = GetPlayerDodgeCloseRadius();
 
 	EnemyBullet* eBullet = GetEnemyBulletArray();
 	int eBulletLimit = GetEnemyBulletLimit();
@@ -616,14 +615,6 @@ static void CheckCollisionPlayerVSEnemyLaser(void) {
 
 	for (int i = 0; i < eLaserLimit; i++) {
 		if (!eLaser[i].isShoot) continue;
-
-		////ギリ避け判定
-		//if (GetDodgeCloseSwitch()) {
-		//	if (CheckCollisionOBBvsCircle(playerPos, playerDodgeCloseRadius, eLaser[i].hitBoxVertex)) {
-		//		TriggerDodgeClose(eLaser[i].pos);
-		//	}
-		//}
-
 		//被弾判定
 		if (CheckCollisionOBBvsCircle(playerPos, playerHitRadius, eLaser[i].hitBoxVertex)) {
 			PlayerDamage(eLaser[i].pos, eLaser[i].pow);
