@@ -297,26 +297,33 @@ static void InitScore(void) {
 
 	//必要なデータ取得
 	scoreManager.nowScore = GetNowScore();
-	//if (scoreManager.nowScore > kCountStopScoreInPlay) {
-	//	scoreManager.nowScore = kCountStopScoreInPlay;
-	//}
+
 	scoreManager.maxCombo = GetMaxCombo();
 	if (scoreManager.maxCombo > 99999) {
 		scoreManager.maxCombo = 99999;
 	}
 
 	scoreManager.bestScore = GetHighScore();
-	//if (scoreManager.bestScore > kCountStopScoreInPlay) {
-	//	scoreManager.bestScore = kCountStopScoreInPlay;
-	//}
 
 }
 
 static void MoveScoreIcon(void) {
-	//アイコンの移動処理
-	scoreIcon.pos.x = UpdateValueByEasing(scoreIcon.standbyPosX, scoreIcon.showPosX, clearIcon.easingT, clearIcon.easingMode);
-	maxComboIcon.pos.x = UpdateValueByEasing(maxComboIcon.standbyPosX, maxComboIcon.showPosX, clearIcon.easingT, clearIcon.easingMode);
-	bestScoreIcon.pos.x = UpdateValueByEasing(bestScoreIcon.standbyPosX, bestScoreIcon.showPosX, clearIcon.easingT, clearIcon.easingMode);
+#pragma region 移動処理
+
+	//フレームイン
+	if (!onceSelect) {
+		scoreIcon.pos.x = UpdateValueByEasing(scoreIcon.standbyPosX, scoreIcon.showPosX, clearIcon.easingT, clearIcon.easingMode);
+		maxComboIcon.pos.x = UpdateValueByEasing(maxComboIcon.standbyPosX, maxComboIcon.showPosX, clearIcon.easingT, clearIcon.easingMode);
+		bestScoreIcon.pos.x = UpdateValueByEasing(bestScoreIcon.standbyPosX, bestScoreIcon.showPosX, clearIcon.easingT, clearIcon.easingMode);
+	}
+	//フレームアウト
+	else {
+		scoreIcon.pos.x = UpdateValueByEasing(scoreIcon.standbyPosX, scoreIcon.showPosX, menuBackground.easingT, clearIcon.easingMode);
+		maxComboIcon.pos.x = UpdateValueByEasing(maxComboIcon.standbyPosX, maxComboIcon.showPosX, menuBackground.easingT, clearIcon.easingMode);
+		bestScoreIcon.pos.x = UpdateValueByEasing(bestScoreIcon.standbyPosX, bestScoreIcon.showPosX, menuBackground.easingT, clearIcon.easingMode);
+	}
+
+#pragma endregion
 
 	//numberのstartPos変更
 	for (int i = 0; i < kScoreNumberLimit; i++) {
@@ -471,7 +478,7 @@ static void UpdateNewRecordIcon(void) {
 		newRecordIcon.pos = MoveByEasing(newRecordIcon.standbyPos, newRecordIcon.showPos, menuBackground.easingT, newRecordIcon.easingMode);
 	}
 
-	//点滅処理
+#pragma region 点滅処理
 	if (newRecordIcon.isFadeIn) {
 		newRecordIcon.easingTAlpha += newRecordIcon.easingSpeedAlpha;
 		if (newRecordIcon.easingTAlpha >= 1.0f) {
@@ -486,6 +493,8 @@ static void UpdateNewRecordIcon(void) {
 		}
 	}
 	newRecordIcon.alpha = UpdateValueByEasing(newRecordIcon.alphaMin, newRecordIcon.alphaMax, newRecordIcon.easingTAlpha, newRecordIcon.easingMode);
+
+#pragma endregion
 
 }
 
