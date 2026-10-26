@@ -149,15 +149,12 @@ struct EnemyBasic {
 
 struct EnemyM {
 	Vector2 pos = { 0, 0 };
-	Vector2 size = { 64, 64 };
+
 
 	//生存フラグ
 	bool isAlive = false;
 
 	int hp = 60;
-	int hpMax = 60;
-
-	float hitRadius = 20.0f;
 
 	//<射撃処理関係>
 	Timer shootTimer = { 30, 0 };
@@ -185,31 +182,18 @@ struct EnemyM {
 
 struct EnemySmall {
 	Vector2 pos = { 0, 0 };
-	Vector2 size = { 32, 32 };
 
 	//生存フラグ
 	bool isAlive = false;
 
 	int hp = 5;
-	int hpMax = 5;
-
-	float hitRadius = 20.0f;
-
-	float pow = 15.0f;
 
 	//<移動関係>
 	//速度
 	Vector2 velocity = { 0.0f, 0.0f };
 	//スピード
 	float nowSpeed = 0.0f;
-	//加速度
-	float accleretionSpeed = 0.05f;
-	//スピード上限
-	float moveSpeedLimit = 4.0f;
-	//減速度
-	float decelerationSpeed = 0.12f;
-	//方向転換の比率
-	float turnRate = 0.5f;
+
 	//移動方向変更フラグ
 	bool velocityUpDate = true;
 
@@ -240,38 +224,22 @@ struct EnemySmall {
 
 struct EnemyBomb {
 	Vector2 pos = { 0, 0 };
-	Vector2 size = { 128, 128 };
+
 	//<生存関係>
 	bool isAlive = false;
 
 	int hp = 60;
-	int hpMax = 60;
-
-	//当たり判定の大きさ
-	float hitRadius = 64.0f;
-
-	float pow = 40.0f;
 	
-	int alphaBurstAreaReady = 255;
-	int alphaBurstAreaNormal = 15;
-
 	//<爆発関係>
 	//爆発までの時間
 	Timer burst = { 0,0 };
-	//爆発範囲
-	float burstRadius = 384.0f;
-	Vector2 bustSize = { 768,768 };
+
 	//<移動関係>
 	//速度
 	Vector2 velocity = { 0.0f, 0.0f };
 	//スピード
 	float nowSpeed = 0.0f;
-	//加速度
-	float accleretionSpeed = 0.05f;
-	//スピード上限
-	float moveSpeedLimit = 6.0f;
-	//減速度
-	float decelerationSpeed = 0.1f;
+
 
 	//ショックの生成無視状態
 	bool isIgnoreShock = false;
@@ -301,15 +269,11 @@ struct EnemyBomb {
 
 struct EnemySniper {
 	Vector2 pos = { 0, 0 };
-	Vector2 size = { 64, 64 };
 
 	//生存フラグ
 	bool isAlive = false;
 
 	int hp = 75;
-	int hpMax = 75;
-
-	float hitRadius = 20.0f;
 
 	//<射撃処理関係>
 	Timer shootLazerTimer = { 300, 0 };

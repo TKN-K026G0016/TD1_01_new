@@ -119,7 +119,7 @@ static void CheckCollisionElecBulletVSEnemy(void) {
 		for (int j = 0; j < elecBulletLimit; j++) {
 			if (!elecBullet[j].isShoot) continue;
 
-			if (CheckCollisionCircleVSCircle(enemySmall[i].pos, enemySmall[i].hitRadius, elecBullet[j].pos, elecBullet[j].hitRadius)) {
+			if (CheckCollisionCircleVSCircle(enemySmall[i].pos, GetEnemyHitRadius(EnemyType::EnemySmall), elecBullet[j].pos, elecBullet[j].hitRadius)) {
 				BreakElecBullet(j);
 				//ホウデンの生成
 				SpawnElecShock(enemySmall[i].pos, elecBullet[j].type, ElecShockOriginType::EnemySmall, i, ElecShockOriginType::None, -1);
@@ -139,7 +139,7 @@ static void CheckCollisionElecBulletVSEnemy(void) {
 		for (int j = 0; j < elecBulletLimit; j++) {
 			if (!elecBullet[j].isShoot) continue;
 
-			if (CheckCollisionCircleVSCircle(enemyM[i].pos, enemyM[i].hitRadius, elecBullet[j].pos, elecBullet[j].hitRadius)) {
+			if (CheckCollisionCircleVSCircle(enemyM[i].pos, GetEnemyHitRadius(EnemyType::EnemyM), elecBullet[j].pos, elecBullet[j].hitRadius)) {
 				BreakElecBullet(j);
 				//ホウデンの生成
 				SpawnElecShock(enemyM[i].pos, elecBullet[j].type, ElecShockOriginType::EnemyM, i, ElecShockOriginType::None, -1);
@@ -159,7 +159,7 @@ static void CheckCollisionElecBulletVSEnemy(void) {
 		for (int j = 0; j < elecBulletLimit; j++) {
 			if (!elecBullet[j].isShoot) continue;
 
-			if (CheckCollisionCircleVSCircle(enemyBomb[i].pos, enemyBomb[i].hitRadius, elecBullet[j].pos, elecBullet[j].hitRadius)) {
+			if (CheckCollisionCircleVSCircle(enemyBomb[i].pos, GetEnemyHitRadius(EnemyType::EnemyBomb), elecBullet[j].pos, elecBullet[j].hitRadius)) {
 				BreakElecBullet(j);
 				//ホウデンの生成
 				SpawnElecShock(enemyBomb[i].pos, elecBullet[j].type, ElecShockOriginType::EnemyBomb, i, ElecShockOriginType::None, -1);
@@ -179,7 +179,7 @@ static void CheckCollisionElecBulletVSEnemy(void) {
 		for (int j = 0; j < elecBulletLimit; j++) {
 			if (!elecBullet[j].isShoot) continue;
 
-			if (CheckCollisionCircleVSCircle(enemySniper[i].pos, enemySniper[i].hitRadius, elecBullet[j].pos, elecBullet[j].hitRadius)) {
+			if (CheckCollisionCircleVSCircle(enemySniper[i].pos, GetEnemyHitRadius(EnemyType::EnemySniper), elecBullet[j].pos, elecBullet[j].hitRadius)) {
 				BreakElecBullet(j);
 				//ホウデンの生成
 				SpawnElecShock(enemySniper[i].pos, elecBullet[j].type, ElecShockOriginType::EnemySniper, i, ElecShockOriginType::None, -1);
@@ -356,7 +356,7 @@ static void CheckCollisionElecShockVSEnemy(void) {
 		for (int j = 0; j < elecShockLimit; j++) {
 			if (!elecShock[j].isShoot) continue;
 
-			if (CheckCollisionCircleVSCircle(enemySmall[i].pos, enemySmall[i].hitRadius, elecShock[j].pos, elecShock[j].hitRadius)) {
+			if (CheckCollisionCircleVSCircle(enemySmall[i].pos, GetEnemyHitRadius(EnemyType::EnemySmall), elecShock[j].pos, elecShock[j].hitRadius)) {
 
 				//ホウデンの生成
 				if (!enemySmall[i].isIgnoreShock) {
@@ -387,7 +387,7 @@ static void CheckCollisionElecShockVSEnemy(void) {
 		for (int j = 0; j < elecShockLimit; j++) {
 			if (!elecShock[j].isShoot) continue;
 
-			if (CheckCollisionCircleVSCircle(enemyM[i].pos, enemyM[i].hitRadius, elecShock[j].pos, elecShock[j].hitRadius)) {
+			if (CheckCollisionCircleVSCircle(enemyM[i].pos, GetEnemyHitRadius(EnemyType::EnemyM), elecShock[j].pos, elecShock[j].hitRadius)) {
 
 				//ホウデンの生成
 				if (!enemyM[i].isIgnoreShock) {
@@ -419,7 +419,7 @@ static void CheckCollisionElecShockVSEnemy(void) {
 		for (int j = 0; j < elecShockLimit; j++) {
 			if (!elecShock[j].isShoot) continue;
 
-			if (CheckCollisionCircleVSCircle(enemyBomb[i].pos, enemyBomb[i].hitRadius, elecShock[j].pos, elecShock[j].hitRadius)) {
+			if (CheckCollisionCircleVSCircle(enemyBomb[i].pos, GetEnemyHitRadius(EnemyType::EnemyBomb), elecShock[j].pos, elecShock[j].hitRadius)) {
 
 				//ホウデンの生成
 				if (!enemyBomb[i].isIgnoreShock) {
@@ -451,7 +451,7 @@ static void CheckCollisionElecShockVSEnemy(void) {
 		for (int j = 0; j < elecShockLimit; j++) {
 			if (!elecShock[j].isShoot) continue;
 
-			if (CheckCollisionCircleVSCircle(enemySniper[i].pos, enemySniper[i].hitRadius, elecShock[j].pos, elecShock[j].hitRadius)) {
+			if (CheckCollisionCircleVSCircle(enemySniper[i].pos, GetEnemyHitRadius(EnemyType::EnemySniper), elecShock[j].pos, elecShock[j].hitRadius)) {
 
 				//ホウデンの生成
 				if (!enemySniper[i].isIgnoreShock) {
@@ -667,9 +667,9 @@ static void CheckCollisionPlayerVSEnemy(void) {
 	for (int i = 0; i < enemySmallLimit; i++) {
 		if (!enemySmall[i].isAlive) continue;
 
-		if (CheckCollisionCircleVSCircle(enemySmall[i].pos, enemySmall[i].hitRadius, playerPos, playerHitRadius)) {
+		if (CheckCollisionCircleVSCircle(enemySmall[i].pos, GetEnemyHitRadius(EnemyType::EnemySmall), playerPos, playerHitRadius)) {
 
-			PlayerDamage(enemySmall[i].pos, enemySmall[i].pow);
+			PlayerDamage(enemySmall[i].pos, GetEnemyPow(EnemyType::EnemySmall));
 		}
 	}
 
