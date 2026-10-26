@@ -113,11 +113,14 @@ struct DataShootLaser {
 	//レーザーの射撃スパン
 	Timer shootLaserTimer = { 2, 0 };
 
+	//初回攻撃フラグ
+	bool firstAttack = true;
 
 	//現在の回転速度
 	float nowRotateSpeed = 0.0f;
 	//回転速度の加速度
 	float rotateAccelerationSpeed = 0.00035f;
+	float rotateAccelerationSpeedFirst = 0.0002f;
 	//回転速度の上限
 	float rotateSpeedMax = 0.05f;
 	//現在の回転角
@@ -354,7 +357,9 @@ void MoveAttack3(void) {
 				}
 
 				//回転の加速処理
-				data.nowRotateSpeed += data.rotateAccelerationSpeed;
+				float rotateAccelerationSpeed = (data.firstAttack) ? data.rotateAccelerationSpeedFirst : data.rotateAccelerationSpeed;
+
+				data.nowRotateSpeed += rotateAccelerationSpeed;
 				if (data.nowRotateSpeed > data.rotateSpeedMax) {
 					data.nowRotateSpeed = data.rotateSpeedMax;
 				}
@@ -374,6 +379,8 @@ void MoveAttack3(void) {
 				data.shootTimer.count = 0;
 				data.nowMode = ModeShootLaser::Teleport;
 				bossEnemy.nowsSates = BossStates::Normal;
+
+				data.firstAttack = false;
 
 				//カメラのズームイン
 				ChangeModeCameraZoom(ModeCameraZoom::ZoomIn);
@@ -505,7 +512,7 @@ void InitBossEnemy(void) {
 		bossBomb[i].burstTexture = GetTexture(TextureType::BossBomBurstRange);
 	}
 
-	//SpawnBoss({ 500, 500 });
+	SpawnBoss({ 500, 500 });
 }
 
 void UpdateBossEnemy(void) {
