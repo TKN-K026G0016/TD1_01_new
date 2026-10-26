@@ -334,7 +334,6 @@ struct WarningBossTelop {
 	Vector2 size = { 512, 128 };
 
 	//振動関係
-	Timer shakeTimer = { 10, 0 };
 	int shakeDuration = 3;
 
 	//イージング関係
@@ -510,10 +509,10 @@ static void UpdateEnergyGauge(void) {
 
 #pragma region ケムリ生成処理
 
-	if (remainEnergy <= energyGaugeFrame.warnDeadEnergy) {
-		energyGaugeFrame.createSmokeWarningTimer.count++;
-	} else if (remainEnergy <= energyGaugeFrame.dangerEnergy) {
+	if (remainEnergy <= energyGaugeFrame.dangerEnergy) {
 		energyGaugeFrame.createSmokeOverHeatTimer.count++;
+	} else if (remainEnergy <= energyGaugeFrame.warnDeadEnergy) {
+		energyGaugeFrame.createSmokeWarningTimer.count++;
 	}
 
 	if (energyGaugeFrame.createSmokeWarningTimer.count >= energyGaugeFrame.createSmokeWarningTimer.time

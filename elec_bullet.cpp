@@ -17,6 +17,7 @@
 #include "texture.h"
 
 #include <math.h>
+#include <algorithm>
 
 static Scene nowScene = Scene::Play;
 
@@ -41,6 +42,13 @@ ElecBulletSpec elecBulletSpec[ToInt(ElecBulletType::Count)] = {
 constexpr static int kElecBulletLimit = 5;
 ElecBullet elecBullet[kElecBulletLimit] = {};
 
+#pragma region 残像関係
+
+//残像のalphaの差
+static constexpr int kAfterImageAlphaOffset = 40;
+
+#pragma endregion
+
 #pragma endregion
 
 #pragma region データ: ElecShock
@@ -49,15 +57,13 @@ struct ElecShockSpec {
 	float hitRadius;
 
 	int pow;
-
-	Texture texture = {};
 };
 
 ElecShockSpec elecShockSpec[ToInt(ElecBulletType::Count)] = {
 	//Normal弾
-	{ 120, 1, {}},
+	{ 120, 1 },
 	//Charge弾
-	{ 200, 3, {} },
+	{ 200, 3 },
 };
 
 constexpr static int kElecShockLimit = 30;
@@ -76,9 +82,9 @@ static int maxCombo = 0;
 Timer comboTimer = { 100, 0 };
 
 //通常弾のコンボ増加数
-int kAddCombo = 1;
+static constexpr int kAddCombo = 1;
 //チャージ弾のコンボ増加数
-int kAddComboCharged = 5;
+static constexpr int kAddComboCharged = 5;
 //通常弾でのコンボ回復量
 constexpr int kRecoveryComboTime = 2;
 //チャージ弾でのコンボ回復量
@@ -92,11 +98,11 @@ int scoreInCombo = 0;
 constexpr float kScoreMugByCombo = 0.01f;
 
 //コンボサウンドの間隔
-int comboSoundSpan = 100;
+static constexpr int comboSoundSpan = 100;
 
-int jingle1Combo = 100;
-int jingle2Combo = 500;
-int jingle3Combo = 1000;
+static constexpr int jingle1Combo = 100;
+static constexpr int jingle2Combo = 500;
+static constexpr int jingle3Combo = 1000;
 
 //スコアジングル再生中のbgmVolume
 static constexpr  float bgmVolumePlayingJingle = 0.5f;
@@ -109,6 +115,11 @@ static constexpr  float bgmVolumePlayingJingle = 0.5f;
 static void InitBullet(void) {
 	for (int i = 0; i < kElecBulletLimit; i++) {
 		elecBullet[i] = {};
+		for (int j = 0; j < kElecBulletAfterimageNum; j++) {
+			elecBullet[i].afterImageAlpha[j] = 255 - (kAfterImageAlphaOffset * j);
+			elecBullet[i].afterImageAlpha[j] = std::clamp(elecBullet[i].afterImageAlpha[j], 0, 255);
+		}
+
 	}
 
 	elecBulletSpec[ToInt(ElecBulletType::Normal)].texture = GetTexture(TextureType::ElecBullet);
@@ -122,8 +133,15 @@ static void MoveBullet(void) {
 	for (int i = 0; i < kElecBulletLimit; i++) {
 		if (!elecBullet[i].isShoot) continue;
 
-		elecBullet[i].prePos[1] = elecBullet[i].prePos[0];
+#pragma region 残像の位置更新
+
+		for (int j = kElecBulletAfterimageNum - 1; j > 0; j--) {
+			elecBullet[i].prePos[j] = elecBullet[i].prePos[j - 1];
+		}
+
 		elecBullet[i].prePos[0] = elecBullet[i].pos;
+
+#pragma endregion
 
 		elecBullet[i].pos.x += cosf(elecBullet[i].moveTheta) * elecBullet[i].moveSpeed;
 		elecBullet[i].pos.y += sinf(elecBullet[i].moveTheta) * elecBullet[i].moveSpeed;
@@ -153,23 +171,46 @@ static void DrawBullet(void) {
 		if (!elecBullet[i].isShoot) continue;
 
 		if (nowScene == Scene::Play) {
-
-			//残像の描画
-			for (int j = 1; j > -1; j--) {
+#pragma region 残像の描画
+			for (int j = kElecBulletAfterimageNum - 1; j >= 0; j--) {
 				Texture texture = elecBullet[i].texture;
-				texture.color = (texture.color & 0xFFFFFF00) | elecBullet[i].afterImageAlpha[j];
-				DrawTextureRotateObj(texture, elecBullet[i].prePos[j], elecBullet[i].size, elecBullet[i].moveTheta);
+
+				texture.color =
+					(texture.color & 0xFFFFFF00)
+					| elecBullet[i].afterImageAlpha[j];
+
+				DrawTextureRotateObj(
+					texture,
+					elecBullet[i].prePos[j],
+					elecBullet[i].size,
+					elecBullet[i].moveTheta
+				);
 			}
 
+#pragma endregion
+			//本体の描画
 			DrawTextureRotateObj(elecBullet[i].texture, elecBullet[i].pos, elecBullet[i].size, elecBullet[i].moveTheta);
-		} else {
-			//残像の描画
-			for (int j = 1; j > -1; j--) {
+		} 
+		else {
+#pragma region 残像の描画
+			for (int j = kElecBulletAfterimageNum - 1; j >= 0; j--) {
 				Texture texture = elecBullet[i].texture;
-				texture.color = (texture.color & 0xFFFFFF00) | elecBullet[i].afterImageAlpha[j];
-				DrawTextureRotateUI(texture, elecBullet[i].prePos[j], elecBullet[i].size, elecBullet[i].moveTheta);
+
+				texture.color =
+					(texture.color & 0xFFFFFF00)
+					| elecBullet[i].afterImageAlpha[j];
+
+				DrawTextureRotateUI(
+					texture,
+					elecBullet[i].prePos[j],
+					elecBullet[i].size,
+					elecBullet[i].moveTheta
+				);
 			}
 
+#pragma endregion
+
+			//本体の描画
 			DrawTextureRotateUI(elecBullet[i].texture, elecBullet[i].pos, elecBullet[i].size, elecBullet[i].moveTheta);
 		}
 	}
@@ -194,14 +235,6 @@ static void BreakElecShockItSelf(void) {
 			elecShock[i].breakTimer.count = 0;
 			BreakElecShock(i);
 		}
-	}
-}
-
-static void DrawElecShock(void) {
-	for (int i = 0; i < kElecShockLimit; i++) {
-		if (!elecShock[i].isShoot) continue;
-
-		//DrawHitEllipse(elecShock[i].pos, elecShock[i].hitRadius, elecShock[i].color, true);
 	}
 }
 
@@ -289,8 +322,6 @@ void UpdateElecBullet(void) {
 
 void DrawElecBullet(void) {
 	DrawBullet();
-
-	DrawElecShock();
 }
 
 #pragma region 関数: 外部参照関係
@@ -303,7 +334,9 @@ void ShootElecBullet(Vector2 pos, float moveTheta, ElecBulletType type) {
 
 		elecBullet[i].pos = pos;
 		elecBullet[i].moveTheta = moveTheta;
-
+		for (int j = 0; j < kElecBulletAfterimageNum; j++) {
+			elecBullet[i].prePos[j] = pos;
+		}
 
 		elecBullet[i].type = type;
 		elecBullet[i].size = elecBulletSpec[ToInt(type)].size;
@@ -363,19 +396,16 @@ void SpawnElecShock(Vector2 pos, ElecBulletType type, ElecShockOriginType origin
 				PlaySe(SeType::SpawnElecShock);
 			}
 
-			//TriggerViberationGamePad(ModeViberation::S);
-
 		} else if(type == ElecBulletType::Charge){
 			CreateElecShockChargedEffect(pos);
 			//Se
 			if (!CheckIsPlayingSe(SeType::SpawnElecShockCharge)) {
 				PlaySe(SeType::SpawnElecShockCharge);
 			}
-			//TriggerViberationGamePad(ModeViberation::M);
 		}
 
 		//ラインエフェクトの生成
-		if (originType2 != ElecShockOriginType::None || originIndex2 >= 0) {
+		if (originType2 != ElecShockOriginType::None && originIndex2 >= 0) {
 
 			Vector2 originPos = {};
 

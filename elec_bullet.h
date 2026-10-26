@@ -10,6 +10,8 @@ enum class ElecBulletType {
 	Count
 };
 
+constexpr int kElecBulletAfterimageNum = 3;
+
 //デンゲキ弾
 struct ElecBullet {
 	Vector2 pos;
@@ -32,8 +34,8 @@ struct ElecBullet {
 	int pow;
 
 	//残像の座標
-	Vector2 prePos[2] = {};
-	int afterImageAlpha[2] = { 100, 40 };
+	Vector2 prePos[kElecBulletAfterimageNum] = {};
+	int afterImageAlpha[kElecBulletAfterimageNum] = {};
 
 	Texture texture = {};
 };
