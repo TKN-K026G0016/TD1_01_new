@@ -70,7 +70,7 @@ struct StatesTimer {
 	Timer normal = { 300,0 };
 	Timer attack1 = { 120,0 };
 	Timer attack1ShootBom = { 30,0 };
-	Timer attack2 = { 360,0 };
+	Timer attack2 = { 480,0 };
 };
 StatesTimer statesTimer;
 

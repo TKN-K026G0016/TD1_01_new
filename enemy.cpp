@@ -77,7 +77,7 @@ static EnemyGuardian enemyGuardian[kEnemyGuardianLimit];
 struct EnemyGuardianData {
 	Vector2 size = { 64, 64 };
 
-	int hpMax = 360;
+	int hpMax = 270;
 	float hitRadius = 20.0f;
 
 	int shootTime = 75;
