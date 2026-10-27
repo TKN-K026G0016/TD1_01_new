@@ -196,9 +196,9 @@ static Vector2 CreateScatterPos(Vector2 centerPos) {
 void InitGem(void) {
 	spec[ToInt(GemType::S)].texture = GetTexture(TextureType::GemSmall);
 	spec[ToInt(GemType::S)].lightTexture = GetTexture(TextureType::GemSmallLight);
-	spec[ToInt(GemType::M)].texture = GetTexture(TextureType::Gem);
+	spec[ToInt(GemType::M)].texture = GetTexture(TextureType::GemSmall);
 	spec[ToInt(GemType::M)].lightTexture = GetTexture(TextureType::GemSmallLight);
-	spec[ToInt(GemType::L)].texture = GetTexture(TextureType::Gem);
+	spec[ToInt(GemType::L)].texture = GetTexture(TextureType::GemSmall);
 	spec[ToInt(GemType::L)].lightTexture = GetTexture(TextureType::GemSmallLight);
 
 	//可動域を取得

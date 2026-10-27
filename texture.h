@@ -73,17 +73,9 @@ enum class TextureType {
 	//Player
 	Player,
 
-	PlayerLaser0,
-	PlayerLaser1,
-	PlayerLaser2,
-
 	ElecBullet,
 	ElecBulletCharged,
-	ChargeOrb,
 
-	ElecShock,
-	ElecShockCharged,
-	Elec,
 	ElecLine,
 
 	ElecShield,
@@ -91,7 +83,6 @@ enum class TextureType {
 	LockOnSign,
 
 	//Item
-	Gem,
 	GemSmall,
 	GemSmallLight,
 
@@ -118,8 +109,6 @@ enum class TextureType {
 	StageLine,
 
 	//UI
-	LifeIcon,
-
 	EnergyGaugeFrame,
 	EnergyGaugeMeter,
 	EnergyGaugeDelayMeter,
@@ -143,7 +132,6 @@ enum class TextureType {
 	ComboNumbersMeter,
 
 	ScoreNumbers,
-	ScoreIcon,
 
 	DisplayEffect,
 

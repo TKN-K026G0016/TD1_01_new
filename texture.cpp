@@ -65,17 +65,9 @@ void InitTexture(void) {
 		//Player
 		{ Novice::LoadTexture("./resources/texture/player/player.png"), { 128, 128 }, {0, 0}, 0, 0, WHITE },
 
-		{ Novice::LoadTexture("./resources/texture/player/laser0.png"), { 64, 64 }, {0, 0}, 0, 0, WHITE },
-		{ Novice::LoadTexture("./resources/texture/player/laser1.png"), { 64, 64 }, {0, 0}, 0, 0, WHITE },
-		{ Novice::LoadTexture("./resources/texture/player/laser2.png"), { 64, 64 }, {0, 0}, 0, 0, WHITE },
-
 		{ Novice::LoadTexture("./resources/texture/player/elec_bullet.png"), { 64, 64 }, {0, 0}, 0, 0, WHITE },
 		{ Novice::LoadTexture("./resources/texture/player/elec_bullet_charged.png"), { 128, 128 }, {0, 0}, 0, 0, WHITE },
-		{ Novice::LoadTexture("./resources/texture/player/charge_effect.png"), { 64, 64 }, {0, 0}, 0, 0, WHITE },
 
-		{ Novice::LoadTexture("./resources/texture/player/elec_shock.png"), { 256, 256 }, {0, 0}, 0, 0, WHITE },
-		{ Novice::LoadTexture("./resources/texture/player/erec_shock_charged.png"), { 256, 256 }, {0, 0}, 0, 0, WHITE },
-		{ Novice::LoadTexture("./resources/texture/player/elec.png"), { 64, 64 }, {2, 0}, 2, 0, WHITE },
 		{ Novice::LoadTexture("./resources/texture/player/elec_line2.png"), { 32, 32 }, {3, 0}, 4, 0, WHITE },
 
 		{ Novice::LoadTexture("./resources/texture/effect/barrier.png"), { 256, 256 }, {0, 0}, 0, 0, WHITE },
@@ -83,7 +75,6 @@ void InitTexture(void) {
 		{ Novice::LoadTexture("./resources/texture/player/lock_on.png"), { 64, 64 }, {7, 0}, 2, 0, WHITE },
 
 		//Item
-		{ Novice::LoadTexture("./resources/texture/item/gem.png"), { 32, 32 }, {7, 0}, 3, 0, WHITE },
 		{ Novice::LoadTexture("./resources/texture/item/gem.png"), { 32, 32 }, {7, 0}, 3, 0, WHITE },
 		{ Novice::LoadTexture("./resources/texture/item/gem_light.png"), { 32, 32 }, {7, 0}, 3, 0, WHITE },
 
@@ -110,8 +101,6 @@ void InitTexture(void) {
 		{ Novice::LoadTexture("./resources/texture/stage/stage_line.png"), { 2960, 1840 }, {0, 0}, 0, 0, WHITE },
 
 		//UI
-		{ Novice::LoadTexture("./resources/texture/ui/play/life_icon.png"), { 64, 64 }, {0, 0}, 0, 0, WHITE },
-
 		{ Novice::LoadTexture("./resources/texture/ui/play/energy_gauge_frame.png"), { 512, 128 }, {7, 0}, 5, 0, WHITE },
 		{ Novice::LoadTexture("./resources/texture/ui/play/energy_gauge_meter.png"), { 512, 128 }, {0, 0}, 0, 0, WHITE },
 		{ Novice::LoadTexture("./resources/texture/ui/play/energy_gauge_delay_meter.png"), { 512, 128 }, {0, 0}, 0, 0, WHITE },
@@ -134,7 +123,6 @@ void InitTexture(void) {
 		{ Novice::LoadTexture("./resources/texture/ui/play/combo_numbers.png"), { 68, 128 }, {0, 0}, 0, 0, WHITE },
 		{ Novice::LoadTexture("./resources/texture/ui/play/combo_numbers_meter_reverse.png"), { 68, 128 }, {0, 0}, 0, 0, WHITE },
 
-		{ Novice::LoadTexture("./resources/texture/ui/play/score_numbers.png"), { 64, 128 }, {0, 0}, 9, 0, WHITE },
 		{ Novice::LoadTexture("./resources/texture/ui/play/score_numbers.png"), { 64, 128 }, {0, 0}, 9, 0, WHITE },
 
 		{ Novice::LoadTexture("./resources/texture/ui/play/display_effect.png"), { 1280, 720 }, {0, 0}, 0, 0, WHITE },
