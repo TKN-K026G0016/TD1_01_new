@@ -1175,6 +1175,8 @@ static void ChangeModeClacksEffect(void) {
 	if (GetPlayerRemainEnergy() <= energyGaugeFrame.warnDeadEnergy && clacksEffect[0].nowMode == ModeClacksEffect::Standby) {
 		clacksEffect[0].nowMode = ModeClacksEffect::FadeIn;
 		clacksEffect[0].easingT = 0.0f;
+
+		PlaySe(SeType::Clacked);
 	}
 	else if (GetPlayerRemainEnergy() > energyGaugeFrame.warnDeadEnergy && clacksEffect[0].nowMode == ModeClacksEffect::Show) {
 		clacksEffect[0].nowMode = ModeClacksEffect::FadeOut;
@@ -1187,6 +1189,9 @@ static void ChangeModeClacksEffect(void) {
 	if (GetPlayerRemainEnergy() <= energyGaugeFrame.dangerEnergy && clacksEffect[1].nowMode == ModeClacksEffect::Standby) {
 		clacksEffect[1].nowMode = ModeClacksEffect::FadeIn;
 		clacksEffect[1].easingT = 0.0f;
+
+		PlaySe(SeType::Clacked);
+
 	} else if (GetPlayerRemainEnergy() > energyGaugeFrame.dangerEnergy && clacksEffect[1].nowMode == ModeClacksEffect::Show) {
 		clacksEffect[1].nowMode = ModeClacksEffect::FadeOut;
 		clacksEffect[1].easingT = 0.0f;
@@ -1198,6 +1203,9 @@ static void ChangeModeClacksEffect(void) {
 	if (!GetPlayerIsEquipShield() && clacksEffect[2].nowMode == ModeClacksEffect::Standby) {
 		clacksEffect[2].nowMode = ModeClacksEffect::FadeIn;
 		clacksEffect[2].easingT = 0.0f;
+
+		PlaySe(SeType::Clacked);
+
 	} else if (GetPlayerIsEquipShield() && clacksEffect[2].nowMode == ModeClacksEffect::Show) {
 		clacksEffect[2].nowMode = ModeClacksEffect::FadeOut;
 		clacksEffect[2].easingT = 0.0f;

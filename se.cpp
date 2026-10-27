@@ -62,6 +62,7 @@ void InitSe(void) {
 		//ui
 		{Novice::LoadAudio("./resources/sound/se/ui/gauge_alarm.wav"), 1.0f},
 		{Novice::LoadAudio("./resources/sound/se/ui/boss_alarm.wav"), 1.0f},
+		{Novice::LoadAudio("./resources/sound/se/ui/clacked.wav"), 1.0f},
 
 		{Novice::LoadAudio("./resources/sound/se/ui/ready.wav"), 1.0f},
 		{Novice::LoadAudio("./resources/sound/se/ui/go.wav"), 1.0f},

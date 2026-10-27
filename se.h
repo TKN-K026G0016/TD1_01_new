@@ -53,6 +53,7 @@ enum class SeType {
 	//ui
 	GaugeAlarm,
 	WarningBossAlarm,
+	Clacked,
 
 	Ready,
 	Go,
