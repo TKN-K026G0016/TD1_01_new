@@ -783,13 +783,12 @@ static void InitScore(void) {
 	for (int i = 0; i < kScoreNumbersLimit; i++) {
 		scoreNumbers[i] = {};
 	}
+	scoreIcon = {};
+
 	scoreNumbersTexture = GetTexture(TextureType::ScoreNumbers);
 }
 
 static void UpdateScore(void) {
-
-
-
 	int nowScore = GetNowScore();
 
 	if (nowScore >= kCountStopScoreInPlay) {
