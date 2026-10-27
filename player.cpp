@@ -8,6 +8,7 @@
 #include "play_ui.h"
 #include "se.h"
 #include "bgm.h"
+#include "scene_manager.h"
 
 #include "vector2.h"
 #include "tool.h"
@@ -911,7 +912,7 @@ static void UpdatePlayerEffect(void) {
 /// <param name=""></param>
 static void CreateChargeOrbEffect(void) {
 
-	if ((chargeElecBulletTimer.count > kStartCreateChargeChipTime && player.remainEnergy > consumptionShootCharge) || isCharge) {
+	if (((chargeElecBulletTimer.count > kStartCreateChargeChipTime && player.remainEnergy > consumptionShootCharge) || isCharge) && GetNowModeFade() == ModeFade::Standby) {
 
 		createChargeChipTimer.count++;
 		if (createChargeChipTimer.count >= createChargeChipTimer.time) {

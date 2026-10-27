@@ -263,7 +263,10 @@ Timer warnBossTimer = { 300, 0 };
 #pragma region 関数: カメラ関係
 
 static void InitCamera(void) {
+	//初期化
+	camera.nowModeZoom = ModeCameraZoom::Standby;
 	camera.zoom = camera.zoomMin;
+	camera.zoomEasingT = 0.0f;
 	camera.pos = GetPlayerPos();
 }
 
@@ -731,7 +734,6 @@ static void UpdateWarningBoss(void) {
 }
 
 static void GoClearScene(void) {
-	/*if (nowRound != Round::RoundBoss) return;*/
 
 	//生存していたらスキップ
 	if (GetBossEnemyIsAlive() || !GetBossEnemyIsDead()) return;
