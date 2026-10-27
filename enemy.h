@@ -233,6 +233,7 @@ struct EnemyBomb {
 	//<爆発関係>
 	//爆発までの時間
 	Timer burst = { 0,0 };
+	Timer changeBurstRange = { 20,0 };
 
 	//<移動関係>
 	//速度

@@ -209,6 +209,7 @@ struct EnemyBombData {
 	//爆発範囲
 	float burstRadius = 384.0f;
 	Vector2 bustSize = { 768,768 };
+	float burstRadiusAmplitude = 30.0f;
 
 	//加速度
 	float accleretionSpeed = 0.05f;
@@ -384,7 +385,7 @@ static void UpdateSpawnEffectEnemyShooter(void) {
 	for (int i = 0; i < kEnemyShooterLimit; i++) {
 		if (!enemyShooter[i].isAlive) continue;
 		if (enemyShooter[i].spawnEasingT >= 1.0f) continue;
-	
+
 		enemyShooter[i].spawnEasingT += kSpawnEasingSpeed;
 		if (enemyShooter[i].spawnEasingT >= 1.0f) {
 			enemyShooter[i].spawnEasingT = 1.0f;
@@ -402,7 +403,7 @@ static void DeadEnemyShooter(int index) {
 	enemyShooter[index].isAlive = false;
 	enemyShooter[index].hp = enemyShooterData.hpMax;
 
-	CreateExplodeEffect(enemyShooter[index].pos,WHITE);
+	CreateExplodeEffect(enemyShooter[index].pos, WHITE);
 }
 
 /// <summary>
@@ -646,7 +647,7 @@ static void MoveEnemyBasic(void) {
 		}
 		enemyBasic[i].pos.x += cosf(enemyBasic[i].moveTheta) * enemyBasicData.moveSpeed;
 		enemyBasic[i].pos.y += sinf(enemyBasic[i].moveTheta) * enemyBasicData.moveSpeed;
-		if ((enemyBasic[i].pos.x < -640 || enemyBasic[i].pos.x>3200 || enemyBasic[i].pos.y < -360 || enemyBasic[i].pos.y>1800)&&!enemyBasic[i].thetaUpDate) {
+		if ((enemyBasic[i].pos.x < -640 || enemyBasic[i].pos.x>3200 || enemyBasic[i].pos.y < -360 || enemyBasic[i].pos.y>1800) && !enemyBasic[i].thetaUpDate) {
 			Vector2 targetPos = GetPlayerPos();
 			float disX = targetPos.x - enemyBasic[i].pos.x;
 			float disY = targetPos.y - enemyBasic[i].pos.y;
@@ -1005,7 +1006,7 @@ static void DeadEnemySmall(int index) {
 	CreateExplodeEffect(enemySmall[index].pos, WHITE);
 
 	AddScoreByDefeatEnemy(enemySmallData.defeatScore);
-	
+
 }
 
 static void CheckDeadEnemySmall(void) {
@@ -1117,7 +1118,8 @@ static void MoveEnemyBomb(void) {
 					Vector2 createPos = { enemyBomb[i].pos.x + enemyBombData.createSmokePosOffset.x, enemyBomb[i].pos.y + enemyBombData.createSmokePosOffset.y };
 					CreateSmokeEffect(createPos, TypeDrawEffect::Obj, TypeSmoke::EnemyBomb);
 				}
-			} else {
+			}
+			else {
 				enemyBomb[i].createSmokeReadyBurstTimer.count++;
 				if (enemyBomb[i].createSmokeReadyBurstTimer.count >= enemyBomb[i].createSmokeReadyBurstTimer.time) {
 					enemyBomb[i].createSmokeReadyBurstTimer.count = 0;
@@ -1258,15 +1260,36 @@ static void DrawEnemyBomb(void) {
 		if (enemyBomb[i].burst.count <= enemyBomb[i].burst.time - 90) {
 			Texture burstTexture = enemyBomb[i].burstTexture;
 			burstTexture.color = (burstTexture.color & 0xFFFFFF00) | enemyBombData.alphaBurstAreaNormal;
-
-			DrawTextureObj(burstTexture, enemyBomb[i].pos, enemyBombData.bustSize);
+			enemyBomb[i].changeBurstRange.count++;
+			if (enemyBomb[i].changeBurstRange.count == enemyBomb[i].changeBurstRange.time + 20) {
+				enemyBomb[i].changeBurstRange.count = 0;
+			}
+			if (enemyBomb[i].changeBurstRange.count >= enemyBomb[i].changeBurstRange.time) {
+				Vector2 burstRange = { enemyBombData.bustSize.x + cosf((static_cast<float>(enemyBomb[i].changeBurstRange.count-15) / 10.0f) * float(M_PI)) * enemyBombData.burstRadiusAmplitude,
+					enemyBombData.bustSize.y + cosf((static_cast<float>(enemyBomb[i].changeBurstRange.count-15) / 10.0f) * float(M_PI)) * enemyBombData.burstRadiusAmplitude };
+				DrawTextureObj(burstTexture, enemyBomb[i].pos,burstRange);
+			}
+			else if (enemyBomb[i].changeBurstRange.count < enemyBomb[i].changeBurstRange.time) {
+				DrawTextureObj(burstTexture, enemyBomb[i].pos, enemyBombData.bustSize);
+			}
 		}
 		else {
+			enemyBomb[i].changeBurstRange.count++;
 			for (int j = 0;j < 45;j++) {
 				if (enemyBomb[i].burst.time - enemyBomb[i].burst.count == j * 2) {
 					Texture burstTexture = enemyBomb[i].burstTexture;
 					burstTexture.color = (burstTexture.color & 0xFFFFFF00) | enemyBombData.alphaBurstAreaReady;
-					DrawTextureObj(enemyBomb[i].burstTexture, enemyBomb[i].pos, enemyBombData.bustSize);
+					if (enemyBomb[i].changeBurstRange.count == enemyBomb[i].changeBurstRange.time + 20) {
+						enemyBomb[i].changeBurstRange.count = 0;
+					}
+					if (enemyBomb[i].changeBurstRange.count >= enemyBomb[i].changeBurstRange.time) {
+						Vector2 burstRange = { enemyBombData.bustSize.x + cosf((static_cast<float>(enemyBomb[i].changeBurstRange.count - 15) / 10.0f) * float(M_PI)) * enemyBombData.burstRadiusAmplitude,
+							enemyBombData.bustSize.y + cosf((static_cast<float>(enemyBomb[i].changeBurstRange.count - 15) / 10.0f) * float(M_PI)) * enemyBombData.burstRadiusAmplitude };
+						DrawTextureObj(burstTexture, enemyBomb[i].pos, burstRange);
+					}
+					else if (enemyBomb[i].changeBurstRange.count < enemyBomb[i].changeBurstRange.time) {
+						DrawTextureObj(burstTexture, enemyBomb[i].pos, enemyBombData.bustSize);
+					}
 				}
 			}
 		}
@@ -1291,10 +1314,10 @@ static void InitEnemySniper(void) {
 static void ShootEnemyBulletSniper(void) {
 	for (int i = 0; i < kEnemySniperLimit; i++) {
 		if (!enemySniper[i].isAlive) continue;
-			Vector2 playerPos = GetPlayerPos();
-			float disX = playerPos.x - enemySniper[i].pos.x;
-			float disY = playerPos.y - enemySniper[i].pos.y;
-			enemySniper[i].theta = atan2f(disY, disX);
+		Vector2 playerPos = GetPlayerPos();
+		float disX = playerPos.x - enemySniper[i].pos.x;
+		float disY = playerPos.y - enemySniper[i].pos.y;
+		enemySniper[i].theta = atan2f(disY, disX);
 		//攻撃のスパン
 		enemySniper[i].shootTimer.count++;
 		if (enemySniper[i].shootTimer.count >= enemySniper[i].shootTimer.time) {
@@ -1303,13 +1326,13 @@ static void ShootEnemyBulletSniper(void) {
 			enemySniper[i].burstShootTimer.count++;
 			if (enemySniper[i].burstShootTimer.count >= enemySniper[i].burstShootTimer.time) {
 
-			
+
 				//射撃処理
-				ShootEnemyBullet(enemySniper[i].pos, enemySniper[i].theta,TypeEnemyBullet::L);
+				ShootEnemyBullet(enemySniper[i].pos, enemySniper[i].theta, TypeEnemyBullet::L);
 
 				enemySniper[i].burstShootTimer.count = 0;
 				enemySniper[i].burstCount++;
-				
+
 			}
 
 			//一定回数射撃したら
@@ -1389,7 +1412,7 @@ static void DeadEnemySniper(int index) {
 	enemySniper[index].isAlive = false;
 	enemySniper[index].hp = enemySniperData.hpMax;
 
-	CreateExplodeEffect(enemySniper[index].pos,WHITE);
+	CreateExplodeEffect(enemySniper[index].pos, WHITE);
 }
 
 static void CheckDeadEnemySniper(void) {
@@ -1425,7 +1448,7 @@ static void DrawEnemySniper(void) {
 
 		texture.color = (texture.color & 0xFFFFFF00) | enemySniper[i].alpha;
 
-		DrawTextureRotateObj(texture, enemySniper[i].pos, size,enemySniper[i].theta);
+		DrawTextureRotateObj(texture, enemySniper[i].pos, size, enemySniper[i].theta);
 	}
 }
 #pragma endregion
@@ -1497,7 +1520,7 @@ void InitEnemy(void) {
 	InitEnemyBomb();
 	InitEnemySniper();
 
-	SpawnEnemy({ 500, 500 }, EnemyType::EnemySniper);
+	SpawnEnemy({ 500, 500 }, EnemyType::EnemyBomb);
 }
 
 void UpdateEnemy(void) {
@@ -1729,7 +1752,7 @@ void SpawnEnemy(Vector2 pos, EnemyType type) {
 
 			break;
 		}
-	break;
+		break;
 	}
 	case EnemyType::EnemyFormation: {
 		Vector2 playerPos = GetPlayerPos();
