@@ -388,6 +388,41 @@ static PauseGuide pauseGuide;
 
 #pragma endregion
 
+#pragma region データ: デンリョクガイド
+
+enum class ModeEnergyGuide {
+	Standby,
+	FrameIn,
+	Show,
+	FrameOut,
+};
+
+struct EnergyGuide {
+	Vector2 pos = {};
+	Vector2 size = { 256, 64 };
+
+	Vector2 offset = { 0, 128 };
+
+	ModeEnergyGuide nowMode = ModeEnergyGuide::Standby;
+
+	Timer showTimer = { 150, 0 };
+
+	//<イージング関係>
+	float easingT = 0.0f;
+	float easingSpeedFrameIn = 0.03f;
+	float easingSpeedFrameOut = 0.08f;
+	EasingMode easingMode = EasingMode::EaseIn;
+
+	int alpha = 0;
+	int alphaMin = 0;
+	int alphaMax = 255;
+
+	Texture texture = {};
+};
+EnergyGuide energyGuide;
+
+#pragma endregion
+
 
 #pragma region 関数: エネルギーゲージ
 
@@ -509,23 +544,23 @@ static void UpdateEnergyGauge(void) {
 
 #pragma region ケムリ生成処理
 
-	if (remainEnergy <= energyGaugeFrame.dangerEnergy) {
-		energyGaugeFrame.createSmokeOverHeatTimer.count++;
-	} else if (remainEnergy <= energyGaugeFrame.warnDeadEnergy) {
-		energyGaugeFrame.createSmokeWarningTimer.count++;
-	}
+	//if (remainEnergy <= energyGaugeFrame.dangerEnergy) {
+	//	energyGaugeFrame.createSmokeOverHeatTimer.count++;
+	//} else if (remainEnergy <= energyGaugeFrame.warnDeadEnergy) {
+	//	energyGaugeFrame.createSmokeWarningTimer.count++;
+	//}
 
-	if (energyGaugeFrame.createSmokeWarningTimer.count >= energyGaugeFrame.createSmokeWarningTimer.time
-		|| energyGaugeFrame.createSmokeOverHeatTimer.count >= energyGaugeFrame.createSmokeOverHeatTimer.time) {
-		energyGaugeFrame.createSmokeWarningTimer.count = 0;
-		energyGaugeFrame.createSmokeOverHeatTimer.count = 0;
+	//if (energyGaugeFrame.createSmokeWarningTimer.count >= energyGaugeFrame.createSmokeWarningTimer.time
+	//	|| energyGaugeFrame.createSmokeOverHeatTimer.count >= energyGaugeFrame.createSmokeOverHeatTimer.time) {
+	//	energyGaugeFrame.createSmokeWarningTimer.count = 0;
+	//	energyGaugeFrame.createSmokeOverHeatTimer.count = 0;
 
-		//生成座標を設定
-		float posX = energyGaugeFrame.pos.x + ToFloat(GetRand(-energyGaugeFrame.spawnSmokeRange.x, energyGaugeFrame.spawnSmokeRange.x));
-		float posY = energyGaugeFrame.pos.y + ToFloat(GetRand(0, energyGaugeFrame.spawnSmokeRange.y));
+	//	//生成座標を設定
+	//	float posX = energyGaugeFrame.pos.x + ToFloat(GetRand(-energyGaugeFrame.spawnSmokeRange.x, energyGaugeFrame.spawnSmokeRange.x));
+	//	float posY = energyGaugeFrame.pos.y + ToFloat(GetRand(0, energyGaugeFrame.spawnSmokeRange.y));
 
-		CreateSmokeEffect({ posX, posY }, TypeDrawEffect::UI, TypeSmoke::EnergyGauge);
-	}
+	//	CreateSmokeEffect({ posX, posY }, TypeDrawEffect::UI, TypeSmoke::EnergyGauge);
+	//}
 
 #pragma endregion
 
@@ -1137,6 +1172,71 @@ static void DrawPauseGuide(void) {
 
 #pragma endregion
 
+#pragma region 関数: ポーズガイド
+
+static void InitEnergyGuide(void) {
+	energyGuide = {};
+	energyGuide.texture = GetTexture(TextureType::White1x1);
+}
+
+static void UpdateEnergyGuide(void) {
+	if (energyGuide.nowMode == ModeEnergyGuide::Standby) return;
+
+	//移動処理
+	Vector2 playerPos = GetPlayerPos();
+	energyGuide.pos = { playerPos.x + energyGuide.offset.x, playerPos.y + energyGuide.offset.y };
+
+	switch (energyGuide.nowMode) {
+	case ModeEnergyGuide::FrameIn: {
+		energyGuide.easingT += energyGuide.easingSpeedFrameIn;
+		if (energyGuide.easingT >= 1.0f) {
+			energyGuide.easingT = 1.0f;
+			energyGuide.nowMode = ModeEnergyGuide::Show;
+		}
+
+		break;
+	}
+	case ModeEnergyGuide::Show: {
+		energyGuide.showTimer.count++;
+		if (energyGuide.showTimer.count >= energyGuide.showTimer.time) {
+			energyGuide.showTimer.count = 0;
+			energyGuide.nowMode = ModeEnergyGuide::FrameOut;
+		}
+
+		break;
+	}
+	case ModeEnergyGuide::FrameOut: {
+		energyGuide.easingT -= energyGuide.easingSpeedFrameOut;
+		if (energyGuide.easingT <= 0.0f) {
+			energyGuide.easingT = 0.0f;
+			energyGuide.nowMode = ModeEnergyGuide::Standby;
+		}
+
+		break;
+	}
+	}
+
+	energyGuide.alpha = UpdateValueByEasing(energyGuide.alphaMin, energyGuide.alphaMax, energyGuide.easingT, energyGuide.easingMode);
+
+	//見た目変更
+	if (GetIsConnectGamePad()) {
+		energyGuide.texture.animNum = 0;
+	} else {
+		energyGuide.texture.animNum = 1;
+	}
+}
+
+
+static void DrawEnergyGuide(void) {
+	if (energyGuide.nowMode == ModeEnergyGuide::Standby) return;
+
+	Texture texture = energyGuide.texture;
+	texture.color = (texture.color & 0xFFFFFF00) | energyGuide.alpha;
+	DrawTextureObj(texture, energyGuide.pos, energyGuide.size);
+}
+
+#pragma endregion
+
 void InitPlayUI(void) {
 	InitEnergyGauge();
 	InitBossHpGauge();
@@ -1148,6 +1248,7 @@ void InitPlayUI(void) {
 	InitStartTelop();
 	InitBossTelop();
 	InitPauseGuide();
+	InitEnergyGuide();
 }
 
 void UpdatePlayUI(void) {
@@ -1161,10 +1262,12 @@ void UpdatePlayUI(void) {
 	UpdateStartTelop();
 	UpdateBossTelop();
 	UpdatePauseGuide();
+	UpdateEnergyGuide();
 }
 
 void DrawPlayUI(void) {
 	DrawPauseGuide();
+	DrawEnergyGuide();
 
 	DrawDisplayEffect();
 	DrawDangerDisplayEffect();
@@ -1208,6 +1311,12 @@ void TriggerPauseGuideFrameIn(void) {
 	pauseGuide.nowMode = ModePauseGuide::FrameIn;
 	pauseGuide.easingT = 0.0f;
 	pauseGuide.showTimer.count = 0;
+}
+
+void TriggerEnergyGuideFrameIn(void) {
+	energyGuide.nowMode = ModeEnergyGuide::FrameIn;
+	energyGuide.easingT = 0.0f;
+	energyGuide.showTimer.count = 0;
 }
 
 #pragma endregion

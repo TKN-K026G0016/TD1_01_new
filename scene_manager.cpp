@@ -52,6 +52,8 @@ static constexpr void (*DrawFuncs[ToInt(Scene::Count)])(void) = {
 
 //現在のシーン
 static Scene nowScene = Scene::Title;
+//前のシーン
+static Scene preScene = Scene::Title;
 
 #pragma endregion
 
@@ -216,6 +218,7 @@ void DrawScene(void) {
 }
 
 void ChangeScene(Scene nextScene) {
+	preScene = nowScene;
 	nowScene = nextScene;
 
 	InitScene();
@@ -255,6 +258,10 @@ void ChangeFadeTarget(FadeTarget target) {
 
 Scene GetNowScene(void) {
 	return nowScene;
+}
+
+Scene GetPreScene(void) {
+	return preScene;
 }
 
 #pragma endregion
