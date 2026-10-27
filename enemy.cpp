@@ -35,7 +35,7 @@ static constexpr int kAlphaMax = 255;
 
 #pragma region データ: EnemyShooter
 
-constexpr int kEnemyShooterLimit = 10;
+constexpr int kEnemyShooterLimit = 20;
 static EnemyShooter enemyShooter[kEnemyShooterLimit];
 
 struct EnemyShooterData {
@@ -92,7 +92,7 @@ EnemyGuardianData enemyGuardianData;
 #pragma endregion
 
 #pragma region データ: EnemyBasic
-constexpr int kEnemyBasicLimit = 20;
+constexpr int kEnemyBasicLimit = 50;
 static EnemyBasic enemyBasic[kEnemyBasicLimit];
 
 struct EnemyBasicData {
@@ -147,7 +147,7 @@ EnemyMData enemyMData;
 #pragma endregion
 
 #pragma region データ: EnemySmall
-constexpr int kEnemySmallLimit = 30;
+constexpr int kEnemySmallLimit = 50;
 static EnemySmall enemySmall[kEnemySmallLimit];
 
 struct EnemySmallData {
@@ -238,8 +238,12 @@ struct EnemySniperData {
 	int hpMax = 75;
 	float hitRadius = 20.0f;
 
+	//攻撃のスパン
 	int shootLaserTime = 300;
-	int shootingLaserTime = 60;
+	//連続発射のスパン
+	int shootingLaserTime = 8;
+	//連続発射の回数
+	int burstLimit = 7;
 
 	//ジェムの生成量
 	int createGemLimit = 4;
@@ -1278,29 +1282,41 @@ static void DrawEnemyBomb(void) {
 static void InitEnemySniper(void) {
 	for (int i = 0; i < kEnemySniperLimit; i++) {
 		enemySniper[i] = {};
-		enemySniper[i].shootLaserTimer.time = enemySniperData.shootLaserTime;
-		enemySniper[i].shootingLaserTimer.time = enemySniperData.shootingLaserTime;
+		enemySniper[i].shootTimer.time = enemySniperData.shootLaserTime;
+		enemySniper[i].burstShootTimer.time = enemySniperData.shootingLaserTime;
 		enemySniper[i].texture = GetTexture(TextureType::EnemySniper);
 	}
 }
 
-static void ShootEnemyLazerSniper(void) {
+static void ShootEnemyBulletSniper(void) {
 	for (int i = 0; i < kEnemySniperLimit; i++) {
 		if (!enemySniper[i].isAlive) continue;
 
-		enemySniper[i].shootLaserTimer.count++;
-		if (enemySniper[i].shootLaserTimer.count >= enemySniper[i].shootLaserTimer.time) {
-			enemySniper[i].shootingLaserTimer.count++;
-			if (enemySniper[i].shootingLaserTimer.count == enemySniper[i].shootingLaserTimer.time) {
-				enemySniper[i].shootLaserTimer.count = 0;
-				enemySniper[i].shootingLaserTimer.count = 0;
-			}
-			Vector2 playerPos = GetPlayerPos();
+		//攻撃のスパン
+		enemySniper[i].shootTimer.count++;
+		if (enemySniper[i].shootTimer.count >= enemySniper[i].shootTimer.time) {
 
-			float disX = playerPos.x - enemySniper[i].pos.x;
-			float disY = playerPos.y - enemySniper[i].pos.y;
-			float shootTheta = atan2f(disY, disX);
-			ShootEnemyBullet(enemySniper[i].pos, shootTheta);
+			//連続射撃のスパン
+			enemySniper[i].burstShootTimer.count++;
+			if (enemySniper[i].burstShootTimer.count >= enemySniper[i].burstShootTimer.time) {
+
+				//射撃処理
+				Vector2 playerPos = GetPlayerPos();
+				float disX = playerPos.x - enemySniper[i].pos.x;
+				float disY = playerPos.y - enemySniper[i].pos.y;
+				float shootTheta = atan2f(disY, disX);
+				ShootEnemyBullet(enemySniper[i].pos, shootTheta);
+
+				enemySniper[i].burstShootTimer.count = 0;
+				enemySniper[i].burstCount++;
+				
+			}
+
+			//一定回数射撃したら
+			if (enemySniper[i].burstCount >= enemySniperData.burstLimit) {
+				enemySniper[i].shootTimer.count = 0;
+				enemySniper[i].burstCount = 0;
+			}
 
 		}
 
@@ -1483,6 +1499,7 @@ void InitEnemy(void) {
 	InitEnemyBomb();
 	InitEnemySniper();
 
+	SpawnEnemy({ 500, 500 }, EnemyType::EnemySniper);
 }
 
 void UpdateEnemy(void) {
@@ -1538,7 +1555,7 @@ void UpdateEnemy(void) {
 	UpdateHitStopTimerEnemySniper();
 	CountIgnoreShockEnemySniper();
 	UpdateSpawnEffectEnemySniper();
-	ShootEnemyLazerSniper();
+	ShootEnemyBulletSniper();
 
 	Attack2EnemyGuardianMove();
 }

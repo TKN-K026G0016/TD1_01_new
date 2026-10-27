@@ -275,8 +275,9 @@ struct EnemySniper {
 	int hp = 0;
 
 	//<射撃処理関係>
-	Timer shootLaserTimer = {};
-	Timer shootingLaserTimer = {};
+	Timer shootTimer = {};
+	Timer burstShootTimer = {};
+	int burstCount = 0;
 
 	//ショックの生成無視状態
 	bool isIgnoreShock = false;
@@ -289,6 +290,7 @@ struct EnemySniper {
 	//<ヒットストップ関係>
 	bool isHitStop = false;
 	Timer hitStopTimer = { 10, 0 };
+
 
 	//生成演出
 	float spawnEasingT = 0.0f;
