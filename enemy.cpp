@@ -287,7 +287,7 @@ static void ShootEnemyBulletShooter(void) {
 			float disX = playerPos.x - enemyShooter[i].pos.x;
 			float disY = playerPos.y - enemyShooter[i].pos.y;
 			float shootTheta = atan2f(disY, disX);
-			ShootEnemyBullet(enemyShooter[i].pos, shootTheta);
+			ShootEnemyBullet(enemyShooter[i].pos, shootTheta, TypeEnemyBullet::M);
 
 		}
 
@@ -472,7 +472,7 @@ static void ShootEnemyBulletguardian(void) {
 			float disX = playerPos.x - enemyGuardian[i].pos.x;
 			float disY = playerPos.y - enemyGuardian[i].pos.y;
 			float shootTheta = atan2f(disY, disX);
-			ShootEnemyBullet(enemyGuardian[i].pos, shootTheta);
+			ShootEnemyBullet(enemyGuardian[i].pos, shootTheta, TypeEnemyBullet::M);
 		}
 	}
 }
@@ -1305,7 +1305,7 @@ static void ShootEnemyBulletSniper(void) {
 				float disX = playerPos.x - enemySniper[i].pos.x;
 				float disY = playerPos.y - enemySniper[i].pos.y;
 				float shootTheta = atan2f(disY, disX);
-				ShootEnemyBullet(enemySniper[i].pos, shootTheta);
+				ShootEnemyBullet(enemySniper[i].pos, shootTheta, TypeEnemyBullet::L);
 
 				enemySniper[i].burstShootTimer.count = 0;
 				enemySniper[i].burstCount++;
@@ -1317,9 +1317,7 @@ static void ShootEnemyBulletSniper(void) {
 				enemySniper[i].shootTimer.count = 0;
 				enemySniper[i].burstCount = 0;
 			}
-
 		}
-
 	}
 }
 
