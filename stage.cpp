@@ -606,22 +606,22 @@ static void SpawnEnemyByRound(void) {
 				int getrand = GetRand(0, 3);;
 				//左上
 				if (getrand == 0) {
-					spawnPos = { ToFloat(GetRand(50,150)),ToFloat(GetRand(50,150)) };
+					spawnPos = { ToFloat(GetRand(50,450)),ToFloat(GetRand(50,450)) };
 					SpawnEnemy(spawnPos, data.type);
 				}
 				//左下
 				else if (getrand == 1) {
-					spawnPos = { ToFloat(GetRand(50,150)),ToFloat(GetRand(1290,1390)) };
+					spawnPos = { ToFloat(GetRand(50,450)),ToFloat(GetRand(990,1390)) };
 					SpawnEnemy(spawnPos, data.type);
 				}
 				//右上 
 				else if (getrand == 2) {
-					spawnPos = { ToFloat(GetRand(2410,2510)),ToFloat(GetRand(50,150)) };
+					spawnPos = { ToFloat(GetRand(2110,2510)),ToFloat(GetRand(50,450)) };
 					SpawnEnemy(spawnPos, data.type);
 				}
 				//右下
 				else if (getrand == 3) {
-					spawnPos = { ToFloat(GetRand(2410,2510)),ToFloat(GetRand(1290,1390)) };
+					spawnPos = { ToFloat(GetRand(2110,2510)),ToFloat(GetRand(990,1390)) };
 					SpawnEnemy(spawnPos, data.type);
 				}
 			}
