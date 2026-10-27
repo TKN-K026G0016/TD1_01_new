@@ -103,7 +103,7 @@ struct EnemyBasicData {
 	float hitRadius = 30.0f;
 
 	//攻撃力
-	float pow = 25.0f;
+	float pow = 30.0f;
 
 	float moveSpeed = 1.5f;
 
@@ -157,7 +157,7 @@ struct EnemySmallData {
 
 	float hitRadius = 20.0f;
 
-	float pow = 15.0f;
+	float pow = 20.0f;
 
 	//加速度
 	float accleretionSpeed = 0.05f;
@@ -201,7 +201,7 @@ struct EnemyBombData {
 	//当たり判定の大きさ
 	float hitRadius = 64.0f;
 
-	float pow = 40.0f;
+	float pow = 100.0f;
 
 	int alphaBurstAreaReady = 255;
 	int alphaBurstAreaNormal = 15;

@@ -48,7 +48,7 @@ struct EnemyLaser{
 	//playerとの距離
 	float disToBoss = 0.0f;
 
-	float pow = 40.0f;
+	float pow = 60.0f;
 
 	//射撃フラグ
 	bool isShoot = false;
