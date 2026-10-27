@@ -789,9 +789,6 @@ static void InitScore(void) {
 }
 
 static void UpdateScore(void) {
-
-
-
 	int nowScore = GetNowScore();
 
 	if (nowScore >= kCountStopScoreInPlay) {
