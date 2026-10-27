@@ -260,6 +260,7 @@ constexpr int createExploseRange = 100;
 
 //エネルギー切れガイドが一度出現したか？
 static bool onceShowEnergyGuide = false;
+static bool onceShowReEquipGuide = false;
 
 #pragma endregion
 
@@ -958,23 +959,31 @@ static void UpdateStartEffect(void) {
 }
 
 /// <summary>
-/// エネルギーガイドの初期化処理
+/// ガイドの初期化処理
 /// </summary>
 /// <param name=""></param>
 static void InitEnergyGuide(void) {
 	if (GetPreScene() == Scene::Guide) {
 		onceShowEnergyGuide = false;
+		onceShowReEquipGuide = false;
 	}
 }
 
 /// <summary>
-/// エネルギーガイドの表示処理
+/// ガイドの表示処理
 /// </summary>
 /// <param name=""></param>
 static void UpdateEnergyGuide(void) {
+	//EnergyGuide
 	if (!onceShowEnergyGuide && player.remainEnergy <= kWarnEnergyLine) {
 		onceShowEnergyGuide = true;
 		TriggerEnergyGuideFrameIn();
+	}
+
+	//reEquipGuide
+	if (!onceShowReEquipGuide && !player.isEquipShield) {
+		onceShowReEquipGuide = true;
+		TriggerReEquipGuideFrameIn();
 	}
 }
 
