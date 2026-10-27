@@ -95,7 +95,7 @@ int totalDefeatScoreInCombo = 0;
 //コンボ中に得たスコアの合計
 int scoreInCombo = 0;
 //スコア数による獲得スコアの倍率
-constexpr float kScoreMugByCombo = 0.008f;
+constexpr float kScoreMugByCombo = 0.006f;
 
 //コンボサウンドの間隔
 static constexpr int comboSoundSpan = 100;
