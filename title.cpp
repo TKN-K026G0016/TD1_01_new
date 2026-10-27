@@ -252,6 +252,7 @@ static void ChangeMode(void) {
 
 		PlaySe(SeType::DeadEnemy);
 		PlaySe(SeType::Confirm);
+		TriggerViberationGamePad(ModeViberation::L);
 
 		NoticeTitlePlayerGameStart();
 
@@ -500,6 +501,8 @@ static void ChangeModeByCredits(void) {
 		PlaySe(SeType::Confirm);
 		PlaySe(SeType::DeadEnemy);
 
+		TriggerViberationGamePad(ModeViberation::L);
+
 		ChangeBgmVolume(lightOutVolume);
 		BreakAllElecBullet();
 	}
@@ -522,6 +525,8 @@ static void ChangeModeByReset(void) {
 
 		PlaySe(SeType::DeadEnemy);
 		PlaySe(SeType::Confirm);
+
+		TriggerViberationGamePad(ModeViberation::L);
 
 		ChangeBgmVolume(lightOutVolume);
 
