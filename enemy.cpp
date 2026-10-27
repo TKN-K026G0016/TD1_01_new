@@ -783,7 +783,7 @@ static void InitEnemyM(void) {
 	for (int i = 0;i < kEnemyMLimit;i++) {
 		enemyM[i] = {};
 		enemyM[i].shootTimer.time = enemyMData.shootTime;
-		enemyM[i].texture = GetTexture(TextureType::EnemyGuardian);
+		enemyM[i].texture = GetTexture(TextureType::EnemyM);
 	}
 }
 
@@ -1293,7 +1293,14 @@ static void DrawEnemyBomb(void) {
 				}
 			}
 		}
-		DrawTextureObj(texture, enemyBomb[i].pos, size);
+		if (enemyBomb[i].changeBurstRange.count >= enemyBomb[i].changeBurstRange.time) {
+			Vector2 range = { size.x + cosf((static_cast<float>(enemyBomb[i].changeBurstRange.count - 15) / 10.0f) * float(M_PI)) * enemyBombData.burstRadiusAmplitude,
+							size.y + cosf((static_cast<float>(enemyBomb[i].changeBurstRange.count - 15) / 10.0f) * float(M_PI)) * enemyBombData.burstRadiusAmplitude };
+			DrawTextureObj(texture, enemyBomb[i].pos, range);
+		}
+		else if (enemyBomb[i].changeBurstRange.count < enemyBomb[i].changeBurstRange.time) {
+			DrawTextureObj(texture, enemyBomb[i].pos, size);
+		}
 	}
 }
 
@@ -1747,6 +1754,7 @@ void SpawnEnemy(Vector2 pos, EnemyType type) {
 			}
 			enemyBomb[i].burst.time = GetRand(200, 600);
 			enemyBomb[i].burst.count = 0;
+			enemyBomb[i].changeBurstRange.count = 0;
 
 			break;
 		}
