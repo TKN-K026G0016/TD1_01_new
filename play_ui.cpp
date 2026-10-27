@@ -22,11 +22,19 @@
 static constexpr bool kGaugeShakeSwitch = true;
 Timer gaugeShakeDamageTimer = { 10, 10 };
 
+enum class ModeEnergyGauge {
+	Normal,
+	Break,
+	Recovery
+};
+
 struct EnergyGaugeFrame {
 	Vector2 pos = { 640, 80 };
 	Vector2 viewPos = { 640, 80 };
 
 	Vector2 size = { 512, 100 };
+
+	ModeEnergyGauge nowMode = ModeEnergyGauge::Normal;
 
 	//デンリョク不足警告表示のタイミング
 	float warnDeadEnergy = 30.0f;
@@ -38,9 +46,21 @@ struct EnergyGaugeFrame {
 	int shakeAmpNormal = 5;
 	int shakeAmpDamage = 7;
 
-	//ゲージ破壊演出関係
-	bool isBreakGauge = false;
+#pragma region 回復エフェクト
+	//回復時のイージング
+	float easingTRecovery = 0.0f;
+	float easingSpeedRecovery = 0.02f;
+	EasingMode easingModeRecovery = EasingMode::EaseOut;
 
+	Vector2 scale = { 1.0f, 1.0f };
+	Vector2 scaleMin = { 1.0f, 1.0f };
+	Vector2 scaleMax = { 5.0f, 5.0f };
+
+	int alpha = 255;
+	int alphaMin = 0;
+	int alphaMax = 255;
+
+#pragma endregion
 
 #pragma region 廃棄予定: ケムリ演出追加
 	////ケムリの生成範囲(frameのposを中心に)
@@ -53,6 +73,7 @@ struct EnergyGaugeFrame {
 #pragma endregion
 
 	Texture texture = {};
+	Texture breakTexture = {};
 };
 EnergyGaugeFrame energyGaugeFrame;
 
@@ -523,6 +544,7 @@ ReEquipGuide reEquipGuide;
 
 static void InitEnergyGauge(void) {
 	energyGaugeFrame.texture = GetTexture(TextureType::EnergyGaugeFrame);
+	energyGaugeFrame.breakTexture = GetTexture(TextureType::EnergyGaugeBreak);
 	energyGaugeMeter.texture = GetTexture(TextureType::EnergyGaugeMeter);
 	energyGaugeDelayMeter.texture = GetTexture(TextureType::EnergyGaugeDelayMeter);
 
@@ -583,7 +605,7 @@ static void UpdateEnergyGauge(void) {
 
 #pragma region GaugeEffectの生成
 
-	if (remainEnergy <= energyGaugeFrame.warnDeadEnergy && remainEnergy > 0) {
+	if (remainEnergy <= energyGaugeFrame.warnDeadEnergy && remainEnergy > 0 && energyGaugeFrame.nowMode != ModeEnergyGauge::Break) {
 		energyGaugeFrame.createGaugeEffectTimer.count++;
 		if (energyGaugeFrame.createGaugeEffectTimer.count >= energyGaugeFrame.createGaugeEffectTimer.time) {
 			energyGaugeFrame.createGaugeEffectTimer.count = 0;
@@ -659,6 +681,30 @@ static void UpdateEnergyGauge(void) {
 
 #pragma endregion
 
+#pragma region 状態変更&復帰処理など
+
+	if (!GetPlayerIsEquipShield() && energyGaugeFrame.nowMode == ModeEnergyGauge::Normal) {
+		energyGaugeFrame.nowMode = ModeEnergyGauge::Break;
+	}
+	else if (GetPlayerIsEquipShield() && energyGaugeFrame.nowMode == ModeEnergyGauge::Break) {
+		energyGaugeFrame.nowMode = ModeEnergyGauge::Recovery;
+		energyGaugeFrame.easingTRecovery = 0.0f;
+	}
+
+	//回復処理
+	if (energyGaugeFrame.nowMode == ModeEnergyGauge::Recovery) {
+		energyGaugeFrame.easingTRecovery += energyGaugeFrame.easingSpeedRecovery;
+		if (energyGaugeFrame.easingTRecovery >= 1.0f) {
+			energyGaugeFrame.easingTRecovery = 1.0f;
+			energyGaugeFrame.nowMode = ModeEnergyGauge::Normal;
+		}
+
+		energyGaugeFrame.scale = MoveByEasing(energyGaugeFrame.scaleMax, energyGaugeFrame.scaleMin, energyGaugeFrame.easingTRecovery, energyGaugeFrame.easingModeRecovery);
+		energyGaugeFrame.alpha = UpdateValueByEasing(energyGaugeFrame.alphaMin, energyGaugeFrame.alphaMax, energyGaugeFrame.easingTRecovery, energyGaugeFrame.easingModeRecovery);
+	}
+
+#pragma endregion
+
 #pragma region ミニゲージの座標更新
 	//miniGaugeの座標を更新
 	Vector2 playerPos = GetPlayerPos();
@@ -670,12 +716,28 @@ static void UpdateEnergyGauge(void) {
 
 static void DrawEnergyGauge(void) {
 	//通常ゲージ
-	//フレーム
-	DrawTextureUI(energyGaugeFrame.texture, energyGaugeFrame.viewPos, energyGaugeFrame.size);
-	//delayメーター
-	DrawGaugeAsUI(energyGaugeDelayMeter.texture, energyGaugeFrame.viewPos, energyGaugeFrame.size, energyGaugeDelayMeter.gaugeRate);
-	//メーター
-	DrawGaugeAsUI(energyGaugeMeter.texture, energyGaugeFrame.viewPos, energyGaugeFrame.size, energyGaugeMeter.gaugeRate);
+
+#pragma region フレーム
+		Vector2 size = { energyGaugeFrame.size.x * energyGaugeFrame.scale.x, energyGaugeFrame.size.y * energyGaugeFrame.scale.y };
+
+		Texture texture = (energyGaugeFrame.nowMode != ModeEnergyGauge::Break) ? energyGaugeFrame.texture : energyGaugeFrame.breakTexture;
+		texture.color = (texture.color & 0xFFFFFF00) | energyGaugeFrame.alpha;
+
+		DrawTextureUI(texture, energyGaugeFrame.viewPos, size);
+
+#pragma endregion
+
+	if (energyGaugeFrame.nowMode != ModeEnergyGauge::Break) {
+
+		//delayメーター
+		texture = energyGaugeDelayMeter.texture;
+		texture.color = (texture.color & 0xFFFFFF00) | energyGaugeFrame.alpha;
+		DrawGaugeAsUI(texture, energyGaugeFrame.viewPos, size, energyGaugeDelayMeter.gaugeRate);
+		//メーター
+		texture = energyGaugeMeter.texture;
+		texture.color = (texture.color & 0xFFFFFF00) | energyGaugeFrame.alpha;
+		DrawGaugeAsUI(energyGaugeMeter.texture, energyGaugeFrame.viewPos, size, energyGaugeMeter.gaugeRate);
+	}
 
 	//ミニゲージ
 	//フレーム

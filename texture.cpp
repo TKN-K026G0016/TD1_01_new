@@ -104,6 +104,7 @@ void InitTexture(void) {
 
 		//UI
 		{ Novice::LoadTexture("./resources/texture/ui/play/energy_gauge_frame.png"), { 512, 128 }, {7, 0}, 5, 0, WHITE },
+		{ Novice::LoadTexture("./resources/texture/ui/play/energy_gauge_frame_break.png"), { 512, 128 }, {0, 0}, 0, 0, WHITE },
 		{ Novice::LoadTexture("./resources/texture/ui/play/energy_gauge_meter.png"), { 512, 128 }, {0, 0}, 0, 0, WHITE },
 		{ Novice::LoadTexture("./resources/texture/ui/play/energy_gauge_delay_meter.png"), { 512, 128 }, {0, 0}, 0, 0, WHITE },
 

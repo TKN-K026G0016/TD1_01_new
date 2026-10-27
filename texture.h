@@ -112,6 +112,7 @@ enum class TextureType {
 
 	//UI
 	EnergyGaugeFrame,
+	EnergyGaugeBreak,
 	EnergyGaugeMeter,
 	EnergyGaugeDelayMeter,
 
