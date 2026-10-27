@@ -258,6 +258,9 @@ StartEffectManager startEffectManager;
 constexpr int exploseCount = 6;
 constexpr int createExploseRange = 100;
 
+//エネルギー切れガイドが一度出現したか？
+static bool onceShowEnergyGuide = false;
+
 #pragma endregion
 
 /// <summary>
@@ -899,14 +902,6 @@ static void DrawElecShield(void) {
 #pragma region 関数: 演出関係
 
 /// <summary>
-/// playerの点滅処理など
-/// </summary>
-/// <param name=""></param>
-static void UpdatePlayerEffect(void) {
-
-}
-
-/// <summary>
 /// チャージ中の演出
 /// </summary>
 /// <param name=""></param>
@@ -962,8 +957,26 @@ static void UpdateStartEffect(void) {
 	startEffectManager.alpha = UpdateValueByEasing(startEffectManager.alphaMin, startEffectManager.alphaMax, startEffectManager.easingT, startEffectManager.easingMode);
 }
 
+/// <summary>
+/// エネルギーガイドの初期化処理
+/// </summary>
+/// <param name=""></param>
+static void InitEnergyGuide(void) {
+	if (GetPreScene() == Scene::Guide) {
+		onceShowEnergyGuide = false;
+	}
+}
 
-
+/// <summary>
+/// エネルギーガイドの表示処理
+/// </summary>
+/// <param name=""></param>
+static void UpdateEnergyGuide(void) {
+	if (!onceShowEnergyGuide && player.remainEnergy <= kWarnEnergyLine) {
+		onceShowEnergyGuide = true;
+		TriggerEnergyGuideFrameIn();
+	}
+}
 
 #pragma endregion
 
@@ -1065,11 +1078,10 @@ void InitPlayer(void) {
 	player.remainEnergy = kFirstEnergy;
 	startEffectManager = {};
 
-	//chargeOrb.texture = GetTexture(TextureType::ChargeOrb);
-
 	GetMovablePos(movablePos);
 	InitLockSign();
 	InitElecShield();
+	InitEnergyGuide();
 }
 
 void UpdatePlayer(void) {
@@ -1086,11 +1098,9 @@ void UpdatePlayer(void) {
 
 	UpdateElecShield();
 	UpdateElecShieldEffect();
-	//RecoveryPlayerState();
 
 	ConsumptionEnergy();
 
-	UpdatePlayerEffect();
 	CreateChargeOrbEffect();
 
 	KnockBack();
@@ -1098,6 +1108,7 @@ void UpdatePlayer(void) {
 	CheckDeadPlayer();
 
 	UpdateStartEffect();
+	UpdateEnergyGuide();
 }
 
 void DrawPlayer(void) {

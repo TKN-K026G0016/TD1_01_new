@@ -84,3 +84,5 @@ void ChangeModeFade(ModeFade mode);
 void ChangeFadeTarget(FadeTarget target);
 
 Scene GetNowScene(void);
+
+Scene GetPreScene(void);

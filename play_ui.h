@@ -45,3 +45,8 @@ void TriggerStartIconFrameOut(void);
 /// PauseGuideの出現処理
 /// </summary>
 void TriggerPauseGuideFrameIn(void);
+
+/// <summary>
+/// EnergyGuideの出現処理
+/// </summary>
+void TriggerEnergyGuideFrameIn(void);
