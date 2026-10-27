@@ -103,7 +103,7 @@ TimeData changeRoundTime[ToInt(Round::Count)] = {
 
 #pragma region データ: Enemy生成関係
 
-constexpr int kMaxSpawner = 6;
+constexpr int kMaxSpawner = 8;
 
 struct SpawnerData {
 	//生成する種類
@@ -146,13 +146,14 @@ SpawnerData spawners[ToInt(Round::Count)][kMaxSpawner] = {
 		{ EnemyType::EnemySmallGroup, {60, 50} },
 		{ EnemyType::EnemyFormation, {250, 0} },
 		{ EnemyType::EnemyShooter, {150, 0} },
-		{EnemyType::EnemyBomb, {300, 0}},
-		{EnemyType::EnemyBomb, {300, 10}},
+		{ EnemyType::EnemyBomb, {280, 0} },
+		{ EnemyType::EnemyBomb, {280, 10} },
+		{ EnemyType::EnemyM, {180, 0} },
 	},
 
 	//BossRound
 		{
-		{ EnemyType::EnemyBasic, {100, 0} },
+		{ EnemyType::EnemyBasic, {60, 0} },
 		{ EnemyType::EnemySmallGroup, {200, 50} },
 		{ EnemyType::EnemyFormation, {250, 0} },
 		{ EnemyType::EnemyShooter, {250, 0} },
@@ -160,7 +161,7 @@ SpawnerData spawners[ToInt(Round::Count)][kMaxSpawner] = {
 	},
 	//BossRound2
 	{
-		{ EnemyType::EnemyBasic, {100, 0} },
+		{ EnemyType::EnemyBasic, {60, 0} },
 		{ EnemyType::EnemySmallGroup, {200, 50} },
 		{ EnemyType::EnemyFormation, {250, 0} },
 		{ EnemyType::EnemyShooter, {100, 0} },
