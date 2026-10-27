@@ -62,11 +62,9 @@ struct EnemyShooterData {
 	//ジェムの生成量
 	int createGemLimit = 4;
 	//撃破時のスコア
-	int defeatScore = 150;
+	int defeatScore = 15;
 };
 EnemyShooterData enemyShooterData;
-
-
 
 #pragma endregion
 
@@ -85,7 +83,7 @@ struct EnemyGuardianData {
 	//ジェムの生成量
 	int createGemLimit = 1;
 	//撃破時のスコア
-	int defeatScore = 150;
+	int defeatScore = 15;
 };
 EnemyGuardianData enemyGuardianData;
 
@@ -116,7 +114,7 @@ struct EnemyBasicData {
 	int createGemLimitFormation = 1;
 
 	//撃破時のスコア
-	int defeatScore = 100;
+	int defeatScore = 10;
 };
 EnemyBasicData enemyBasicData;
 
@@ -139,7 +137,7 @@ struct EnemyMData {
 	//ジェムの生成量
 	int enemyMGemLimit = 4;
 	//撃破時のスコア
-	int defeatScore = 150;
+	int defeatScore = 15;
 };
 EnemyMData enemyMData;
 
@@ -173,7 +171,7 @@ struct EnemySmallData {
 	//Formationの生成間隔
 	int smallFormationRange = 50;
 	//撃破時のスコア
-	int defeatScore = 50;
+	int defeatScore = 5;
 };
 EnemySmallData enemySmallData;
 
@@ -223,7 +221,7 @@ struct EnemyBombData {
 	//ジェムの生成量
 	int createGemLimit = 3;
 	//撃破時のスコア
-	int defeatScore = 500;
+	int defeatScore = 50;
 };
 EnemyBombData enemyBombData;
 
@@ -249,7 +247,7 @@ struct EnemySniperData {
 	//ジェムの生成量
 	int createGemLimit = 4;
 	//撃破スコア
-	int defeatScore = 300;
+	int defeatScore = 30;
 };
 EnemySniperData enemySniperData;
 

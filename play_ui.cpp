@@ -20,7 +20,7 @@
 #pragma region データ: エネルギーゲージ
 
 static constexpr bool kGaugeShakeSwitch = true;
-Timer gaugeShakeDamageTimer = { 30, 10 };
+Timer gaugeShakeDamageTimer = { 20, 20 };
 
 enum class ModeEnergyGauge {
 	Normal,
@@ -34,7 +34,7 @@ struct EnergyGaugeFrame {
 
 	Vector2 size = { 512, 100 };
 
-	ModeEnergyGauge nowMode = ModeEnergyGauge::Normal;
+	ModeEnergyGauge nowMode = ModeEnergyGauge::Recovery;
 
 	//デンリョク不足警告表示のタイミング
 	float warnDeadEnergy = 30.0f;
@@ -685,6 +685,7 @@ static void UpdateEnergyGauge(void) {
 
 	if (!GetPlayerIsEquipShield() && energyGaugeFrame.nowMode == ModeEnergyGauge::Normal) {
 		energyGaugeFrame.nowMode = ModeEnergyGauge::Break;
+		TriggerGaugeShakeByDamage();
 	}
 	else if (GetPlayerIsEquipShield() && energyGaugeFrame.nowMode == ModeEnergyGauge::Break) {
 		energyGaugeFrame.nowMode = ModeEnergyGauge::Recovery;

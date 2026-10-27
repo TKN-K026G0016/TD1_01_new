@@ -170,9 +170,9 @@ struct ElecShield {
 	
 	//<サイズ関係>
 	//通常時のサイズ最小値
-	Vector2 sizeValueMin = { 50.0f, 50.0f };
+	Vector2 sizeValueMin = { 60.0f, 60.0f };
 	//通常時のサイズ最大値
-	Vector2 sizeValueMax = { 60.0f, 60.0f };
+	Vector2 sizeValueMax = { 70.0f, 70.0f };
 	//回復状態時のサイズ最大値
 	Vector2 sizeValueMaxRecovery = { 180.0f, 180.0f };
 	//復活処理時のサイズ最小値
@@ -193,10 +193,12 @@ struct ElecShield {
 	unsigned int color = WHITE;
 
 	//色の最小値
-	unsigned int colorMinNormal = 0x04C1E8FF;
+	/*unsigned int colorMinNormal = 0x04C1E8FF;*/
+	unsigned int colorMinNormal = 0x00D3FFFF;
 	unsigned int colorMinDanger = 0x96083fFF;
 	//色の最大値
-	unsigned int colorMax = 0x485793FF;
+	/*unsigned int colorMax = 0x485793FF;*/
+	unsigned int colorMax = 0x1D43DEFF;
 	//危険色に変わるゲージの割合
 	float dangerColorLine = 0.5f;
 
