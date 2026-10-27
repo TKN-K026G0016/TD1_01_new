@@ -15,7 +15,7 @@ struct EnemyBulletSpec {
 
 	float hitRadius = 10;
 
-	float pow = 30.0f;
+	float pow =40.0f;
 
 	float moveSpeed = 4.0f;
 };

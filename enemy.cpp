@@ -157,7 +157,7 @@ struct EnemySmallData {
 
 	float hitRadius = 20.0f;
 
-	float pow = 20.0f;
+	float pow = 35.0f;
 
 	//加速度
 	float accleretionSpeed = 0.05f;
@@ -1519,8 +1519,6 @@ void InitEnemy(void) {
 	InitEnemySmall();
 	InitEnemyBomb();
 	InitEnemySniper();
-
-	SpawnEnemy({ 500, 500 }, EnemyType::EnemyBomb);
 }
 
 void UpdateEnemy(void) {
