@@ -143,7 +143,7 @@ static constexpr float kBreakShieldLine = 0.0f;
 #pragma region データ: ElecShield
 
 //シールドがなくなってから再展開するまでの時間
-Timer reEquipShieldTimer = { 200, 0 };
+Timer reEquipShieldTimer = { 120, 0 };
 
 struct ElecShield {
 	Vector2 size = {};
@@ -215,7 +215,7 @@ static constexpr float kDecelerationKnockBackPow = 0.1f;
 
 static float knockBackPow = kFirstKnockBackPow;
 static Vector2 knockBackVec = {};
-static Timer knockBackTimer = { 20, 0 };
+static Timer knockBackTimer = { 15, 0 };
 
 #pragma endregion
 
