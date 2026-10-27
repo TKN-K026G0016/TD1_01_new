@@ -783,7 +783,7 @@ static void InitEnemyM(void) {
 	for (int i = 0;i < kEnemyMLimit;i++) {
 		enemyM[i] = {};
 		enemyM[i].shootTimer.time = enemyMData.shootTime;
-		enemyM[i].texture = GetTexture(TextureType::EnemyGuardian);
+		enemyM[i].texture = GetTexture(TextureType::EnemyM);
 	}
 }
 

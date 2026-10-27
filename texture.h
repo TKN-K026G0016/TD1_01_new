@@ -91,6 +91,7 @@ enum class TextureType {
 	EnemyGuardian,
 	EnemyBasic,
 	EnemySmall,
+	EnemyM,
 	EnemySniper,
 
 
