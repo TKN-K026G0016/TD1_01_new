@@ -236,7 +236,7 @@ static EnemySniper enemySniper[kEnemySniperLimit];
 struct EnemySniperData {
 	Vector2 size = { 64, 64 };
 
-	int hpMax = 75;
+	int hpMax = 60;
 	float hitRadius = 20.0f;
 
 	//攻撃のスパン
@@ -244,7 +244,7 @@ struct EnemySniperData {
 	//連続発射のスパン
 	int shootingLaserTime = 8;
 	//連続発射の回数
-	int burstLimit = 7;
+	int burstLimit = 5;
 
 	//ジェムの生成量
 	int createGemLimit = 4;
