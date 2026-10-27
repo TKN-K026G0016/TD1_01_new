@@ -50,3 +50,8 @@ void TriggerPauseGuideFrameIn(void);
 /// EnergyGuideの出現処理
 /// </summary>
 void TriggerEnergyGuideFrameIn(void);
+
+/// <summary>
+/// ReEquipGuideの出現処理
+/// </summary>
+void TriggerReEquipGuideFrameIn(void);

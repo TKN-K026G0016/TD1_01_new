@@ -142,6 +142,8 @@ enum class TextureType {
 	WarnBossTelop,
 
 	PauseGuide,
+	EnergyGuide,
+	ReEquipShieldGuide,
 
 	//effect
 	EffectSquare,

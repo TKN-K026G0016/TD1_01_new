@@ -134,6 +134,8 @@ void InitTexture(void) {
 		{ Novice::LoadTexture("./resources/texture/ui/play/warn_boss.png"), { 512, 128 }, {0, 0}, 0, 0, WHITE },
 
 		{ Novice::LoadTexture("./resources/texture/ui/play/pause_guide.png"), { 256, 64 }, {0, 0}, 1, 0, WHITE },
+		{ Novice::LoadTexture("./resources/texture/ui/play/energy_guide.png"), { 512, 128 }, {0, 0}, 0, 0, WHITE },
+		{ Novice::LoadTexture("./resources/texture/ui/play/reequip_shield_guide.png"), { 512, 128 }, {0, 0}, 0, 0, WHITE },
 
 		//effect
 		{ Novice::LoadTexture("./resources/texture/effect/effect.square.png"), {128 , 128 }, {0, 0}, 0, 0, WHITE },

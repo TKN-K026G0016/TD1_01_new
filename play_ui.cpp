@@ -399,17 +399,17 @@ enum class ModeEnergyGuide {
 
 struct EnergyGuide {
 	Vector2 pos = {};
-	Vector2 size = { 256, 64 };
+	Vector2 size = { 512, 128 };
 
-	Vector2 offset = { 0, 128 };
+	Vector2 offset = { 0, 150 };
 
 	ModeEnergyGuide nowMode = ModeEnergyGuide::Standby;
 
-	Timer showTimer = { 150, 0 };
+	Timer showTimer = { 200, 0 };
 
 	//<イージング関係>
 	float easingT = 0.0f;
-	float easingSpeedFrameIn = 0.03f;
+	float easingSpeedFrameIn = 0.05f;
 	float easingSpeedFrameOut = 0.08f;
 	EasingMode easingMode = EasingMode::EaseIn;
 
@@ -420,6 +420,41 @@ struct EnergyGuide {
 	Texture texture = {};
 };
 EnergyGuide energyGuide;
+
+#pragma endregion
+
+#pragma region データ: シールド再展開ガイド
+
+enum class ModeReEquipGuide {
+	Standby,
+	FrameIn,
+	Show,
+	FrameOut,
+};
+
+struct ReEquipGuide {
+	Vector2 pos = {};
+	Vector2 size = { 512, 128 };
+
+	Vector2 offset = { 0, 150 };
+
+	ModeReEquipGuide nowMode = ModeReEquipGuide::Standby;
+
+	Timer showTimer = { 200, 0 };
+
+	//<イージング関係>
+	float easingT = 0.0f;
+	float easingSpeedFrameIn = 0.05f;
+	float easingSpeedFrameOut = 0.08f;
+	EasingMode easingMode = EasingMode::EaseIn;
+
+	int alpha = 0;
+	int alphaMin = 0;
+	int alphaMax = 255;
+
+	Texture texture = {};
+};
+ReEquipGuide reEquipGuide;
 
 #pragma endregion
 
@@ -1172,15 +1207,20 @@ static void DrawPauseGuide(void) {
 
 #pragma endregion
 
-#pragma region 関数: ポーズガイド
+#pragma region 関数: エネルギーガイド
 
 static void InitEnergyGuide(void) {
 	energyGuide = {};
-	energyGuide.texture = GetTexture(TextureType::White1x1);
+	energyGuide.texture = GetTexture(TextureType::EnergyGuide);
 }
 
 static void UpdateEnergyGuide(void) {
 	if (energyGuide.nowMode == ModeEnergyGuide::Standby) return;
+
+	//シールド再展開ガイドが出現したら、フェードインさせる
+	if (reEquipGuide.nowMode != ModeReEquipGuide::Standby) {
+		energyGuide.nowMode = ModeEnergyGuide::FrameOut;
+	}
 
 	//移動処理
 	Vector2 playerPos = GetPlayerPos();
@@ -1237,6 +1277,71 @@ static void DrawEnergyGuide(void) {
 
 #pragma endregion
 
+#pragma region 関数: シールド再展開ガイド
+
+static void InitReEquipGuide(void) {
+	reEquipGuide = {};
+	reEquipGuide.texture = GetTexture(TextureType::ReEquipShieldGuide);
+}
+
+static void UpdateReEquipGuide(void) {
+	if (reEquipGuide.nowMode == ModeReEquipGuide::Standby) return;
+
+	//移動処理
+	Vector2 playerPos = GetPlayerPos();
+	reEquipGuide.pos = { playerPos.x + reEquipGuide.offset.x, playerPos.y + reEquipGuide.offset.y };
+
+	switch (reEquipGuide.nowMode) {
+	case ModeReEquipGuide::FrameIn: {
+		reEquipGuide.easingT += reEquipGuide.easingSpeedFrameIn;
+		if (reEquipGuide.easingT >= 1.0f) {
+			reEquipGuide.easingT = 1.0f;
+			reEquipGuide.nowMode = ModeReEquipGuide::Show;
+		}
+
+		break;
+	}
+	case ModeReEquipGuide::Show: {
+		reEquipGuide.showTimer.count++;
+		if (reEquipGuide.showTimer.count >= reEquipGuide.showTimer.time) {
+			reEquipGuide.showTimer.count = 0;
+			reEquipGuide.nowMode = ModeReEquipGuide::FrameOut;
+		}
+
+		break;
+	}
+	case ModeReEquipGuide::FrameOut: {
+		reEquipGuide.easingT -= reEquipGuide.easingSpeedFrameOut;
+		if (reEquipGuide.easingT <= 0.0f) {
+			reEquipGuide.easingT = 0.0f;
+			reEquipGuide.nowMode = ModeReEquipGuide::Standby;
+		}
+
+		break;
+	}
+	}
+
+	reEquipGuide.alpha = UpdateValueByEasing(reEquipGuide.alphaMin, reEquipGuide.alphaMax, reEquipGuide.easingT, reEquipGuide.easingMode);
+
+	//見た目変更
+	if (GetIsConnectGamePad()) {
+		reEquipGuide.texture.animNum = 0;
+	} else {
+		reEquipGuide.texture.animNum = 1;
+	}
+}
+
+
+static void DrawReEquipGuide(void) {
+	if (reEquipGuide.nowMode == ModeReEquipGuide::Standby) return;
+
+	Texture texture = reEquipGuide.texture;
+	texture.color = (texture.color & 0xFFFFFF00) | reEquipGuide.alpha;
+	DrawTextureObj(texture, reEquipGuide.pos, reEquipGuide.size);
+}
+
+#pragma endregion
+
 void InitPlayUI(void) {
 	InitEnergyGauge();
 	InitBossHpGauge();
@@ -1249,6 +1354,7 @@ void InitPlayUI(void) {
 	InitBossTelop();
 	InitPauseGuide();
 	InitEnergyGuide();
+	InitReEquipGuide();
 }
 
 void UpdatePlayUI(void) {
@@ -1263,11 +1369,13 @@ void UpdatePlayUI(void) {
 	UpdateBossTelop();
 	UpdatePauseGuide();
 	UpdateEnergyGuide();
+	UpdateReEquipGuide();
 }
 
 void DrawPlayUI(void) {
 	DrawPauseGuide();
 	DrawEnergyGuide();
+	DrawReEquipGuide();
 
 	DrawDisplayEffect();
 	DrawDangerDisplayEffect();
@@ -1278,6 +1386,7 @@ void DrawPlayUI(void) {
 	DrawShockCombo();
 	DrawStartTelop();
 	DrawBossTelop();
+
 
 	DrawScore();
 }
@@ -1317,6 +1426,12 @@ void TriggerEnergyGuideFrameIn(void) {
 	energyGuide.nowMode = ModeEnergyGuide::FrameIn;
 	energyGuide.easingT = 0.0f;
 	energyGuide.showTimer.count = 0;
+}
+
+void TriggerReEquipGuideFrameIn(void) {
+	reEquipGuide.nowMode = ModeReEquipGuide::FrameIn;
+	reEquipGuide.easingT = 0.0f;
+	reEquipGuide.showTimer.count = 0;
 }
 
 #pragma endregion
