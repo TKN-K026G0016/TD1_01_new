@@ -8,13 +8,34 @@
 
 #include <math.h>
 
-static constexpr int kEnemyBulletLimit = 20;
+#pragma region データ: enemyBullet
+
+struct EnemyBulletSpec {
+	Vector2 size = {};
+
+	float hitRadius = 10;
+
+	float pow = 30.0f;
+
+	float moveSpeed = 4.0f;
+};
+static EnemyBulletSpec bulletSpec[ToInt(TypeEnemyBullet::Count)] = {
+	{{32, 32}, 10.0f, 4.0f},
+	{{40, 40}, 20.0f, 5.0f},
+};
+
+static constexpr int kEnemyBulletLimit = 50;
 static EnemyBullet enemyBullet[kEnemyBulletLimit];
 
+#pragma endregion
+
+#pragma region データ: enemyLaser
 static constexpr int kEnemyLaserLimit = 100;
 static EnemyLaser enemyLaser[kEnemyLaserLimit];
 //模擬弾レーザー不透明度
 static constexpr int kDummyLaserAlpha = 15;
+
+#pragma endregion
 
 #pragma region 関数: enemyBullet
 
@@ -162,13 +183,19 @@ void DrawEnemyBullet(void) {
 
 #pragma region 関数: 外部参照関係
 
-void ShootEnemyBullet(Vector2 shootPos, float moveTheta) {
+void ShootEnemyBullet(Vector2 shootPos, float moveTheta, TypeEnemyBullet type) {
 	for (int i = 0; i < kEnemyBulletLimit; i++) {
 		if (enemyBullet[i].isShoot) continue;
 
 		enemyBullet[i].isShoot = true;
 		enemyBullet[i].pos = shootPos;
 		enemyBullet[i].moveTheta = moveTheta;
+
+		//データの設定
+		enemyBullet[i].size = bulletSpec[ToInt(type)].size;
+		enemyBullet[i].hitRadius = bulletSpec[ToInt(type)].hitRadius;
+		enemyBullet[i].moveSpeed = bulletSpec[ToInt(type)].moveSpeed;
+		enemyBullet[i].pow = bulletSpec[ToInt(type)].pow;
 
 		break;
 	}
