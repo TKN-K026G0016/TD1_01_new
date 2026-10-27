@@ -87,10 +87,11 @@ enum class TextureType {
 	GemSmallLight,
 
 	//Enemy
-	EnemySniper,
+	EnemyShooter,
 	EnemyGuardian,
 	EnemyBasic,
 	EnemySmall,
+	EnemySniper,
 
 
 	BossBomb,

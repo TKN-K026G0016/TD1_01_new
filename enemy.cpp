@@ -267,7 +267,7 @@ static void InitEnemyShooter(void) {
 	for (int i = 0; i < kEnemyShooterLimit; i++) {
 		enemyShooter[i] = {};
 		enemyShooter[i].shootTimer.time = enemyShooterData.shootTime;
-		enemyShooter[i].texture = GetTexture(TextureType::EnemySniper);
+		enemyShooter[i].texture = GetTexture(TextureType::EnemyShooter);
 	}
 }
 
@@ -1291,7 +1291,10 @@ static void InitEnemySniper(void) {
 static void ShootEnemyBulletSniper(void) {
 	for (int i = 0; i < kEnemySniperLimit; i++) {
 		if (!enemySniper[i].isAlive) continue;
-
+			Vector2 playerPos = GetPlayerPos();
+			float disX = playerPos.x - enemySniper[i].pos.x;
+			float disY = playerPos.y - enemySniper[i].pos.y;
+			enemySniper[i].theta = atan2f(disY, disX);
 		//攻撃のスパン
 		enemySniper[i].shootTimer.count++;
 		if (enemySniper[i].shootTimer.count >= enemySniper[i].shootTimer.time) {
@@ -1300,12 +1303,9 @@ static void ShootEnemyBulletSniper(void) {
 			enemySniper[i].burstShootTimer.count++;
 			if (enemySniper[i].burstShootTimer.count >= enemySniper[i].burstShootTimer.time) {
 
+			
 				//射撃処理
-				Vector2 playerPos = GetPlayerPos();
-				float disX = playerPos.x - enemySniper[i].pos.x;
-				float disY = playerPos.y - enemySniper[i].pos.y;
-				float shootTheta = atan2f(disY, disX);
-				ShootEnemyBullet(enemySniper[i].pos, shootTheta);
+				ShootEnemyBullet(enemySniper[i].pos, enemySniper[i].theta);
 
 				enemySniper[i].burstShootTimer.count = 0;
 				enemySniper[i].burstCount++;
@@ -1427,7 +1427,7 @@ static void DrawEnemySniper(void) {
 
 		texture.color = (texture.color & 0xFFFFFF00) | enemySniper[i].alpha;
 
-		DrawTextureObj(texture, enemySniper[i].pos, size);
+		DrawTextureRotateObj(texture, enemySniper[i].pos, size,enemySniper[i].theta);
 	}
 }
 #pragma endregion

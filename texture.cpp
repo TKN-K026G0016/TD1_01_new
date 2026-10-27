@@ -80,10 +80,11 @@ void InitTexture(void) {
 
 		//Enemy
 
-		{ Novice::LoadTexture("./resources/texture/enemy/enemy_sniper.png"), { 128, 128 }, {0, 0}, 0, 0, WHITE },
+		{ Novice::LoadTexture("./resources/texture/enemy/enemy_shooter.png"), { 128, 128 }, {0, 0}, 0, 0, WHITE },
 		{ Novice::LoadTexture("./resources/texture/enemy/enemy_guardian.png"), { 128, 128 }, {0, 0}, 0, 0, WHITE },
 		{ Novice::LoadTexture("./resources/texture/enemy/enemy_basic.png"), { 128, 128 }, {0, 0}, 0, 0, WHITE },
 		{ Novice::LoadTexture("./resources/texture/enemy/enemy_small.png"), { 32, 32 }, {0, 0}, 0, 0, WHITE },
+		{ Novice::LoadTexture("./resources/texture/enemy/enemy_sniper.png"), { 128, 128 }, {0, 0}, 0, 0, WHITE },
 
 		{Novice::LoadTexture("./resources/texture/enemy/enemy_bomb.png"), { 128, 128 }, {0, 0}, 0, 0, WHITE},
 		{Novice::LoadTexture("./resources/texture/enemy/bossBomBurstRange.png"), { 512, 512 }, {0, 0}, 0, 0, WHITE},

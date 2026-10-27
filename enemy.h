@@ -269,6 +269,8 @@ struct EnemyBomb {
 struct EnemySniper {
 	Vector2 pos = { 0, 0 };
 
+	float theta = 0;
+
 	//生存フラグ
 	bool isAlive = false;
 
