@@ -109,6 +109,8 @@ PlayerState GetPlayerNowState(void);
 
 bool GetPlayerIsInvincible(void);
 
+bool GetPlayerIsEquipShield(void);
+
 /// <summary>
 /// ElecShieldの状態を変更
 /// </summary>

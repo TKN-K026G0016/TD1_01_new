@@ -127,6 +127,7 @@ void InitTexture(void) {
 		{ Novice::LoadTexture("./resources/texture/ui/play/score_numbers.png"), { 64, 128 }, {0, 0}, 9, 0, WHITE },
 
 		{ Novice::LoadTexture("./resources/texture/ui/play/display_effect.png"), { 1280, 720 }, {0, 0}, 0, 0, WHITE },
+		{ Novice::LoadTexture("./resources/texture/ui/play/breakScreen.png"), { 1280, 720 }, {0, 0}, 2, 0, WHITE },
 
 		{ Novice::LoadTexture("./resources/texture/ui/play/ready.png"), { 512, 128 }, {0, 0}, 0, 0, WHITE },
 		{ Novice::LoadTexture("./resources/texture/ui/play/go.png"), { 512, 128 }, {0, 0}, 0, 0, WHITE },

@@ -15,6 +15,7 @@
 #include "texture.h"
 
 #include <Novice.h>
+#include <algorithm>
 
 #pragma region データ: エネルギーゲージ
 
@@ -31,18 +32,25 @@ struct EnergyGaugeFrame {
 	float warnDeadEnergy = 30.0f;
 	float dangerEnergy = 15.0f;
 
-	//ケムリの生成範囲(frameのposを中心に)
-	Vector2i spawnSmokeRange = { 250, 60 };
-	//警告中の煙エフェクト生成スパン
-	Timer createSmokeWarningTimer = { 20, 0 };
-	//オーバーヒート中の煙エフェクト生成スパン
-	Timer createSmokeOverHeatTimer = { 7, 0 };
-
 	//ゲージエフェクトの生成スパン
 	Timer createGaugeEffectTimer = { 3, 0 };
 	//振動の強さ
-	int shakeAmpNormal = 3;
-	int shakeAmpDamage = 5;
+	int shakeAmpNormal = 5;
+	int shakeAmpDamage = 7;
+
+	//ゲージ破壊演出関係
+	bool isBreakGauge = false;
+
+
+#pragma region 廃棄予定: ケムリ演出追加
+	////ケムリの生成範囲(frameのposを中心に)
+	//Vector2i spawnSmokeRange = { 250, 60 };
+	////警告中の煙エフェクト生成スパン
+	//Timer createSmokeWarningTimer = { 20, 0 };
+	////オーバーヒート中の煙エフェクト生成スパン
+	//Timer createSmokeOverHeatTimer = { 7, 0 };
+
+#pragma endregion
 
 	Texture texture = {};
 };
@@ -293,6 +301,58 @@ struct DangerDisplayEffect {
 DangerDisplayEffect dangerDisplayEffect = {};
 
 Texture displayEffectTexture = {};
+
+#pragma endregion
+
+#pragma region データ: ひび割れ演出
+
+enum class TypeClacksEffect {
+	S,
+	M,
+	L,
+
+	Count
+};
+
+struct ClacksManager {
+	Vector2 pos = kWindowCenter;
+	Vector2 size = { 1280, 720 };
+
+	//<イージング関係>
+	float easingSpeedFadeIn = 0.5f;
+	EasingMode easingModeFadeIn = EasingMode::EaseIn;
+	float easingSpeedFadeOut = 0.04f;
+	float easingTChangeBlue = 0.05f;
+	EasingMode easingModeFadeOut = EasingMode::EaseIn;
+
+	//<不透明度関係>
+	int alphaMax = 160;
+	int alphaMin = 0;
+
+	//<色関係>
+	unsigned int colorNormal = WHITE;
+	unsigned int lighUpColor = GetPlayerColor();
+
+	Texture texture = {};
+};
+ClacksManager clacksManager;
+
+enum class ModeClacksEffect {
+	Standby,
+	FadeIn,
+	Show,
+	FadeOut,
+};
+
+struct ClacksEffect {
+	ModeClacksEffect nowMode = ModeClacksEffect::Standby;
+
+	float easingT = 0.0f;
+
+	int alpha = 0;
+	unsigned int color = WHITE;
+};
+ClacksEffect clacksEffect[ToInt(TypeClacksEffect::Count)];
 
 #pragma endregion
 
@@ -1037,6 +1097,119 @@ void CancelDangerDisplayEffect(void) {
 
 #pragma endregion
 
+#pragma region 関数: ClacksEffect
+
+static void InitClacksEffect(void) {
+	clacksManager = {};
+	clacksManager.texture = GetTexture(TextureType::ClacksEffect);
+
+	for (int i = 0; i < ToInt(TypeClacksEffect::Count); i++) {
+		clacksEffect[i] = {};
+	}
+}
+
+static void ChangeModeClacksEffect(void) {
+#pragma region Round1
+	if (GetPlayerRemainEnergy() <= energyGaugeFrame.warnDeadEnergy && clacksEffect[0].nowMode == ModeClacksEffect::Standby) {
+		clacksEffect[0].nowMode = ModeClacksEffect::FadeIn;
+		clacksEffect[0].easingT = 0.0f;
+	}
+	else if (GetPlayerRemainEnergy() > energyGaugeFrame.warnDeadEnergy && clacksEffect[0].nowMode == ModeClacksEffect::Show) {
+		clacksEffect[0].nowMode = ModeClacksEffect::FadeOut;
+		clacksEffect[0].easingT = 0.0f;
+	}
+
+#pragma endregion
+
+#pragma region Round2
+	if (GetPlayerRemainEnergy() <= energyGaugeFrame.dangerEnergy && clacksEffect[1].nowMode == ModeClacksEffect::Standby) {
+		clacksEffect[1].nowMode = ModeClacksEffect::FadeIn;
+		clacksEffect[1].easingT = 0.0f;
+	} else if (GetPlayerRemainEnergy() > energyGaugeFrame.dangerEnergy && clacksEffect[1].nowMode == ModeClacksEffect::Show) {
+		clacksEffect[1].nowMode = ModeClacksEffect::FadeOut;
+		clacksEffect[1].easingT = 0.0f;
+	}
+
+#pragma endregion
+
+#pragma region Round3
+	if (!GetPlayerIsEquipShield() && clacksEffect[2].nowMode == ModeClacksEffect::Standby) {
+		clacksEffect[2].nowMode = ModeClacksEffect::FadeIn;
+		clacksEffect[2].easingT = 0.0f;
+	} else if (GetPlayerIsEquipShield() && clacksEffect[2].nowMode == ModeClacksEffect::Show) {
+		clacksEffect[2].nowMode = ModeClacksEffect::FadeOut;
+		clacksEffect[2].easingT = 0.0f;
+	}
+
+#pragma endregion
+
+}
+
+static void UpdateClacksEffect(void) {
+
+	for (int i = 0; i < ToInt(TypeClacksEffect::Count); i++) {
+		switch (clacksEffect[i].nowMode) {
+		case ModeClacksEffect::FadeIn: {
+			clacksEffect[i].easingT += clacksManager.easingSpeedFadeIn;
+			if (clacksEffect[i].easingT >= 1.0f) {
+				clacksEffect[i].easingT = 1.0f;
+				clacksEffect[i].nowMode = ModeClacksEffect::Show;
+			}
+
+			clacksEffect[i].alpha = UpdateValueByEasing(clacksManager.alphaMin, clacksManager.alphaMax, clacksEffect[i].easingT, clacksManager.easingModeFadeIn);
+			clacksEffect[i].color = clacksManager.colorNormal;
+
+			break;
+		}
+		case ModeClacksEffect::FadeOut: {
+
+			clacksEffect[i].easingT += clacksManager.easingSpeedFadeOut;
+			if (clacksEffect[i].easingT >= 1.0f) {
+				clacksEffect[i].easingT = 1.0f;
+				clacksEffect[i].nowMode = ModeClacksEffect::Standby;
+			}
+
+			clacksEffect[i].alpha = UpdateValueByEasing(clacksManager.alphaMax, clacksManager.alphaMin, clacksEffect[i].easingT, clacksManager.easingModeFadeOut);
+
+			//白→青
+			if (clacksEffect[i].easingT <= clacksManager.easingTChangeBlue) {
+				float localEasingT = clacksEffect[i].easingT / clacksManager.easingTChangeBlue;
+				localEasingT = std::clamp(localEasingT, 0.0f, 1.0f);
+
+				float easedT = CreateEasedT(localEasingT, clacksManager.easingModeFadeOut);
+				clacksEffect[i].color = UpdateColorByEasing(clacksManager.colorNormal, clacksManager.lighUpColor, easedT);
+			}
+			//青→白
+			else {
+				float localEasingT = (clacksEffect[i].easingT - clacksManager.easingTChangeBlue) / (1.0f -clacksManager.easingTChangeBlue);
+				localEasingT = std::clamp(localEasingT, 0.0f, 1.0f);
+				float easedT = CreateEasedT(localEasingT, clacksManager.easingModeFadeOut);
+				clacksEffect[i].color = UpdateColorByEasing(clacksManager.lighUpColor, clacksManager.colorNormal, easedT);
+			}
+
+		
+
+			break;
+		}
+		}
+	}
+}
+
+static void DrawClacksEffect(void) {
+	for (int i = 0; i < ToInt(TypeClacksEffect::Count); i++) {
+		if (clacksEffect[i].nowMode == ModeClacksEffect::Standby) continue;
+
+		Texture texture = clacksManager.texture;
+		texture.animNum = i;
+
+		texture.color = (clacksEffect[i].color & 0xFFFFFF00) | clacksEffect[i].alpha;
+
+		DrawTextureUI(texture, clacksManager.pos, clacksManager.size);
+	}
+}
+
+#pragma endregion
+
 #pragma region 関数: 開始演出
 
 static void InitStartTelop(void) {
@@ -1349,6 +1522,7 @@ void InitPlayUI(void) {
 	InitShockCombo();
 	InitScore();
 	InitDisplayEffect();
+	InitClacksEffect();
 	InitDangerDisplayEffect();
 	InitStartTelop();
 	InitBossTelop();
@@ -1364,6 +1538,8 @@ void UpdatePlayUI(void) {
 	UpdateShockCombo();
 	UpdateScore();
 	UpdateDisplayEffect();
+	ChangeModeClacksEffect();
+	UpdateClacksEffect();
 	UpdateDangerDisplayEffect();
 	UpdateStartTelop();
 	UpdateBossTelop();
@@ -1377,6 +1553,7 @@ void DrawPlayUI(void) {
 	DrawEnergyGuide();
 	DrawReEquipGuide();
 
+	DrawClacksEffect();
 	DrawDisplayEffect();
 	DrawDangerDisplayEffect();
 

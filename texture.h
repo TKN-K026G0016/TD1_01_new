@@ -135,6 +135,7 @@ enum class TextureType {
 	ScoreNumbers,
 
 	DisplayEffect,
+	ClacksEffect,
 
 	ReadyTelop,
 	GoTelop,

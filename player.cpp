@@ -1060,6 +1060,8 @@ static void CheckDeadPlayer(void) {
 
 		player.isAlive = false;
 		chargeElecBulletTimer.count = 0;
+		isCharge = false;
+		player.isInvincible = false;
 
 		//爆発エフェクト生成
 		for (int i = 0; i < exploseCount; i++) {
@@ -1245,6 +1247,10 @@ void PlayerKnockBack(Vector2 hitPos) {
 
 bool GetPlayerIsInvincible(void) {
 	return player.isInvincible;
+}
+
+bool GetPlayerIsEquipShield(void) {
+	return player.isEquipShield;
 }
 
 void ChangeModeElecShield(ModeElecShield mode) {
