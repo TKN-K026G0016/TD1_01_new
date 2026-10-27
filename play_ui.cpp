@@ -20,7 +20,7 @@
 #pragma region データ: エネルギーゲージ
 
 static constexpr bool kGaugeShakeSwitch = true;
-Timer gaugeShakeDamageTimer = { 10, 10 };
+Timer gaugeShakeDamageTimer = { 30, 10 };
 
 enum class ModeEnergyGauge {
 	Normal,
@@ -44,7 +44,7 @@ struct EnergyGaugeFrame {
 	Timer createGaugeEffectTimer = { 3, 0 };
 	//振動の強さ
 	int shakeAmpNormal = 5;
-	int shakeAmpDamage = 7;
+	int shakeAmpDamage = 10;
 
 #pragma region 回復エフェクト
 	//回復時のイージング
@@ -624,7 +624,7 @@ static void UpdateEnergyGauge(void) {
 		UpdateAnimation(miniEnergyGauge.frameTexture);
 
 		//振動処理
-		if (kGaugeShakeSwitch) {
+		if (kGaugeShakeSwitch && energyGaugeFrame.nowMode != ModeEnergyGauge::Break) {
 			energyGaugeFrame.viewPos.x = energyGaugeFrame.pos.x + GetRand(-energyGaugeFrame.shakeAmpNormal, energyGaugeFrame.shakeAmpNormal);
 			energyGaugeFrame.viewPos.y = energyGaugeFrame.pos.y + GetRand(-energyGaugeFrame.shakeAmpNormal, energyGaugeFrame.shakeAmpNormal);
 		}
