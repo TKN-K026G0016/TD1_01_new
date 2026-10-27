@@ -1305,7 +1305,7 @@ static void ShootEnemyBulletSniper(void) {
 
 			
 				//射撃処理
-				ShootEnemyBullet(enemySniper[i].pos, enemySniper[i].theta);
+				ShootEnemyBullet(enemySniper[i].pos, enemySniper[i].theta,TypeEnemyBullet::L);
 
 				enemySniper[i].burstShootTimer.count = 0;
 				enemySniper[i].burstCount++;
