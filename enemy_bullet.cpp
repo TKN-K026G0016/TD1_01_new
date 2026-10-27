@@ -20,8 +20,8 @@ struct EnemyBulletSpec {
 	float moveSpeed = 4.0f;
 };
 static EnemyBulletSpec bulletSpec[ToInt(TypeEnemyBullet::Count)] = {
-	{{32, 32}, 20.0f, 4.0f},
-	{{40, 40}, 20.0f, 5.0f},
+	{{32, 32}, 10.0f, 30.0f, 4.0f},
+	{{40, 40}, 20.0f, 30.0f, 5.0f},
 };
 
 static constexpr int kEnemyBulletLimit = 50;
