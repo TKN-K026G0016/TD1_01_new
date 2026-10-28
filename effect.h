@@ -85,7 +85,8 @@ void CreateTriangleEffect(Vector2 pos, unsigned int color);
 /// <param name="sizeValue">サイズ</param>
 /// <param name="moveSpeed">移動速度</param>
 /// <param name="color">色</param>
-void CreateTriangleEffect2(Vector2 pos, float sizeValue, float moveSpeed, unsigned int color);
+/// <param name="drawType">表示タイプ</param>
+void CreateTriangleEffect2(Vector2 pos, float sizeValue, float moveSpeed, unsigned int color, TypeDrawEffect drawType);
 
 /// <summary>
 /// 拡大する円のエフェクト生成処理

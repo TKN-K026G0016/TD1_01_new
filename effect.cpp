@@ -380,6 +380,8 @@ struct TriangleEffect2 {
 
 	//表示フラグ
 	bool appear = false;
+	//表示タイプ
+	TypeDrawEffect drawType = TypeDrawEffect::Obj;
 
 	float sizeValue = 0.0f;
 
@@ -402,8 +404,6 @@ struct TriangleEffect2 {
 
 	//色
 	unsigned int color = { };
-
-	//Texture texture = {};
 
 };
 TriangleEffect2 triangleEffect2[kTriangleEffectNumber];
@@ -1560,7 +1560,7 @@ void DrawTriangleEffect() {
 
 #pragma region 関数: TriangleEffect2
 
-void CreateTriangleEffect2(Vector2 pos, float sizeValue, float moveSpeed, unsigned int color) {
+void CreateTriangleEffect2(Vector2 pos, float sizeValue, float moveSpeed, unsigned int color, TypeDrawEffect drawType) {
 	for (int i = 0; i < kTriangleEffectNumber; i++) {
 		if (triangleEffect2[i].appear) continue;
 
@@ -1570,6 +1570,7 @@ void CreateTriangleEffect2(Vector2 pos, float sizeValue, float moveSpeed, unsign
 		triangleEffect2[i].color = color;
 		triangleEffect2[i].sizeValue = sizeValue;
 		triangleEffect2[i].moveSpeed = moveSpeed;
+		triangleEffect2[i].drawType = drawType;
 
 		//ランダムな方向に飛んでいく
 		triangleEffect2[i].moveTheta = ToFloat(GetRand(0, 360)) * (ToFloat(M_PI) / 180.0f);
@@ -1618,19 +1619,6 @@ void UpdateTriangleEffect2() {
 		}
 
 #pragma endregion
-
-#pragma region 元データ
-		////透明化(消滅)
-		//if (triangleEffect2[i].color >= 0xffffff05) {
-		//	triangleEffect2[i].color -= 0x00000015;
-		//	triangleEffect2[i].texture.color = triangleEffect2[i].color;
-		//}
-		//else {
-		//	triangleEffect2[i].color = 0xffffffff;
-		//	triangleEffect2[i].appear = false;
-		//}
-
-#pragma endregion
 	}
 }
 
@@ -1644,7 +1632,12 @@ void DrawTriangleEffect2() {
 		texture.color = (triangleEffect2[i].color & 0xFFFFFF00) | triangleEffect2[i].alpha;
 
 		if (nowScene == Scene::Play) {
-			DrawTextureRotateObj(texture, triangleEffect2[i].pos, size, triangleEffect2[i].rotateTheta);
+
+			if (triangleEffect2[i].drawType == TypeDrawEffect::Obj) {
+				DrawTextureRotateObj(texture, triangleEffect2[i].pos, size, triangleEffect2[i].rotateTheta);
+			} else {
+				DrawTextureRotateUI(texture, triangleEffect2[i].pos, size, triangleEffect2[i].rotateTheta);
+			}
 		} else {
 			DrawTextureRotateUI(texture, triangleEffect2[i].pos, size, triangleEffect2[i].rotateTheta);
 		}
@@ -1764,12 +1757,6 @@ static void UpdateElecLineEffect(void) {
 	for (int i = 0; i < kElecLineEffectLimit; i++) {
 		if (!elecLineEffect[i].isShoot) continue;
 
-		//elecLineEffect[i].breakTimer.count++;
-		//if (elecLineEffect[i].breakTimer.count >= elecLineEffect[i].breakTimer.time) {
-		//	elecLineEffect[i].breakTimer.count = 0;
-		//	elecLineEffect[i].isShoot = false;
-		//}
-
 		//アニメーション処理
 		elecLineEffect[i].texture.animChangeTimer.count++;
 		if (elecLineEffect[i].texture.animChangeTimer.count >= elecLineEffect[i].texture.animChangeTimer.time) {
@@ -1818,9 +1805,6 @@ void CreateElecLine(Vector2 startPos, Vector2 endPos, bool charged) {
 		elecLineEffect[i].isShoot = true;
 		elecLineEffect[i].breakTimer.count = 0;
 
-		//elecLineEffect[i].startPos = startPos;
-		//elecLineEffect[i].endPos = endPos;
-
 		float disX = endPos.x - startPos.x;
 		float disY = endPos.y - startPos.y;
 
@@ -1843,7 +1827,7 @@ void CreateElecShockEffect(Vector2 pos) {
 
 	//三角を生成
 	for (int i = 0; i < elecShockEffect.createTriangleLimit; i++) {
-		CreateTriangleEffect2(pos, elecShockEffect.triangleSizeValue, elecShockEffect.triangleMoveSpeed, kPlayerColor);
+		CreateTriangleEffect2(pos, elecShockEffect.triangleSizeValue, elecShockEffect.triangleMoveSpeed, kPlayerColor, TypeDrawEffect::Obj);
 	}
 
 }
@@ -1854,7 +1838,7 @@ void CreateElecShockChargedEffect(Vector2 pos) {
 
 	//三角を生成
 	for (int i = 0; i < elecShockChargedEffect.createTriangleLimit; i++) {
-		CreateTriangleEffect2(pos, elecShockChargedEffect.triangleSizeValue, elecShockChargedEffect.triangleMoveSpeed, kPlayerChargedColor);
+		CreateTriangleEffect2(pos, elecShockChargedEffect.triangleSizeValue, elecShockChargedEffect.triangleMoveSpeed, kPlayerChargedColor, TypeDrawEffect::Obj);
 	}
 
 }
@@ -1866,7 +1850,7 @@ void CreateElecShockChargedEffect(Vector2 pos) {
 
 void CreatePlayerDamageEffect(Vector2 pos) {
 	for (int i = 0; i < playerDamageEffect.createTriangleLimit; i++) {
-		CreateTriangleEffect2(pos, playerDamageEffect.triangleSizeValue, playerDamageEffect.triangleMoveSpeed, kPlayerColor);
+		CreateTriangleEffect2(pos, playerDamageEffect.triangleSizeValue, playerDamageEffect.triangleMoveSpeed, kPlayerColor, TypeDrawEffect::Obj);
 	}
 }
 
@@ -1876,7 +1860,7 @@ void CreatePlayerDamageEffect(Vector2 pos) {
 
 void CreateEnemyDamageEffect(Vector2 pos) {
 	for (int i = 0; i < enemyDamageEffect.createTriangleLimit; i++) {
-		CreateTriangleEffect2(pos, enemyDamageEffect.triangleSizeValue, enemyDamageEffect.triangleMoveSpeed, kEnemyColor);
+		CreateTriangleEffect2(pos, enemyDamageEffect.triangleSizeValue, enemyDamageEffect.triangleMoveSpeed, kEnemyColor, TypeDrawEffect::Obj);
 	}
 }
 

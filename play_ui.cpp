@@ -43,7 +43,7 @@ struct EnergyGaugeFrame {
 	//ゲージエフェクトの生成スパン
 	Timer createGaugeEffectTimer = { 3, 0 };
 	//振動の強さ
-	int shakeAmpNormal = 5;
+	int shakeAmpNormal = 4;
 	int shakeAmpDamage = 10;
 
 #pragma region 回復エフェクト
@@ -182,11 +182,11 @@ ProgressGaugeIcon progressGaugeIcon;
 
 #pragma region データ: ショックコンボ
 
-constexpr int kComboNumbersLimit = 4;
+constexpr int kComboNumbersLimit = 5;
 struct ShockComboNumbers {
 	Vector2 size = { 68, 128 };
 
-	Vector2 startPos = { 1200, 630 };
+	Vector2 startPos = { 1200, 600 };
 	Vector2 interval = { -80.0f, 0.0f };
 
 	float offsetY = 85.0f;
@@ -221,7 +221,7 @@ struct ShockComboIcon {
 	bool isInvisible = false;
 	Timer invisibleTimer = { 3, 0 };
 
-	int countStopValue = 10000;
+	int countStopValue = 99999;
 
 	Texture texture = {};
 };
@@ -618,6 +618,16 @@ static void UpdateEnergyGauge(void) {
 
 #pragma region 点滅処理&振動
 
+	//ダメージによる振動処理
+	if (gaugeShakeDamageTimer.count <= gaugeShakeDamageTimer.time) {
+		gaugeShakeDamageTimer.count++;
+
+		if (kGaugeShakeSwitch) {
+			energyGaugeFrame.viewPos.x = energyGaugeFrame.pos.x + GetRand(-energyGaugeFrame.shakeAmpDamage, energyGaugeFrame.shakeAmpDamage);
+			energyGaugeFrame.viewPos.y = energyGaugeFrame.pos.y + GetRand(-energyGaugeFrame.shakeAmpDamage, energyGaugeFrame.shakeAmpDamage);
+		}
+	}
+
 	//警告表示のラインを下回るor故障状態時
 	if (remainEnergy <= energyGaugeFrame.warnDeadEnergy || energyGaugeFrame.nowMode == ModeEnergyGauge::Break) {
 		UpdateAnimation(energyGaugeFrame.texture);
@@ -645,38 +655,6 @@ static void UpdateEnergyGauge(void) {
 			CancelDangerDisplayEffect();
 		}
 	}
-
-	//ダメージによる振動処理
-	if (gaugeShakeDamageTimer.count <= gaugeShakeDamageTimer.time) {
-		gaugeShakeDamageTimer.count++;
-
-		if (kGaugeShakeSwitch) {
-			energyGaugeFrame.viewPos.x = energyGaugeFrame.pos.x + GetRand(-energyGaugeFrame.shakeAmpDamage, energyGaugeFrame.shakeAmpDamage);
-			energyGaugeFrame.viewPos.y = energyGaugeFrame.pos.y + GetRand(-energyGaugeFrame.shakeAmpDamage, energyGaugeFrame.shakeAmpDamage);
-		}
-	}
-
-#pragma endregion
-
-#pragma region ケムリ生成処理
-
-	//if (remainEnergy <= energyGaugeFrame.dangerEnergy) {
-	//	energyGaugeFrame.createSmokeOverHeatTimer.count++;
-	//} else if (remainEnergy <= energyGaugeFrame.warnDeadEnergy) {
-	//	energyGaugeFrame.createSmokeWarningTimer.count++;
-	//}
-
-	//if (energyGaugeFrame.createSmokeWarningTimer.count >= energyGaugeFrame.createSmokeWarningTimer.time
-	//	|| energyGaugeFrame.createSmokeOverHeatTimer.count >= energyGaugeFrame.createSmokeOverHeatTimer.time) {
-	//	energyGaugeFrame.createSmokeWarningTimer.count = 0;
-	//	energyGaugeFrame.createSmokeOverHeatTimer.count = 0;
-
-	//	//生成座標を設定
-	//	float posX = energyGaugeFrame.pos.x + ToFloat(GetRand(-energyGaugeFrame.spawnSmokeRange.x, energyGaugeFrame.spawnSmokeRange.x));
-	//	float posY = energyGaugeFrame.pos.y + ToFloat(GetRand(0, energyGaugeFrame.spawnSmokeRange.y));
-
-	//	CreateSmokeEffect({ posX, posY }, TypeDrawEffect::UI, TypeSmoke::EnergyGauge);
-	//}
 
 #pragma endregion
 
@@ -882,8 +860,8 @@ static void UpdateShockCombo(void) {
 	//コンボ持続中
 	if (!comboIcon.isShowPreCombo) {
 		comboIcon.nowCombo = GetShockCombo();
-		if (comboIcon.nowCombo > comboIcon.countStopValue) {
-			comboIcon.nowCombo = 9999;
+		if (comboIcon.nowCombo >= comboIcon.countStopValue) {
+			comboIcon.nowCombo = comboIcon.countStopValue;
 		}
 
 		for (int i = 0; i < kComboNumbersLimit; i++) {
@@ -945,8 +923,10 @@ static void DrawShockCombo(void) {
 		return;
 	} else if (comboIcon.nowCombo < 1000) {
 		digits = 3;
-	} else {
+	} else if(comboIcon.nowCombo < 10000) {
 		digits = 4;
+	} else {
+		digits = 5;
 	}
 
 	//scoreNumbers
