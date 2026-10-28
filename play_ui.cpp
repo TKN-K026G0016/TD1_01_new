@@ -50,7 +50,7 @@ struct EnergyGaugeFrame {
 	//回復時のイージング
 	float easingTRecovery = 0.0f;
 	float easingSpeedRecovery = 0.02f;
-	EasingMode easingModeRecovery = EasingMode::EaseOut;
+	EasingMode easingModeRecovery = EasingMode::EaseInOut;
 
 	Vector2 scale = { 1.0f, 1.0f };
 	Vector2 scaleMin = { 1.0f, 1.0f };
@@ -619,12 +619,12 @@ static void UpdateEnergyGauge(void) {
 #pragma region 点滅処理&振動
 
 	//警告表示のラインを下回るor故障状態時
-	if (remainEnergy <= energyGaugeFrame.warnDeadEnergy) {
+	if (remainEnergy <= energyGaugeFrame.warnDeadEnergy || energyGaugeFrame.nowMode == ModeEnergyGauge::Break) {
 		UpdateAnimation(energyGaugeFrame.texture);
 		UpdateAnimation(miniEnergyGauge.frameTexture);
 
 		//振動処理
-		if (kGaugeShakeSwitch && energyGaugeFrame.nowMode != ModeEnergyGauge::Break) {
+		if (kGaugeShakeSwitch) {
 			energyGaugeFrame.viewPos.x = energyGaugeFrame.pos.x + GetRand(-energyGaugeFrame.shakeAmpNormal, energyGaugeFrame.shakeAmpNormal);
 			energyGaugeFrame.viewPos.y = energyGaugeFrame.pos.y + GetRand(-energyGaugeFrame.shakeAmpNormal, energyGaugeFrame.shakeAmpNormal);
 		}
@@ -654,7 +654,6 @@ static void UpdateEnergyGauge(void) {
 			energyGaugeFrame.viewPos.x = energyGaugeFrame.pos.x + GetRand(-energyGaugeFrame.shakeAmpDamage, energyGaugeFrame.shakeAmpDamage);
 			energyGaugeFrame.viewPos.y = energyGaugeFrame.pos.y + GetRand(-energyGaugeFrame.shakeAmpDamage, energyGaugeFrame.shakeAmpDamage);
 		}
-
 	}
 
 #pragma endregion
@@ -737,7 +736,7 @@ static void DrawEnergyGauge(void) {
 		//メーター
 		texture = energyGaugeMeter.texture;
 		texture.color = (texture.color & 0xFFFFFF00) | energyGaugeFrame.alpha;
-		DrawGaugeAsUI(energyGaugeMeter.texture, energyGaugeFrame.viewPos, size, energyGaugeMeter.gaugeRate);
+		DrawGaugeAsUI(texture, energyGaugeFrame.viewPos, size, energyGaugeMeter.gaugeRate);
 	}
 
 	//ミニゲージ

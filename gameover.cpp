@@ -56,8 +56,8 @@ struct GameoverIcon {
 
 	//イージング関係
 	float easingT = 0.0f;
-	float easingSpeed = 0.1f;
-	EasingMode easingMode = EasingMode::EaseIn;
+	float easingSpeed = 0.09f;
+	EasingMode easingMode = EasingMode::EaseOut;
 
 	Vector2 standbyPos = { 350, 900 };
 	Vector2 showPos = { 350, 600 };
@@ -74,7 +74,7 @@ static constexpr int kScoreNumberLimit = 10;
 struct ScoreNumber {
 	Vector2 size = { 32, 64 };
 
-	Vector2 startPosOffset = { 220, 300 };
+	Vector2 startPosOffset = { 160, 0 };
 	Vector2 interval = { 32, 0 };
 
 	int animNum = 0;
@@ -83,7 +83,11 @@ ScoreNumber scoreNumbers[kScoreNumberLimit];
 Texture scoreNumberTexture = {};
 
 struct ScoreManager {
-	Vector2 pos = { 30, 30 };
+	Vector2 standbyPos = { -500, 350 };
+	Vector2 showPos = { 160, 350 };
+
+	Vector2 pos = standbyPos;
+	Vector2 size = { 512, 64 };
 
 	//表示の数値
 	int showScore = 0;
@@ -94,15 +98,20 @@ struct ScoreManager {
 	float easingT = 0.0f;
 	float easingSpeed = 0.008f;
 	EasingMode easingMode = EasingMode::EaseIn;
+
+	Texture texture = {};
 };
-ScoreManager scoreManager;
+static ScoreManager scoreManager;
 
 #pragma endregion
 
 #pragma region データ: 進捗度ゲージ
 
 struct GameoverProgressGauge {
-	Vector2 pos = { 350, 180 };
+	Vector2 standbyPos = { -400, 180 };
+	Vector2 showPos = { 350, 180 };
+
+	Vector2 pos = standbyPos;
 	Vector2 size = { 504, 23 };
 
 	//ボスラウンドまでの時間
@@ -260,6 +269,7 @@ static void InitScoreCount(void) {
 	}
 
 	scoreManager = {};
+	scoreManager.texture = GetTexture(TextureType::ClearScoreIcon);
 
 	scoreManager.score = GetNowScore();
 	if (scoreManager.score > kCountStopScoreInPlay) {
@@ -295,10 +305,10 @@ static void UpdateScoreCount(void) {
 }
 
 static void DrawScoreCount(void) {
-	if (ToInt(nowMode) < ToInt(ModeGameover::CountUpScore)) return;
+	//if (ToInt(nowMode) < ToInt(ModeGameover::CountUpScore)) return;
 
 	for (int i = 0; i < kScoreNumberLimit; i++) {
-		Vector2 pos = { scoreNumbers[i].startPosOffset.x + scoreNumbers[i].interval.x * (kScoreNumberLimit - i - 1), scoreNumbers[i].startPosOffset.y };
+		Vector2 pos = { scoreManager.pos.x + scoreNumbers[i].startPosOffset.x + scoreNumbers[i].interval.x * (kScoreNumberLimit - i - 1),  scoreManager.pos.y + scoreNumbers[i].startPosOffset.y };
 
 		Texture texture = scoreNumberTexture;
 		texture.animNum = scoreNumbers[i].animNum;
@@ -307,11 +317,21 @@ static void DrawScoreCount(void) {
 	}
 }
 
+static void MoveScoreIcon(void) {
+	scoreManager.pos = MoveByEasing(scoreManager.standbyPos, scoreManager.showPos, gameoverIcon.easingT, gameoverIcon.easingMode);
+}
+
+static void DrawScoreIcon(void) {
+	DrawTextureUI(scoreManager.texture, scoreManager.pos, scoreManager.size);
+}
+
 #pragma endregion
 
 #pragma region 関数: 進捗度ゲージ
 
 static void InitProgressGauge(void) {
+
+	progressGauge = {};
 
 	progressGauge.frameTexture = GetTexture(TextureType::ProgressGauge);
 	progressGaugeIcon.texture = GetTexture(TextureType::ProgressGaugeIcon);
@@ -323,17 +343,27 @@ static void InitProgressGauge(void) {
 	//進行具合を表示
 	progressGauge.gaugeRate = ToFloat(progressGauge.nowProgressTime) / ToFloat(progressGauge.bossRoundTime);
 	progressGauge.gaugeRate = std::clamp(progressGauge.gaugeRate, 0.0f, 1.0f);
-	//iconの目的地を設定
-	progressGaugeIcon.targetPos.x = progressGaugeIcon.startPos.x + progressGauge.gaugeRate * (progressGaugeIcon.endPos.x - progressGaugeIcon.startPos.x);
 }
 
-static void UpdateProgressGauge(void) {
+static void MoveProgressGauge(void) {
+	progressGauge.pos = MoveByEasing(progressGauge.standbyPos, progressGauge.showPos, gameoverIcon.easingT, gameoverIcon.easingMode);
+}
+
+static void MoveProgressGaugeIcon(void) {
 	//アイコンの移動
+	//Iconの開始地点を更新
+	progressGaugeIcon.startPos = { progressGauge.pos.x - progressGauge.size.x / 2, progressGauge.pos.y };
+	//Iconの最終地点を更新
+	progressGaugeIcon.endPos = { progressGauge.pos.x + progressGauge.size.x / 2, progressGauge.pos.y };
+
+	//iconの目的地を設定
+	progressGaugeIcon.targetPos.x = progressGaugeIcon.startPos.x + progressGauge.gaugeRate * (progressGaugeIcon.endPos.x - progressGaugeIcon.startPos.x);
+
 	progressGaugeIcon.pos.x = UpdateValueByEasing(progressGaugeIcon.startPos.x, progressGaugeIcon.targetPos.x, scoreManager.easingT, scoreManager.easingMode);
 }
 
 static void DrawProgressGauge(void) {
-	if (ToInt(nowMode) < ToInt(ModeGameover::CountUpScore)) return;
+	//if (ToInt(nowMode) < ToInt(ModeGameover::CountUpScore)) return;
 
 	DrawTextureUI(progressGauge.frameTexture, progressGauge.pos, progressGauge.size);
 	DrawTextureUI(progressGaugeIcon.texture, progressGaugeIcon.pos, progressGaugeIcon.size);
@@ -552,10 +582,12 @@ void UpdateGameover(void) {
 		break;
 	case ModeGameover::IconFall:
 		UpdateIcon();
+		MoveScoreIcon();
+		MoveProgressGauge();
+
 		break;
 	case ModeGameover::CountUpScore:
 		UpdateScoreCount();
-		UpdateProgressGauge();
 		break;
 	case ModeGameover::Select:
 		UpdateMenuBackground();
@@ -568,6 +600,8 @@ void UpdateGameover(void) {
 		break;
 	}
 
+	MoveProgressGaugeIcon();
+
 	UpdateButton();
 	UpdateCursor();
 }
@@ -578,6 +612,7 @@ void DrawGameover(void) {
 	DrawMenuBackground();
 
 	DrawScoreCount();
+	DrawScoreIcon();
 	DrawProgressGauge();
 
 	DrawIcon();

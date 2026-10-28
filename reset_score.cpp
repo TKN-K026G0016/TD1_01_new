@@ -37,7 +37,7 @@ struct ResetScoreCoverPanel {
 	Vector2 pos = kWindowCenter;
 	Vector2 size = { 1280, 720 };
 
-	unsigned int color = 0x00000DD;
+	unsigned int color = 0x000000DD;
 
 	Texture texture = {};
 };
@@ -113,7 +113,7 @@ static constexpr int kScoreNumberLimit = 10;
 struct ScoreNumber {
 	Vector2 size = { 40, 80 };
 
-	Vector2 startPosOffset = { 0, 0 };
+	Vector2 startPosOffset = { 260, 0 };
 	Vector2 interval = { 40, 0 };
 
 	int animNum = 0;
@@ -122,16 +122,18 @@ static ScoreNumber scoreNumbers[kScoreNumberLimit];
 static Texture scoreNumberTexture = {};
 
 struct ScoreManager {
-	Vector2 pos = { 30, 30 };
+	Vector2 standbyPos = { -600, 220 };
+	Vector2 showPos = { 200, 220 };
 
-	Vector2 standbyPos = { -500, 270 };
-	Vector2 showPos = { 300, 270 };
+	Vector2 pos = standbyPos;
+	Vector2 size = { 512, 64 };
 
 	int showScore = 0;
 
 	int exploseLimit = 8;
 	Vector2 exploseRange = { 400, 30 };
 
+	Texture texture = {};
 };
 static ScoreManager scoreManager;
 
@@ -385,11 +387,14 @@ static void DrawCursor(void) {
 #pragma region 関数: スコア
 
 static void InitScoreCount(void) {
+	scoreManager = {};
+	scoreManager.texture = GetTexture(TextureType::ClearBestScoreIcon);
+
 	for (int i = 0; i < kScoreNumberLimit; i++) {
 		scoreNumbers[i] = {};
 	}
 
-	scoreManager = {};
+
 
 	scoreNumberTexture = GetTexture(TextureType::ScoreNumbers);
 }
@@ -403,9 +408,6 @@ static void UpdateScoreCount(void) {
 #pragma endregion
 
 	scoreManager.showScore = GetHighScore();
-	//if (scoreManager.showScore > kCountStopScoreInPlay) {
-	//	scoreManager.showScore = kCountStopScoreInPlay;
-	//}
 
 	for (int i = 0; i < kScoreNumberLimit; i++) {
 		scoreNumbers[i].animNum = GetValueAtDigit(scoreManager.showScore, i);
@@ -414,6 +416,10 @@ static void UpdateScoreCount(void) {
 
 static void DrawScoreCount(void) {
 
+	//アイコンの描写
+	DrawTextureUI(scoreManager.texture, scoreManager.pos, scoreManager.size);
+
+	//数値の描写
 	for (int i = 0; i < kScoreNumberLimit; i++) {
 		Vector2 pos = {  scoreManager.pos.x + scoreNumbers[i].startPosOffset.x + scoreNumbers[i].interval.x * (kScoreNumberLimit - i - 1), scoreManager.pos.y + scoreNumbers[i].startPosOffset.y };
 
