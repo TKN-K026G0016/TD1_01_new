@@ -77,6 +77,8 @@ static void DrawBullet(void) {
 		if (!enemyBullet[i].isShoot) continue;
 
 		DrawTextureObj(enemyBullet[i].texture, enemyBullet[i].pos, enemyBullet[i].size);
+
+		DrawHitEllipse(enemyBullet[i].pos, enemyBullet[i].hitRadius, RED, true);
 	}
 }
 

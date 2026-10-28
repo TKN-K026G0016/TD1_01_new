@@ -815,6 +815,14 @@ float GetCameraZoom(void) {
 	return camera.zoom;
 }
 
+float GetCameraZoomEasingT(void) {
+	return camera.zoomEasingT;
+}
+
+EasingMode GetCameraZoomEasingMode(void) {
+	return camera.zoomEasingMode;
+}
+
 void ChangeModeCameraZoom(ModeCameraZoom nextMode) {
 	camera.nowModeZoom = nextMode;
 

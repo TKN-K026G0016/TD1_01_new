@@ -266,6 +266,27 @@ static bool onceShowReEquipGuide = false;
 
 #pragma endregion
 
+#pragma region データ: ZoomOutGuide
+
+struct ZoomOutGuide {
+	//サイズ関係
+	float sizeValue = 0;
+	float sizeValueMax = 100;
+	float sizeValueMin = 0.0f;
+
+	//<透明度関係>
+	int alpha = 0;
+	int alphaMin = 0;
+	int alphaMax = 110;
+
+	unsigned int color = WHITE;
+
+	Texture texture = {};
+};
+ZoomOutGuide zoomOutGuide;
+
+#pragma endregion
+
 /// <summary>
 /// 入力検知
 /// </summary>
@@ -989,6 +1010,35 @@ static void UpdateEnergyGuide(void) {
 	}
 }
 
+/// <summary>
+/// ズームアウトガイドの初期化処理
+/// </summary>
+/// <param name=""></param>
+static void InitZoomOutGuide(void) {
+	zoomOutGuide = {};
+	zoomOutGuide.texture = GetTexture(TextureType::EffectCircle);
+}
+
+static void UpdateZoomOutGuide(void) {
+	float easingT = GetCameraZoomEasingT();
+	EasingMode easingMode = GetCameraZoomEasingMode();
+
+	zoomOutGuide.sizeValue = UpdateValueByEasing(zoomOutGuide.sizeValueMin, zoomOutGuide.sizeValueMax, easingT, easingMode);
+	zoomOutGuide.alpha = UpdateValueByEasing(zoomOutGuide.alphaMin, zoomOutGuide.alphaMax, easingT, easingMode);
+}
+
+/// <summary>
+/// ズームアウトガイドの描画処理
+/// </summary>
+/// <param name=""></param>
+static void DrawZoomOutGuide(void) {
+	Vector2 size = { zoomOutGuide.sizeValue, zoomOutGuide.sizeValue };
+
+	Texture texture = zoomOutGuide.texture;
+	texture.color = (zoomOutGuide.color & 0xFFFFFF00) | zoomOutGuide.alpha;
+	DrawTextureObj(texture, player.pos, size);
+}
+
 #pragma endregion
 
 #pragma region 関数: 死亡判定など
@@ -1095,6 +1145,7 @@ void InitPlayer(void) {
 	InitLockSign();
 	InitElecShield();
 	InitEnergyGuide();
+	InitZoomOutGuide();
 }
 
 void UpdatePlayer(void) {
@@ -1122,11 +1173,15 @@ void UpdatePlayer(void) {
 
 	UpdateStartEffect();
 	UpdateEnergyGuide();
+	UpdateZoomOutGuide();
 }
 
 void DrawPlayer(void) {
 	if (!player.isAlive || isInvisible) return;
 
+	DrawZoomOutGuide();
+
+#pragma region 本体
 	//通常時
 	if (startEffectManager.nowMode != ModeStartEffect::WaitPlayerSpawn) {
 		DrawTextureRotateObj(player.texture, player.pos, player.size, player.rotateTheta);
@@ -1140,6 +1195,8 @@ void DrawPlayer(void) {
 
 		DrawTextureRotateObj(texture, player.pos, size, player.rotateTheta);
 	}
+
+#pragma endregion
 
 	DrawLockOnSign();
 	DrawElecShield();

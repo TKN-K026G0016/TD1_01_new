@@ -1,6 +1,7 @@
 #pragma once
 #include "vector2.h"
 #include "timer.h"
+#include "tool.h"
 
 enum class ModeCameraZoom {
 	Standby,
@@ -59,6 +60,10 @@ Vector2 GetCameraPos(void);
 /// <param name=""></param>
 /// <returns></returns>
 float GetCameraZoom(void);
+
+float GetCameraZoomEasingT(void);
+
+EasingMode GetCameraZoomEasingMode(void);
 
 /// <summary>
 /// カメラのズーム状態変更
