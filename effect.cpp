@@ -593,7 +593,7 @@ SpawnGemEffect spawnGemEffect;
 #pragma region データ: BreakEnemyBulletEffect
 
 struct BreakEnemyBulletEffect {
-	float endSizeValue = 50;
+	float endSizeValue = 80;
 
 	float easingSpeed = 0.05f;
 

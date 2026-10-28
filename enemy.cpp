@@ -1525,7 +1525,7 @@ void InitEnemy(void) {
 	InitEnemyBomb();
 	InitEnemySniper();
 
-	SpawnEnemy({300, 300}, EnemyType::EnemyShooter);
+	//SpawnEnemy({300, 300}, EnemyType::EnemyShooter);
 }
 
 void UpdateEnemy(void) {
