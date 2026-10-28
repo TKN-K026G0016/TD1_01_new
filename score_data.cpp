@@ -3,6 +3,7 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <limits>
 
 #pragma region データ
 //現在のスコア
@@ -51,7 +52,21 @@ int GetHighScore(void) {
 }
 
 void AddScore(int point) {
-	nowScore += point;
+	if (point < 0) return;
+
+	//int型の最大値
+	constexpr int kMaxScore = std::numeric_limits<int>::max();
+
+	//カンストしていたら
+	
+	if (nowScore > kMaxScore - point) {
+		nowScore = kMaxScore;
+	}
+	//カンストしていなければ
+	else {
+		nowScore += point;
+	}
+
 }
 
 void ResetNowScore(void) {
@@ -59,6 +74,8 @@ void ResetNowScore(void) {
 }
 
 void UpdateHighScore(void) {
+	if (nowScore <= highScore) return;
+
 	highScore = nowScore;
 	SaveHighScore();
 }

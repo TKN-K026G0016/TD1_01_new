@@ -963,18 +963,22 @@ static void InitScore(void) {
 static void UpdateScore(void) {
 	int nowScore = GetNowScore();
 
+	//スコアがカンストしていたら
 	if (nowScore >= kCountStopScoreInPlay) {
 		scoreIcon.showScore = kCountStopScoreInPlay;
 
 		for (int i = 0; i < kScoreNumbersLimit; i++) {
 			scoreNumbers[i].animNum = GetValueAtDigit(scoreIcon.showScore, i);
 		}
+
+		return;
 	}
 
 	int diff = nowScore - scoreIcon.showScore;
 
 	//一定値以上得点を得ていたら、
 	if (diff >= scoreIcon.threshold) {
+
 		//イージング開始時のみstartScoreを更新
 		if (scoreIcon.easingT == 0.0f) {
 			scoreIcon.startScore = scoreIcon.showScore;

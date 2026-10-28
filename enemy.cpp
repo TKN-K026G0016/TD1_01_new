@@ -221,7 +221,7 @@ struct EnemyBombData {
 	//ジェムの生成量
 	int createGemLimit = 3;
 	//撃破時のスコア
-	int defeatScore = 50;
+	int defeatScore = 100;
 };
 EnemyBombData enemyBombData;
 

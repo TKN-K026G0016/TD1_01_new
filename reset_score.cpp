@@ -133,6 +133,11 @@ struct ScoreManager {
 	int exploseLimit = 8;
 	Vector2 exploseRange = { 400, 30 };
 
+	//振動関係
+	Vector2 shakeOffset = { 0,0 };
+	Timer shakeTimer = { 20, 20 };
+	int shakeAmp = 10;
+
 	Texture texture = {};
 };
 static ScoreManager scoreManager;
@@ -193,6 +198,7 @@ static void Confirm(void) {
 
 			//初期化処理
 			ResetHighScore();
+			scoreManager.shakeTimer.count = 0;
 
 			//爆発演出
 			for (int i = 0; i < scoreManager.exploseLimit; i++) {
@@ -405,6 +411,17 @@ static void UpdateScoreCount(void) {
 
 	scoreManager.pos = MoveByEasing(scoreManager.standbyPos, scoreManager.showPos, menuBackground.easingT, EasingMode::EaseOut);
 
+	//振動処理
+	if (scoreManager.shakeTimer.count < scoreManager.shakeTimer.time) {
+		scoreManager.shakeTimer.count++;
+
+		scoreManager.shakeOffset.x = ToFloat(GetRand(-scoreManager.shakeAmp, scoreManager.shakeAmp));
+		scoreManager.shakeOffset.y = ToFloat(GetRand(-scoreManager.shakeAmp, scoreManager.shakeAmp));
+
+	} else {
+		scoreManager.shakeOffset = {};
+	}
+
 #pragma endregion
 
 	scoreManager.showScore = GetHighScore();
@@ -417,11 +434,13 @@ static void UpdateScoreCount(void) {
 static void DrawScoreCount(void) {
 
 	//アイコンの描写
-	DrawTextureUI(scoreManager.texture, scoreManager.pos, scoreManager.size);
+	Vector2 managerPos = { scoreManager.pos.x + scoreManager.shakeOffset.x, scoreManager.pos.y + scoreManager.shakeOffset.y };
+
+	DrawTextureUI(scoreManager.texture, managerPos, scoreManager.size);
 
 	//数値の描写
 	for (int i = 0; i < kScoreNumberLimit; i++) {
-		Vector2 pos = {  scoreManager.pos.x + scoreNumbers[i].startPosOffset.x + scoreNumbers[i].interval.x * (kScoreNumberLimit - i - 1), scoreManager.pos.y + scoreNumbers[i].startPosOffset.y };
+		Vector2 pos = { managerPos.x + scoreNumbers[i].startPosOffset.x + scoreNumbers[i].interval.x * (kScoreNumberLimit - i - 1), managerPos.y + scoreNumbers[i].startPosOffset.y };
 
 		Texture texture = scoreNumberTexture;
 		texture.animNum = scoreNumbers[i].animNum;
