@@ -69,7 +69,7 @@ Player player;
 //<無敵時の点滅関係>
 //点滅のスパン
 static bool isInvisible = false;
-static Timer invisibleTimer = { 5, 0 };
+static Timer invisibleTimer = { 3, 0 };
 
 #pragma endregion
 

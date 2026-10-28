@@ -1,5 +1,6 @@
 #include "enemy_bullet.h"
 #include "boss_enemy.h"
+#include "effect.h"
 
 #include "vector2.h"
 #include "timer.h"
@@ -63,6 +64,7 @@ static void BreakEnemyBulletItSelf(void) {
 		enemyBullet[i].breakTimer.count++;
 		if (enemyBullet[i].breakTimer.count >= enemyBullet[i].breakTimer.time) {
 			BreakEnemyBullet(i);
+			CreateBreakEnemyBulletEffect(enemyBullet[i].pos);
 		}
 	}
 }

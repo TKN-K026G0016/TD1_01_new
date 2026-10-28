@@ -45,7 +45,7 @@ ElecBullet elecBullet[kElecBulletLimit] = {};
 #pragma region 残像関係
 
 //残像のalphaの差
-static constexpr int kAfterImageAlphaOffset = 40;
+static constexpr int kAfterImageAlphaOffset = 50;
 
 #pragma endregion
 

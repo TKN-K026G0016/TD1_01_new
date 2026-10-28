@@ -590,6 +590,19 @@ SpawnGemEffect spawnGemEffect;
 
 #pragma endregion
 
+#pragma region データ: BreakEnemyBulletEffect
+
+struct BreakEnemyBulletEffect {
+	float endSizeValue = 50;
+
+	float easingSpeed = 0.05f;
+
+	unsigned int color = kEnemyColor;
+};
+BreakEnemyBulletEffect breakEnemyBulletEffect;
+
+#pragma endregion
+
 #pragma region データ: BombExplosionEffect
 //爆発本体
 const int kBombExplosionEffectNumber = 4;
@@ -2080,6 +2093,14 @@ void CreateBreakGemEffect(Vector2 pos) {
 
 void CreateSpawnGemEffect(Vector2 pos) {
 	CreateCircleEffect(pos, spawnGemEffect.endSizeValue, spawnGemEffect.easingSpeed, spawnGemEffect.color);
+}
+
+#pragma endregion
+
+#pragma region 関数: BreakEnemyBulletEffect
+
+void CreateBreakEnemyBulletEffect(Vector2 pos) {
+	CreateCircleEffect(pos, breakEnemyBulletEffect.endSizeValue, breakEnemyBulletEffect.easingSpeed, breakEnemyBulletEffect.color);
 }
 
 #pragma endregion

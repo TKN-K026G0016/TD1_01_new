@@ -75,8 +75,8 @@ void InitTexture(void) {
 		{ Novice::LoadTexture("./resources/texture/player/lock_on.png"), { 64, 64 }, {7, 0}, 2, 0, WHITE },
 
 		//Item
-		{ Novice::LoadTexture("./resources/texture/item/gem.png"), { 32, 32 }, {7, 0}, 3, 0, WHITE },
-		{ Novice::LoadTexture("./resources/texture/item/gem_light.png"), { 32, 32 }, {7, 0}, 3, 0, WHITE },
+		{ Novice::LoadTexture("./resources/texture/item/gem2.png"), { 32, 32 }, {7, 0}, 3, 0, WHITE },
+		{ Novice::LoadTexture("./resources/texture/item/gem_light2.png"), { 32, 32 }, {7, 0}, 3, 0, WHITE },
 
 		//Enemy
 
