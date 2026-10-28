@@ -242,7 +242,7 @@ struct EnemySniperData {
 	//連続発射のスパン
 	int shootingLaserTime = 8;
 	//連続発射の回数
-	int burstLimit = 5;
+	int burstLimit = 4;
 
 	//ジェムの生成量
 	int createGemLimit = 4;
